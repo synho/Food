@@ -1,0 +1,15 @@
+# Python
+kg_pipeline/venv/
+__pycache__/
+*.py[cod]
+
+# Data & Environment
+kg_pipeline/.env
+kg_pipeline/data/raw_papers/
+kg_pipeline/data/extracted_triples/
+
+# Neo4j Local Data
+kg_pipeline/neo4j/
+
+# OS
+.DS_Store
