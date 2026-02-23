@@ -293,12 +293,15 @@ def _score_risk(profile: dict, ctx: UserContext) -> tuple[str, list[str], list[s
 # ── KG enrichment ─────────────────────────────────────────────────────────────
 
 def _get_kg_evidence(disease_name: str) -> list[dict]:
-    """Query Neo4j for food/nutrient nodes that PREVENTS/TREATS/ALLEVIATES/REDUCES_RISK_OF the disease."""
+    """Query Neo4j for food/nutrient nodes that PREVENTS/TREATS/ALLEVIATES/REDUCES_RISK_OF the disease.
+    Uses case-insensitive name matching to catch variant capitalizations."""
     try:
         rows = run_query(
             """
             MATCH (f)-[r:PREVENTS|TREATS|ALLEVIATES|REDUCES_RISK_OF]->(d:Disease)
-            WHERE d.name = $disease AND (f:Food OR f:Nutrient) AND r.source_id IS NOT NULL
+            WHERE toLower(d.name) = toLower($disease)
+              AND (f:Food OR f:Nutrient OR f:LifestyleFactor)
+              AND r.source_id IS NOT NULL
             RETURN f.name AS food, labels(f)[0] AS food_type, type(r) AS predicate,
                    r.source_id AS source_id, r.context AS context, r.journal AS journal,
                    r.pub_date AS pub_date
