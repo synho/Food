@@ -110,6 +110,9 @@ def extract_triples_bedrock(
                 )
                 text = text[bracket:].strip()
 
+            # Fix invalid escape sequences (e.g. 2\'-FL → 2'-FL) before parsing
+            import re as _re
+            text = _re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', text)
             triples = json.loads(text)
             if not isinstance(triples, list):
                 print(f"Unexpected response shape for {pmcid}: {type(triples)}")
