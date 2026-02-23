@@ -141,10 +141,11 @@ def context_from_text_endpoint(body: FromTextRequest):
 
 
 @app.post("/api/recommendations/foods", response_model=RecommendationsResponse)
-def recommendations_foods(ctx: UserContext):
+def recommendations_foods(request: Request, ctx: UserContext):
     """
     Recommended and restricted foods from KG. Only items with at least one evidence record.
     User context (conditions, symptoms) is normalized to canonical names for KG lookup.
+    Free plan: up to 5 items. Paid plan: up to 20 items.
     """
     return get_recommendations(
         conditions=ctx.conditions or [],
@@ -152,29 +153,34 @@ def recommendations_foods(ctx: UserContext):
         age=ctx.age,
         gender=ctx.gender,
         limit=20,
+        plan=request.state.plan,
     )
 
 
 @app.post("/api/health-map/position", response_model=PositionResponse)
-def health_map_position(ctx: UserContext):
+def health_map_position(request: Request, ctx: UserContext):
     """
     Where the user is on the map (active conditions/symptoms) and nearby risks (diseases, early signals).
+    Free plan: up to 5 nearby risks. Paid plan: up to 30.
     """
     return get_position(
         conditions=ctx.conditions or [],
         symptoms=ctx.symptoms or [],
+        plan=request.state.plan,
     )
 
 
 @app.post("/api/health-map/safest-path", response_model=SafestPathResponse)
-def health_map_safest_path(ctx: UserContext):
+def health_map_safest_path(request: Request, ctx: UserContext):
     """
     Actionable steps to evacuate to safety (e.g. increase X, reduce Y) with evidence.
+    Free plan: up to 3 foods per step. Paid plan: up to 5.
     """
     return get_safest_path(
         conditions=ctx.conditions or [],
         symptoms=ctx.symptoms or [],
         limit=10,
+        plan=request.state.plan,
     )
 
 

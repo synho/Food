@@ -184,13 +184,16 @@ def get_recommendations(
     age: int | None = None,
     gender: str | None = None,
     limit: int = 20,
+    plan: str = "free",
 ) -> RecommendationsResponse:
     """
     Query KG for recommended and restricted foods. Only includes items with evidence (zero-error).
     Conditions and symptoms are normalized to canonical names for KG lookup.
     Three query layers: 1-hop direct, CONTAINS chain, disease-expansion via symptoms.
     Falls back to age/gender profile defaults when no conditions/symptoms given.
+    Free plan is capped at 5 recommended and 5 restricted items.
     """
+    effective_limit = 5 if plan == "free" else limit
     cond_canonical = [normalize_entity_name(c) for c in (conditions or []) if c]
     sym_canonical = [normalize_entity_name(s) for s in (symptoms or []) if s]
     targets = cond_canonical + sym_canonical
@@ -229,7 +232,7 @@ def get_recommendations(
             rec_by_key[key] = []
         rec_by_key[key].append(ev)
 
-    for (food, reason), ev_list in list(rec_by_key.items())[:limit]:
+    for (food, reason), ev_list in list(rec_by_key.items())[:effective_limit]:
         if ev_list:
             recommended.append(FoodRecommendation(food=food, reason=reason, evidence=ev_list))
 
@@ -250,7 +253,7 @@ def get_recommendations(
             res_by_key[key] = []
         res_by_key[key].append(ev)
 
-    for (food, reason), ev_list in list(res_by_key.items())[:limit]:
+    for (food, reason), ev_list in list(res_by_key.items())[:effective_limit]:
         if ev_list:
             restricted.append(FoodRestriction(food=food, reason=reason, evidence=ev_list))
 

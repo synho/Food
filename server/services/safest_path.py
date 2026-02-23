@@ -16,11 +16,13 @@ def _rel_to_evidence(rel: dict) -> Evidence:
     )
 
 
-def get_safest_path(conditions: list[str], symptoms: list[str], limit: int = 10) -> SafestPathResponse:
+def get_safest_path(conditions: list[str], symptoms: list[str], limit: int = 10, plan: str = "free") -> SafestPathResponse:
     """
     Actionable steps: increase foods that PREVENTS/TREATS/ALLEVIATES; reduce foods that AGGRAVATES/CAUSES.
     Only steps with at least one evidence record (zero-error).
+    Free plan caps foods listed per step to 3.
     """
+    max_foods_per_step = 3 if plan == "free" else 5
     cond_canonical = [normalize_entity_name(c) for c in (conditions or []) if c]
     sym_canonical = [normalize_entity_name(s) for s in (symptoms or []) if s]
     targets = cond_canonical + sym_canonical
@@ -42,7 +44,7 @@ def get_safest_path(conditions: list[str], symptoms: list[str], limit: int = 10)
     rows = run_query(q_increase, {"targets": targets, "limit": limit})
     if rows:
         ev_list = [_rel_to_evidence(r) for r in rows]
-        foods = list(dict.fromkeys([(r.get("food") or "").strip() for r in rows if (r.get("food") or "").strip()]))[:5]
+        foods = list(dict.fromkeys([(r.get("food") or "").strip() for r in rows if (r.get("food") or "").strip()]))[:max_foods_per_step]
         steps.append(
             PathStep(
                 action=f"Increase: {', '.join(foods)}",
@@ -67,7 +69,7 @@ def get_safest_path(conditions: list[str], symptoms: list[str], limit: int = 10)
     rows = run_query(q_reduce, {"targets": targets, "limit": limit})
     if rows:
         ev_list = [_rel_to_evidence(r) for r in rows]
-        foods = list(dict.fromkeys([(r.get("food") or "").strip() for r in rows if (r.get("food") or "").strip()]))[:5]
+        foods = list(dict.fromkeys([(r.get("food") or "").strip() for r in rows if (r.get("food") or "").strip()]))[:max_foods_per_step]
         steps.append(
             PathStep(
                 action=f"Reduce: {', '.join(foods)}",
