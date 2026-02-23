@@ -137,11 +137,14 @@ class FromTextRequest(BaseModel):
 def context_from_text_endpoint(body: FromTextRequest):
     """
     Extract structured UserContext from free-form self-intro text.
-    Returns the same shape as UserContext (age, gender, conditions, symptoms, medications, goals).
+    Returns:
+      context: UserContext fields (age, gender, conditions, symptoms, medications, goals)
+      inferred: list of field names whose values were guessed (not exact-matched)
+      follow_up: list of targeted questions to confirm guesses or fill missing fields
     """
     from server.services.context_from_text import context_from_text
-    ctx = context_from_text(body.text or "")
-    return ctx.model_dump()
+    ctx, inferred, follow_up = context_from_text(body.text or "")
+    return {"context": ctx.model_dump(), "inferred": inferred, "follow_up": follow_up}
 
 
 @app.post("/api/recommendations/foods", response_model=RecommendationsResponse)
