@@ -15,6 +15,8 @@ ENTITY_TYPES = [
     "BodySystem",
     "AgeRelatedChange",
     "LifeStage",
+    # Evidence graph (schema reserved; Study nodes not yet ingested from pipeline)
+    "Study",
 ]
 
 # Human-readable names that map to entity types (for extraction prompt and normalization)
@@ -51,6 +53,7 @@ PREDICATES = [
     "EARLY_SIGNAL_OF",
     "SUBSTITUTES_FOR",
     "COMPLEMENTS_DRUG",
+    "AFFECTS",  # Food/Nutrient affects a Disease/Symptom (direction or magnitude unspecified)
 ]
 
 # Aging/biology predicates (optional in first pass)

@@ -1,4 +1,15 @@
 # Pipeline config: recent-first, high-impact journals (see docs/PIPELINE_STRATEGY.md)
+#
+# ── TEST MODE (cheap validation, no wasted API quota) ──────────────────────────
+#   fetch.days_back: 7
+#   fetch.max_results: 3
+#   Then run: python run_pipeline.py
+#   Verify:   python src/validate_run.py --strict
+#
+# ── PRODUCTION MODE (broad KG, Phase 4 expansion) ────────────────────────────
+#   fetch.days_back: 90
+#   fetch.max_results: 50   (or 100)
+# ─────────────────────────────────────────────────────────────────────────────
 
 fetch:
   # Phase 4 expansion: use days_back: 90, max_results: 50 (or 100) for broader KG (docs/PIPELINE_STRATEGY.md)
@@ -57,3 +68,17 @@ continuous_build:
   max_retries: 3
   use_api_retry_after: true   # parse retryDelay from Gemini error JSON
   max_wait_sec: 120       # if retryDelay > this, skip the paper
+
+# USDA FoodData Central — optional quantitative nutrient data stream
+# Run manually: python src/fetch_usda.py
+# Get free API key: https://fdc.nal.usda.gov/api-guide.html
+usda:
+  enabled: false          # Set to true to enable USDA fetch
+  max_foods: 5            # Number of food queries per run
+  api_key: ""             # Required when enabled: true
+
+# Gemini audit — sample claim quality check (no Neo4j writes)
+# Run manually: python src/audit_graph.py
+audit:
+  sample_size: 5          # Number of triples to classify per run (keep small to control cost)
+  model: "gemini-2.0-flash-lite"

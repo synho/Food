@@ -26,6 +26,7 @@ class KnowledgeGraphIngestor:
         labels = [
             "Food", "Disease", "Symptom", "Nutrient", "Drug",
             "LifestyleFactor", "BodySystem", "AgeRelatedChange", "LifeStage",
+            "Study",  # Reserved for future evidence graph; no Study nodes ingested yet
         ]
         with self.driver.session() as session:
             for label in labels:
@@ -33,9 +34,19 @@ class KnowledgeGraphIngestor:
         print(f"Schema indexes created/verified for: {', '.join(labels)}")
 
     def ingest_triples(self, triples):
+        skipped = 0
         with self.driver.session() as session:
             for triple in triples:
+                if not triple.get("source_id"):
+                    subj = triple.get("subject", "?")
+                    pred = triple.get("predicate", "?")
+                    obj = triple.get("object", "?")
+                    print(f"WARNING: skipping triple with missing source_id: {subj} --{pred}--> {obj}")
+                    skipped += 1
+                    continue
                 session.execute_write(self._create_relationship, triple)
+        if skipped:
+            print(f"WARNING: {skipped} triple(s) skipped due to missing source_id (zero-error rule).")
 
     @staticmethod
     def _create_relationship(tx, triple):

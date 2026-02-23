@@ -13,5 +13,6 @@ services:
       - ./neo4j/import:/var/lib/neo4j/import
       - ./neo4j/plugins:/plugins
     environment:
-      - NEO4J_AUTH=none # For easy development; set to neo4j/password for production
+      # Project default: user and password both "foodnot4self"
+      - NEO4J_AUTH=foodnot4self/foodnot4self
       - NEO4J_PLUGINS=["apoc"]

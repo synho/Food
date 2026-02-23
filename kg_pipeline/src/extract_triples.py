@@ -75,7 +75,8 @@ Instructions:
 2. Extract exact, concise entity names; use canonical forms where possible (e.g. "Vitamin D" not "vitamin d", "Type 2 diabetes" for T2DM). Assign subject_type and object_type ONLY from the Target Entity Types list.
 3. Use ONLY predicates from the Target Relationship Types list (e.g. PREVENTS, TREATS, CONTAINS, ALLEVIATES, AGGRAVATES, REDUCES_RISK_OF, EARLY_SIGNAL_OF, SUBSTITUTES_FOR, COMPLEMENTS_DRUG where the text supports them).
 4. Early signals: When the text describes early signs or symptoms of a disease, extract Symptom -EARLY_SIGNAL_OF-> Disease. When it describes foods/nutrients that reduce a symptom, use ALLEVIATES; when they worsen a symptom, use AGGRAVATES (so we can recommend "foods that reduce" vs "foods to avoid" for user safety).
-5. Return a JSON array of objects. Each object must have:
+5. Chain extraction: When possible, emit the explicit chain: Food –CONTAINS→ Nutrient –AFFECTS/ALLEVIATES/AGGRAVATES→ Symptom/Disease, so the evidence trail is explicit and the KG can answer "why is this food good/bad for me?" via the nutrient mechanism.
+6. Return a JSON array of objects. Each object must have:
    - "subject", "subject_type", "predicate", "object", "object_type"
    - "context": short quote from the text justifying this relationship
    - "source_id": "{pmcid}"

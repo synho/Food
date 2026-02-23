@@ -70,6 +70,21 @@ def health():
     return {"status": "ok"}
 
 
+@app.get("/api/kg/food-chain")
+def kg_food_chain(food: str = ""):
+    """
+    Multi-hop KG chain for a food: Food → Nutrient → Disease/Symptom.
+    Shows *why* a food is beneficial or risky via the nutrient mechanism.
+    Example: GET /api/kg/food-chain?food=Salmon
+    Returns: { food, chain: [{ nutrient, relationship_type, target, evidence[] }] }
+    """
+    if not food.strip():
+        from fastapi import HTTPException
+        raise HTTPException(status_code=422, detail="food query parameter is required")
+    from server.services.food_chain import get_food_chain
+    return get_food_chain(food.strip())
+
+
 @app.get("/api/kg/stats")
 def kg_stats():
     """
