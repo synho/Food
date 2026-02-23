@@ -91,13 +91,24 @@ def extract_triples_bedrock(
         try:
             raw = _invoke_converse(client, model_id, prompt)
 
-            # Strip markdown code fences if model wraps response
+            # Strip any prose prefix and markdown code fences.
+            # Nova Micro sometimes returns: "Here is the JSON...\n\n```json\n[...]```"
             text = raw.strip()
-            if text.startswith("```"):
-                text = text.split("```", 2)[1]
+            fence_pos = text.find("```")
+            if fence_pos != -1:
+                text = text[fence_pos:]          # drop any prose before the fence
+                text = text.split("```", 2)[1]   # drop opening fence
                 if text.startswith("json"):
                     text = text[4:]
                 text = text.rsplit("```", 1)[0].strip()
+            # If no fence but starts with [ or {, use as-is
+            elif not (text.startswith("[") or text.startswith("{")):
+                # Try to find the start of the JSON array/object
+                bracket = min(
+                    (text.find("[") if text.find("[") != -1 else len(text)),
+                    (text.find("{") if text.find("{") != -1 else len(text)),
+                )
+                text = text[bracket:].strip()
 
             triples = json.loads(text)
             if not isinstance(triples, list):
