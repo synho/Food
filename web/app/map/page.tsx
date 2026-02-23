@@ -4,12 +4,13 @@ import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   fetchPosition, fetchSafestPath, fetchEarlySignals, fetchFoodChain,
-  fetchContextFromText, fetchInterrogation,
+  fetchContextFromText, fetchInterrogation, fetchLandmines,
 } from "@/lib/api";
 import type { FoodChainResponse } from "@/lib/api";
 import type {
   UserContext, PositionResponse, SafestPathResponse,
   EarlySignalGuidanceResponse, NearbyRisk, PathStep, InterrogationResult,
+  LandmineDisease, LandmineResult,
 } from "@/lib/types";
 
 // ─── Map canvas ───────────────────────────────────────────────────────────────
@@ -74,9 +75,11 @@ function nearTerritory(conditions: string[]): string {
   const t = conditions.join(" ").toLowerCase();
   if (/diabetes|blood sugar|insulin|glucose|metabolic/.test(t)) return "Metabolic Crossroads";
   if (/hypertension|heart|cardiovascular|cholesterol|pressure/.test(t)) return "Cardiometabolic Ridge";
-  if (/inflamm|arthritis|autoimmune|lupus/.test(t)) return "Inflammatory Plains";
+  if (/inflamm|arthritis|autoimmune|lupus|depression|mood/.test(t)) return "Inflammatory Plains";
   if (/sarcopenia|osteoporosis|muscle|bone|joint/.test(t)) return "Musculoskeletal Valley";
   if (/neuro|cognitive|alzheimer|parkinson|dementia/.test(t)) return "Neurological Frontier";
+  if (/stroke|cerebro|brain ischemia/.test(t)) return "Recovery Valley";
+  if (/kidney|renal|ckd/.test(t)) return "Metabolic Crossroads";
   return "";
 }
 
@@ -373,8 +376,9 @@ function MapLegend() {
     { color: "#16a34a", label: "Safest route" },
     { color: "#f59e0b", label: "Early signal" },
     { color: "#f59e0b", label: "Destination", star: true },
+    { color: "#dc2626", label: "Landmine disease", mine: true },
   ];
-  const LX = 14, LY = H - 148;
+  const LX = 14, LY = H - 162;
   return (
     <g>
       <rect x={LX - 6} y={LY - 14} width={132} height={items.length * 17 + 18}
@@ -383,13 +387,189 @@ function MapLegend() {
         style={{ fontSize: "8px", fill: "#475569", fontWeight: "700", letterSpacing: "0.06em" }}>
         LEGEND
       </text>
-      {items.map(({ color, label }, i) => (
+      {items.map(({ color, label, mine }, i) => (
         <g key={label} transform={`translate(${LX}, ${LY + 10 + i * 17})`}>
-          <circle cy={-3} r={5} fill={color} />
+          {mine ? (
+            <g transform="translate(0,-3)">
+              <circle r={4} fill={color} />
+              {[0,45,90,135,180,225,270,315].map((a, si) => {
+                const rad = a * Math.PI / 180;
+                return <line key={si} x1={Math.cos(rad)*4} y1={Math.sin(rad)*4}
+                  x2={Math.cos(rad)*7} y2={Math.sin(rad)*7}
+                  stroke={color} strokeWidth="1.2" />;
+              })}
+            </g>
+          ) : (
+            <circle cy={-3} r={5} fill={color} />
+          )}
           <text x={12} style={{ fontSize: "8px", fill: "#475569" }}>{label}</text>
         </g>
       ))}
     </g>
+  );
+}
+
+// ─── Landmine colors ──────────────────────────────────────────────────────────
+const MINE_COLORS: Record<string, { fill: string; glow: string; opacity: number }> = {
+  none:   { fill: "#94a3b8", glow: "#e2e8f0", opacity: 0.25 },
+  low:    { fill: "#d97706", glow: "#fde68a", opacity: 0.75 },
+  medium: { fill: "#ea580c", glow: "#fdba74", opacity: 0.9  },
+  high:   { fill: "#dc2626", glow: "#fca5a5", opacity: 1.0  },
+};
+
+function LandmineMarker({
+  x, y, riskLevel, name, korean, selected, onClick,
+}: {
+  x: number; y: number; riskLevel: string; name: string; korean: string;
+  selected: boolean; onClick: () => void;
+}) {
+  const mc = MINE_COLORS[riskLevel] ?? MINE_COLORS.none;
+  const spikes = [0, 45, 90, 135, 180, 225, 270, 315];
+  const isPulsing = riskLevel === "medium" || riskLevel === "high";
+  const scale = selected ? 1.3 : 1.0;
+  const shortName = name.length > 16 ? name.slice(0, 15) + "…" : name;
+
+  return (
+    <g onClick={onClick} style={{ cursor: "pointer" }}
+      transform={`translate(${x},${y}) scale(${scale})`}
+      opacity={mc.opacity}>
+      {isPulsing && (
+        <circle r={14} fill={mc.glow}>
+          <animate attributeName="r" from="10" to="18" dur={riskLevel === "high" ? "1.2s" : "2s"} repeatCount="indefinite" />
+          <animate attributeName="opacity" from="0.5" to="0" dur={riskLevel === "high" ? "1.2s" : "2s"} repeatCount="indefinite" />
+        </circle>
+      )}
+      {selected && <circle r={16} fill={mc.glow} opacity="0.6" />}
+      {/* Mine body */}
+      <circle r={7} fill={mc.fill} stroke="white" strokeWidth="1.5" />
+      <circle r={2.5} fill="white" opacity="0.7" />
+      {/* Spikes */}
+      {spikes.map((angle) => {
+        const rad = angle * Math.PI / 180;
+        return (
+          <line key={angle}
+            x1={Math.cos(rad) * 7} y1={Math.sin(rad) * 7}
+            x2={Math.cos(rad) * 12} y2={Math.sin(rad) * 12}
+            stroke={mc.fill} strokeWidth="2" strokeLinecap="round" />
+        );
+      })}
+      {/* Label */}
+      <text y={22} textAnchor="middle"
+        style={{ fontSize: "6.5px", fill: mc.fill, fontWeight: "700", userSelect: "none" }}>
+        {shortName}
+      </text>
+      <text y={30} textAnchor="middle"
+        style={{ fontSize: "6px", fill: "#64748b", userSelect: "none" }}>
+        {korean}
+      </text>
+    </g>
+  );
+}
+
+// ─── Landmine detail panel ────────────────────────────────────────────────────
+const RISK_BADGE: Record<string, string> = {
+  none:   "bg-slate-100 text-slate-500",
+  low:    "bg-amber-100 text-amber-700",
+  medium: "bg-orange-100 text-orange-700",
+  high:   "bg-red-100 text-red-700",
+};
+const RISK_LABEL: Record<string, string> = {
+  none: "No current risk factors", low: "Low risk", medium: "Elevated risk", high: "High risk",
+};
+const RISK_BORDER: Record<string, string> = {
+  none: "#94a3b8", low: "#d97706", medium: "#ea580c", high: "#dc2626",
+};
+
+function LandminePanel({ landmine, onClose }: { landmine: LandmineDisease; onClose: () => void }) {
+  const borderColor = RISK_BORDER[landmine.risk_level] ?? "#94a3b8";
+  return (
+    <div className="relative rounded-xl border-2 bg-white p-4 shadow-lg space-y-3"
+      style={{ borderColor }}>
+      <button onClick={onClose}
+        className="absolute right-3 top-3 text-slate-400 hover:text-slate-700 text-lg leading-none">×</button>
+
+      {/* Header */}
+      <div className="flex items-start gap-2 pr-6">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="font-bold text-slate-900">{landmine.name}</h3>
+            <span className="text-slate-500 text-sm">({landmine.korean})</span>
+            <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${RISK_BADGE[landmine.risk_level]}`}>
+              {RISK_LABEL[landmine.risk_level]}
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 mt-0.5 italic">{landmine.territory}</p>
+        </div>
+      </div>
+
+      {/* Why critical */}
+      <div className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-700 leading-relaxed">
+        <span className="font-semibold text-slate-800">Why this is a landmine: </span>
+        {landmine.why_critical}
+      </div>
+
+      {/* Risk factors */}
+      {(landmine.risk_factors_present.length > 0 || landmine.risk_factors_missing.length > 0) && (
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1.5">Risk factors</p>
+          <div className="space-y-1">
+            {landmine.risk_factors_present.map((rf, i) => (
+              <div key={i} className="flex items-center gap-2 text-xs">
+                <span className="text-red-500 font-bold">✗</span>
+                <span className="text-red-700 font-medium">{rf}</span>
+              </div>
+            ))}
+            {landmine.risk_factors_missing.slice(0, 4).map((rf, i) => (
+              <div key={i} className="flex items-center gap-2 text-xs">
+                <span className="text-emerald-500">✓</span>
+                <span className="text-slate-500">{rf}</span>
+              </div>
+            ))}
+            {landmine.risk_factors_missing.length > 4 && (
+              <p className="text-xs text-slate-400">+{landmine.risk_factors_missing.length - 4} more not present</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Early warning signs */}
+      {landmine.early_warning_signs.length > 0 && (
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1.5">Early warning signs</p>
+          <div className="flex flex-wrap gap-1">
+            {landmine.early_warning_signs.map((sign, i) => (
+              <span key={i} className="rounded-full bg-amber-50 border border-amber-200 px-2 py-0.5 text-xs text-amber-700">
+                {sign}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Escape routes */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1.5">
+          Escape routes {landmine.kg_evidence.length > 0 && (
+            <span className="rounded-full bg-emerald-100 text-emerald-700 px-1.5 py-0.5 text-xs ml-1 normal-case font-normal">
+              {landmine.kg_evidence.length} KG sources
+            </span>
+          )}
+        </p>
+        <div className="space-y-1">
+          {landmine.escape_routes.slice(0, 4).map((route, i) => (
+            <div key={i} className="flex items-start gap-2 text-xs">
+              <span className="text-emerald-500 mt-0.5">→</span>
+              <span className="text-slate-700">{route}</span>
+              {landmine.kg_evidence[i] && (
+                <span className="ml-auto rounded px-1 py-0.5 text-xs bg-blue-50 text-blue-600 flex-shrink-0">
+                  {landmine.kg_evidence[i].predicate}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -680,6 +860,10 @@ export default function HealthMapPage() {
   const [answeredIds, setAnsweredIds]     = useState<string[]>([]);
   const [interrogating, setInterrogating] = useState(false);
 
+  // ── Landmine detection ───────────────────────────────────────────────────
+  const [landmineData, setLandmineData]   = useState<LandmineResult | null>(null);
+  const [selectedLandmine, setSelectedLandmine] = useState<LandmineDisease | null>(null);
+
   // ── Food chain explorer ──────────────────────────────────────────────────
   const [foodInput, setFoodInput]         = useState("");
   const [chainLoading, setChainLoading]   = useState(false);
@@ -714,6 +898,10 @@ export default function HealthMapPage() {
         .then(setInterrogation)
         .catch(() => {/* silent — interrogation is enhancement only */})
         .finally(() => setInterrogating(false));
+      // Async: landmine detection (non-blocking)
+      fetchLandmines(ctx)
+        .then(setLandmineData)
+        .catch(() => {/* silent — landmine detection is enhancement only */});
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Request failed";
       setError(/failed to fetch|network error|load failed/i.test(msg)
@@ -1043,6 +1231,11 @@ export default function HealthMapPage() {
             {selectedRisk && (
               <InfoPanel risk={selectedRisk} onClose={() => setSelectedRisk(null)} />
             )}
+
+            {/* ── Selected landmine panel ─────────────────────────────────── */}
+            {selectedLandmine && (
+              <LandminePanel landmine={selectedLandmine} onClose={() => setSelectedLandmine(null)} />
+            )}
           </div>
 
           {/* ── RIGHT: Map ───────────────────────────────────────────────── */}
@@ -1075,6 +1268,21 @@ export default function HealthMapPage() {
                     <DestinationStar x={destX} y={destY} />
                   </>
                 )}
+
+                {/* Landmine markers — rendered below user marker */}
+                {landmineData?.landmines.map((lm) => (
+                  <LandmineMarker
+                    key={lm.name}
+                    x={lm.map_x} y={lm.map_y}
+                    riskLevel={lm.risk_level}
+                    name={lm.name}
+                    korean={lm.korean}
+                    selected={selectedLandmine?.name === lm.name}
+                    onClick={() => setSelectedLandmine(
+                      selectedLandmine?.name === lm.name ? null : lm
+                    )}
+                  />
+                ))}
 
                 {risks.map((risk, i) => {
                   const { x, y } = riskXY(i, userX, userY);
@@ -1119,6 +1327,44 @@ export default function HealthMapPage() {
                           <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-xs text-slate-500 capitalize">{risk.kind}</span>
                           <span className="text-xs text-slate-400">{risk.evidence?.length ?? 0} source{risk.evidence?.length !== 1 ? "s" : ""}</span>
                         </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* ── Landmine grid ─────────────────────────────────────────── */}
+            {landmineData && (
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                <h3 className="text-xs font-bold uppercase tracking-wide text-slate-500 mb-3 flex items-center gap-2">
+                  Landmine Diseases — Navigate Around These
+                  <span className="rounded-full bg-red-100 text-red-700 px-2 py-0.5 text-xs font-bold normal-case">
+                    {landmineData.landmines.filter(l => l.risk_level !== "none").length} on your radar
+                  </span>
+                </h3>
+                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {landmineData.landmines.map((lm) => {
+                    const isSelected = selectedLandmine?.name === lm.name;
+                    const bc = RISK_BORDER[lm.risk_level] ?? "#94a3b8";
+                    return (
+                      <button key={lm.name} type="button"
+                        onClick={() => setSelectedLandmine(isSelected ? null : lm)}
+                        className={`text-left rounded-xl border-l-4 border border-slate-100 p-3 transition-all hover:shadow-md ${isSelected ? "ring-2 ring-offset-1" : ""}`}
+                        style={{ borderLeftColor: bc, outlineColor: isSelected ? bc : undefined,
+                                 opacity: lm.risk_level === "none" ? 0.5 : 1 }}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-bold text-slate-800 truncate pr-1">{lm.name}</span>
+                          <span className={`text-xs font-bold rounded px-1.5 py-0.5 flex-shrink-0 ${RISK_BADGE[lm.risk_level]}`}>
+                            {lm.risk_level.toUpperCase()}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500">{lm.korean}</p>
+                        {lm.risk_factors_present.length > 0 && (
+                          <p className="text-xs text-red-600 mt-1">
+                            {lm.risk_factors_present.length} risk factor{lm.risk_factors_present.length !== 1 ? "s" : ""} present
+                          </p>
+                        )}
                       </button>
                     );
                   })}

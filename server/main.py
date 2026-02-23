@@ -135,6 +135,17 @@ class InterrogateRequest(BaseModel):
         description="Question IDs already answered by user — prevents re-asking")
 
 
+@app.post("/api/health-map/landmines")
+def health_map_landmines(ctx: UserContext):
+    """
+    Detect landmine disease risk levels from user context + KG evidence.
+    Returns all 6 landmine diseases with risk_level (none|low|medium|high),
+    risk factors present/missing, early warning signs, escape routes, and KG evidence.
+    """
+    from server.services.landmine_detector import get_landmines
+    return get_landmines(ctx)
+
+
 @app.post("/api/health-map/interrogate")
 def health_map_interrogate(body: InterrogateRequest):
     """

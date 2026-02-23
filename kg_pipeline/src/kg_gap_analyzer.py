@@ -186,7 +186,10 @@ def _build_queries(report: GapReport, days_back: int = 730, max_per_type: int = 
 
     # Priority 1 — Key conditions with no avoidance data
     _avoidance_priority = {"Type 2 diabetes", "Hypertension", "Cardiovascular disease",
-                           "Osteoporosis", "Sarcopenia", "Prediabetes"}
+                           "Osteoporosis", "Sarcopenia", "Prediabetes",
+                           # Landmine diseases — P1 priority for avoidance data
+                           "Alzheimer's disease", "Stroke", "Chronic kidney disease",
+                           "Major depressive disorder", "Pancreatic cancer", "Dementia"}
     priority_avoidance = [n for n in report.conditions_no_avoidance if n in _avoidance_priority]
     rest_avoidance = [n for n in report.conditions_no_avoidance if n not in _avoidance_priority]
 

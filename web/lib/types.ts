@@ -1,3 +1,35 @@
+/** One KG evidence record linking a food/nutrient to a landmine disease. */
+export interface LandmineKgEvidence {
+  food: string;
+  food_type: string;
+  predicate: string;
+  source_id: string;
+  context: string;
+  journal: string;
+  pub_date: string;
+}
+
+/** One landmine disease with risk assessment. */
+export interface LandmineDisease {
+  name: string;
+  korean: string;
+  risk_level: "none" | "low" | "medium" | "high";
+  risk_factors_present: string[];
+  risk_factors_missing: string[];
+  early_warning_signs: string[];
+  escape_routes: string[];
+  kg_evidence: LandmineKgEvidence[];
+  why_critical: string;
+  map_x: number;
+  map_y: number;
+  territory: string;
+}
+
+/** Response from /api/health-map/landmines */
+export interface LandmineResult {
+  landmines: LandmineDisease[];
+}
+
 /** Agentic health map interrogation response. */
 export interface InterrogationResult {
   completeness_score: number;          // 0-100

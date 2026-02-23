@@ -54,6 +54,32 @@ TOPIC_CLUSTERS: dict[str, dict] = {
         "keywords": ["cognitive decline", "dementia", "brain"],
         "mesh": ["Cognitive Dysfunction"],
     },
+    # Landmine diseases — P1 priority for avoidance data
+    "alzheimers": {
+        "entities": ["Alzheimer's disease", "Dementia"],
+        "keywords": ["alzheimer", "dementia", "cognitive aging", "neurodegeneration"],
+        "mesh": ["Alzheimer Disease", "Dementia"],
+    },
+    "stroke": {
+        "entities": ["Stroke", "Cerebrovascular disease"],
+        "keywords": ["stroke", "cerebral infarction", "brain ischemia", "cerebrovascular"],
+        "mesh": ["Stroke", "Brain Ischemia"],
+    },
+    "depression": {
+        "entities": ["Major depressive disorder", "Depression"],
+        "keywords": ["depression", "antidepressant diet", "mood disorder", "mental health diet"],
+        "mesh": ["Depressive Disorder, Major"],
+    },
+    "kidney_disease": {
+        "entities": ["Chronic kidney disease"],
+        "keywords": ["chronic kidney disease", "renal diet", "nephrology nutrition", "CKD"],
+        "mesh": ["Renal Insufficiency, Chronic"],
+    },
+    "pancreatic_cancer": {
+        "entities": ["Pancreatic cancer"],
+        "keywords": ["pancreatic cancer", "pancreas diet", "cancer prevention nutrition"],
+        "mesh": ["Pancreatic Neoplasms"],
+    },
     # Always-active clusters (no KG entities to check — always run)
     "inflammation": {
         "entities": [],

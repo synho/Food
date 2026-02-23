@@ -194,13 +194,34 @@ def _infer_likely_conditions(
         inferred.append({
             "name": "Osteoporosis",
             "confidence": "age-related risk",
-            "reason": f"Risk of bone density loss increases significantly after 50",
+            "reason": "Risk of bone density loss increases significantly after 50",
         })
     if age >= 60 and "Sarcopenia" not in already and "confirmed:Sarcopenia" not in answered:
         inferred.append({
             "name": "Sarcopenia",
             "confidence": "age-related risk",
-            "reason": f"Muscle mass loss (sarcopenia) commonly begins around 60",
+            "reason": "Muscle mass loss (sarcopenia) commonly begins around 60",
+        })
+
+    # Landmine age/condition combos
+    cond_set = {normalize_entity_name(c).lower() for c in (ctx.conditions or [])}
+    if (age >= 65 or "type 2 diabetes" in cond_set) and \
+            "Alzheimer's disease" not in already and "confirmed:Alzheimer's disease" not in answered:
+        inferred.append({
+            "name": "Alzheimer's disease",
+            "confidence": "landmine risk",
+            "reason": (
+                "Type 2 diabetes doubles Alzheimer's risk; age 65+ significantly elevates it"
+                if "type 2 diabetes" in cond_set
+                else "Age 65+ significantly elevates Alzheimer's risk"
+            ),
+        })
+    if ("hypertension" in cond_set or "cardiovascular disease" in cond_set) and \
+            "Stroke" not in already and "confirmed:Stroke" not in answered:
+        inferred.append({
+            "name": "Stroke",
+            "confidence": "landmine risk",
+            "reason": "Hypertension and cardiovascular disease are the leading modifiable stroke risk factors",
         })
 
     return inferred[:4]
@@ -233,9 +254,37 @@ def _generate_questions(
             "confidence": cond["confidence"],
         })
 
+    # 1b. Landmine-priority questions: when a landmine disease has elevated risk, surface it first
+    try:
+        from server.services.landmine_detector import get_landmines, LANDMINE_PROFILES
+        landmine_result = get_landmines(ctx)
+        for lm in landmine_result.get("landmines", []):
+            if lm["risk_level"] in ("high", "medium") and lm["risk_factors_present"]:
+                lm_id = f"landmine_risk:{lm['name']}"
+                if lm_id not in answered:
+                    top_rf = lm["risk_factors_present"][0]
+                    top_sign = lm["early_warning_signs"][0] if lm["early_warning_signs"] else "early symptoms"
+                    questions.append({
+                        "id": lm_id,
+                        "field": "symptoms",
+                        "priority": 1,
+                        "question": (
+                            f"You have {top_rf} — this significantly raises your risk of "
+                            f"{lm['name']} ({lm['korean']}). Do you monitor for {top_sign}?"
+                        ),
+                        "context": lm["why_critical"],
+                        "type": "text",
+                        "hint": f"Any signs of {top_sign}, or 'not noticed'",
+                    })
+                    break  # Only surface highest-priority landmine per call
+    except Exception:
+        pass  # Landmine enrichment is best-effort
+
     # 2. Medications for serious conditions
     serious = {"Type 2 diabetes", "Hypertension", "Cardiovascular disease",
-               "Osteoporosis", "Sarcopenia", "Prediabetes"}
+               "Osteoporosis", "Sarcopenia", "Prediabetes",
+               "Alzheimer's disease", "Stroke", "Chronic kidney disease",
+               "Major depressive disorder", "Pancreatic cancer"}
     has_serious = any(c in serious for c in (ctx.conditions or []))
     if has_serious and not ctx.medications and "medications" not in answered:
         conditions_str = ", ".join(c for c in (ctx.conditions or []) if c in serious)

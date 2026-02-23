@@ -5,6 +5,7 @@ import type {
   UserContext,
   ContextFromTextResult,
   InterrogationResult,
+  LandmineResult,
   RecommendationsResponse,
   PositionResponse,
   SafestPathResponse,
@@ -101,6 +102,11 @@ export async function fetchContextFromText(text: string): Promise<ContextFromTex
   // Support both old shape ({age, conditions, ...}) and new shape ({context, inferred, follow_up})
   if ("context" in data) return data as ContextFromTextResult;
   return { context: data as UserContext, inferred: [], follow_up: [] };
+}
+
+/** Landmine disease risk detection — returns all 6 landmines with risk levels. */
+export async function fetchLandmines(ctx: UserContext): Promise<LandmineResult> {
+  return post("/api/health-map/landmines", ctx);
 }
 
 /** Agentic health map interrogation — completeness score + KG-driven critical questions. */
