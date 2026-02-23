@@ -43,9 +43,17 @@ paths:
   master_graph: "data/extracted_triples/master_graph.json"
   manifests: "data/manifests"   # per-run manifests for cascade; each agent reads previous output from here
 
-# Extract agent: use a cheap model first; switch to a more accurate (expensive) model only after verifying accuracy (docs/PIPELINE_AGENTS.md)
+# Extract agent: configure backend model here.
+# Gemini (default — requires GEMINI_API_KEY in kg_pipeline/.env):
+#   model: "gemini-2.0-flash-lite"           # cheapest Gemini; 45s delay between papers (rate limit)
+#
+# AWS Bedrock (requires AWS credentials; much higher rate limits; no per-key quota):
+#   model: "bedrock/amazon.nova-micro-v1:0"               # $0.035/$0.14 per 1M tokens — cheapest
+#   model: "bedrock/amazon.nova-lite-v1:0"                # $0.06/$0.24 per 1M tokens — multimodal
+#   model: "bedrock/anthropic.claude-3-haiku-20240307-v1:0"  # $0.25/$1.25 per 1M — highest accuracy
+#   bedrock_region: "us-east-1"              # optional; default us-east-1
 extract:
-  model: "gemini-2.0-flash-lite"   # Low cost; consider gemini-2.0-flash or pro after accuracy checks
+  model: "gemini-2.0-flash-lite"   # Switch to bedrock/amazon.nova-micro-v1:0 for cheaper/faster runs
 
 smart_fetch:
   nutrition_journals:

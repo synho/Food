@@ -67,12 +67,15 @@ def _deep_merge(base: dict, override: dict) -> dict:
 
 
 def get_config_path() -> Path:
-    """Config is at kg_pipeline/config.yaml (parent of src)."""
+    """Config path: CONFIG_PATH env var if set, else kg_pipeline/config.yaml."""
+    env_path = os.environ.get("CONFIG_PATH", "").strip()
+    if env_path:
+        return Path(env_path)
     return Path(__file__).resolve().parent.parent / "config.yaml"
 
 
 def load_config() -> dict:
-    """Load config from config.yaml with defaults."""
+    """Load config from config file (CONFIG_PATH or default config.yaml) merged with defaults."""
     config = dict(DEFAULTS)
     path = get_config_path()
     if yaml and path.exists():

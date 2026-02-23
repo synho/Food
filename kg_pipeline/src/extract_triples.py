@@ -2,8 +2,6 @@ import os
 import json
 import glob
 import time
-from google import genai
-from google.genai import types
 from dotenv import load_dotenv
 
 from config_loader import get_paths_config, get_extract_config, get_continuous_build_config
@@ -13,14 +11,38 @@ from consolidate_graph import consolidate_graph
 
 load_dotenv()
 
-# Initialize GenAI Client (optional: demo mode when GEMINI_API_KEY is missing)
-_api_key = os.getenv("GEMINI_API_KEY", "").strip()
-DEMO_MODE = not bool(_api_key)
-if DEMO_MODE:
+# ── Backend selection ─────────────────────────────────────────────────────────
+# If extract.model starts with "bedrock/", use Bedrock; otherwise use Gemini.
+# Bedrock models: bedrock/amazon.nova-micro-v1:0  (cheapest)
+#                 bedrock/amazon.nova-lite-v1:0   (balanced)
+#                 bedrock/anthropic.claude-3-haiku-20240307-v1:0 (highest accuracy)
+
+_extract_cfg = get_extract_config()
+_model_setting = _extract_cfg.get("model", "gemini-2.0-flash-lite")
+_USE_BEDROCK = _model_setting.startswith("bedrock/")
+_BEDROCK_MODEL_ID = _model_setting[len("bedrock/"):] if _USE_BEDROCK else ""
+_BEDROCK_REGION = _extract_cfg.get("bedrock_region", "us-east-1")
+
+if _USE_BEDROCK:
+    from bedrock_extractor import extract_triples_bedrock, get_recommended_delay
     client = None
-    print("GEMINI_API_KEY not set: running in DEMO mode (minimal triples from abstracts, no LLM).")
+    DEMO_MODE = False
+    print(f"Using AWS Bedrock backend: {_BEDROCK_MODEL_ID} (region: {_BEDROCK_REGION})")
 else:
-    client = genai.Client(api_key=_api_key)
+    try:
+        from google import genai
+        from google.genai import types
+        _api_key = os.getenv("GEMINI_API_KEY", "").strip()
+        DEMO_MODE = not bool(_api_key)
+        if DEMO_MODE:
+            client = None
+            print("GEMINI_API_KEY not set: running in DEMO mode (minimal triples from abstracts, no LLM).")
+        else:
+            client = genai.Client(api_key=_api_key)
+    except ImportError:
+        client = None
+        DEMO_MODE = True
+        print("google-genai not installed and no Bedrock model configured: running in DEMO mode.")
 
 
 def _demo_triples_from_paper(article_data, pmcid):
@@ -59,13 +81,9 @@ def _parse_gemini_retry_delay(exc, default_sec: int = 65, max_sec: int = 120) ->
     return default_sec
 
 
-def extract_triples_from_text(text, pmcid):
-    """
-    Uses Gemini to extract knowledge graph triples from medical text.
-    """
+def _build_extraction_prompt(text: str, pmcid: str) -> str:
     ontology_section = get_ontology_prompt_section()
-    prompt = f"""
-You are an expert medical data extractor building a Knowledge Graph for a personalized health navigation application.
+    return f"""You are an expert medical data extractor building a Knowledge Graph for a personalized health navigation application.
 Extract structured relationships between entities from the provided medical text, using the ontology below.
 
 {ontology_section}
@@ -75,7 +93,7 @@ Instructions:
 2. Extract exact, concise entity names; use canonical forms where possible (e.g. "Vitamin D" not "vitamin d", "Type 2 diabetes" for T2DM). Assign subject_type and object_type ONLY from the Target Entity Types list.
 3. Use ONLY predicates from the Target Relationship Types list (e.g. PREVENTS, TREATS, CONTAINS, ALLEVIATES, AGGRAVATES, REDUCES_RISK_OF, EARLY_SIGNAL_OF, SUBSTITUTES_FOR, COMPLEMENTS_DRUG where the text supports them).
 4. Early signals: When the text describes early signs or symptoms of a disease, extract Symptom -EARLY_SIGNAL_OF-> Disease. When it describes foods/nutrients that reduce a symptom, use ALLEVIATES; when they worsen a symptom, use AGGRAVATES (so we can recommend "foods that reduce" vs "foods to avoid" for user safety).
-5. Chain extraction: When possible, emit the explicit chain: Food –CONTAINS→ Nutrient –AFFECTS/ALLEVIATES/AGGRAVATES→ Symptom/Disease, so the evidence trail is explicit and the KG can answer "why is this food good/bad for me?" via the nutrient mechanism.
+5. Chain extraction: When possible, emit the explicit chain: Food -CONTAINS-> Nutrient -AFFECTS/ALLEVIATES/AGGRAVATES-> Symptom/Disease, so the evidence trail is explicit and the KG can answer "why is this food good/bad for me?" via the nutrient mechanism.
 6. Return a JSON array of objects. Each object must have:
    - "subject", "subject_type", "predicate", "object", "object_type"
    - "context": short quote from the text justifying this relationship
@@ -86,11 +104,28 @@ Do not add "journal" or "pub_date"; they will be added from article metadata.
 If you find no relevant relationships, return an empty array [].
 
 Text to analyze:
-{text}
-    """
+{text}"""
 
-    if DEMO_MODE or client is None:
+
+def extract_triples_from_text(text, pmcid):
+    """
+    Extract KG triples from medical text using the configured backend (Bedrock or Gemini).
+    """
+    if DEMO_MODE or (not _USE_BEDROCK and client is None):
         return []
+
+    prompt = _build_extraction_prompt(text, pmcid)
+
+    # ── Bedrock backend ───────────────────────────────────────────────────────
+    if _USE_BEDROCK:
+        return extract_triples_bedrock(
+            prompt=prompt,
+            model_id=_BEDROCK_MODEL_ID,
+            pmcid=pmcid,
+            region=_BEDROCK_REGION,
+        )
+
+    # ── Gemini backend ────────────────────────────────────────────────────────
     model = get_extract_config().get("model", "gemini-2.0-flash-lite")
     print(f"Sending extraction request to Gemini ({model}) for {pmcid}...")
     max_retries = 3
@@ -128,7 +163,11 @@ def main():
 
     all_triples = []
     cb_cfg = get_continuous_build_config()
-    inter_paper_delay = cb_cfg.get("extract_delay_sec", 0)
+    if _USE_BEDROCK:
+        # Bedrock has much higher rate limits; use model-specific recommended delay
+        inter_paper_delay = get_recommended_delay(_BEDROCK_MODEL_ID)
+    else:
+        inter_paper_delay = cb_cfg.get("extract_delay_sec", 0)
 
     for idx, file_path in enumerate(paper_files, 1):
         with open(file_path, "r", encoding="utf-8") as f:
