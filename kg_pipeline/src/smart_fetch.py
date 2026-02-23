@@ -1,12 +1,18 @@
 """
 Smart, KG-gap-aware paper fetcher.
-Runs 8 topic clusters targeting nutrition journals + MeSH terms.
-Active clusters are determined by which entities are underrepresented in the KG.
+
+Two-phase fetch strategy:
+  Phase 1 (KG-targeted): query Neo4j for specific missing relationships, generate
+    entity-level PubMed queries to fill those exact gaps — these run FIRST and with
+    highest priority.
+  Phase 2 (cluster sweep): broad topic clusters (bone_health, inflammation, etc.)
+    targeting underrepresented entities — fills breadth after targeted gaps are covered.
 
 Usage:
-    python src/smart_fetch.py                          # full smart fetch
+    python src/smart_fetch.py                          # full smart fetch (both phases)
     python src/smart_fetch.py --dry-run                # print queries, no download
-    python src/smart_fetch.py --clusters sarcopenia,bone_health
+    python src/smart_fetch.py --clusters sarcopenia,bone_health  # clusters only
+    python src/smart_fetch.py --gap-only               # entity-targeted queries only
 """
 import argparse
 import json
@@ -18,6 +24,7 @@ from pathlib import Path
 from config_loader import get_paths_config, get_smart_fetch_config
 from artifacts import get_run_id, write_manifest
 from fetch_papers import search_pmc, fetch_article_data
+from kg_gap_analyzer import analyze_kg_gaps
 
 # ── Topic cluster definitions ─────────────────────────────────────────────────
 
@@ -66,33 +73,7 @@ TOPIC_CLUSTERS: dict[str, dict] = {
 }
 
 
-# ── KG gap analysis ───────────────────────────────────────────────────────────
-
-def analyze_kg_gaps(uri: str, user: str, pw: str, threshold: int = 3) -> dict[str, int] | None:
-    """
-    Query Neo4j for entities with degree < threshold.
-    Returns {entity_name: degree}, or None if Neo4j is unreachable (triggers all-clusters fallback).
-    """
-    try:
-        from neo4j import GraphDatabase
-        driver = GraphDatabase.driver(uri, auth=(user, pw))
-        # COUNT {} syntax required for Neo4j 5+
-        query = """
-        MATCH (n)
-        WHERE n:Disease OR n:Symptom OR n:Nutrient OR n:Food
-        WITH n, COUNT { (n)--() } AS deg
-        WHERE deg < $threshold
-        RETURN n.name AS name, deg
-        """
-        with driver.session() as session:
-            result = session.run(query, threshold=threshold)
-            gaps = {row["name"]: row["deg"] for row in result if row["name"]}
-        driver.close()
-        print(f"KG gap analysis: {len(gaps)} underrepresented entities (degree < {threshold}).")
-        return gaps
-    except Exception as e:
-        print(f"Warning: KG gap analysis unavailable ({e}). All clusters will be active.")
-        return None
+# (KG gap analysis moved to kg_gap_analyzer.py — imported above)
 
 
 # ── Cluster selection ─────────────────────────────────────────────────────────
@@ -178,93 +159,163 @@ def get_already_fetched_pmcids(raw_dir: str) -> set[str]:
     return existing
 
 
+# ── Shared fetch helper ───────────────────────────────────────────────────────
+
+def _fetch_from_query(
+    label: str,
+    query: str,
+    max_results: int,
+    raw_dir: str,
+    already_fetched: set[str],
+    dry_run: bool,
+) -> list[str]:
+    """Search PMC with query, download new papers, return list of fetched PMCIDs."""
+    if dry_run:
+        print(f"\n[DRY RUN] {label}:\n  {query[:160]}...")
+        return []
+
+    print(f"\nFetching: {label}")
+    pmcids = search_pmc(query, max_results=max_results)
+    new_pmcids = [p for p in pmcids if p not in already_fetched]
+    if not new_pmcids:
+        print(f"  No new papers found.")
+        return []
+
+    fetched: list[str] = []
+    for pmcid in new_pmcids:
+        article = fetch_article_data(pmcid)
+        if article:
+            out_path = os.path.join(raw_dir, f"PMC{pmcid}.json")
+            with open(out_path, "w", encoding="utf-8") as f:
+                json.dump(article, f, indent=4)
+            already_fetched.add(pmcid)
+            fetched.append(pmcid)
+
+    print(f"  Fetched {len(fetched)} new papers.")
+    return fetched
+
+
 # ── Main orchestration ────────────────────────────────────────────────────────
 
 def run_smart_fetch(
     requested_clusters: list[str] | None = None,
     dry_run: bool = False,
+    gap_only: bool = False,
 ) -> dict:
     """
-    Orchestrate smart fetch: gap analysis → cluster selection → queries → fetch → manifest.
-    Returns summary dict.
+    Two-phase KG-aware fetch:
+      Phase 1 — Entity-targeted: query Neo4j for specific missing relationships,
+        generate precise PubMed queries, fetch FIRST (highest priority).
+      Phase 2 — Cluster sweep: broad topic clusters for breadth coverage.
+        Skipped when gap_only=True or when requested_clusters is specified.
     """
     cfg = get_smart_fetch_config()
     paths = get_paths_config()
     raw_dir = paths["raw_papers"]
 
     nutrition_journals = cfg["nutrition_journals"]
-    gap_threshold = cfg.get("gap_threshold", 3)
-    max_per_cluster = cfg.get("max_per_cluster", 5)
+    max_per_query = cfg.get("max_per_cluster", 5)
     days_back = cfg.get("days_back", 365)
     use_mesh = cfg.get("use_mesh", True)
+    max_gap_queries = cfg.get("max_gap_queries", 8)
 
-    # Neo4j credentials from env (same as ingest_to_neo4j.py)
     neo4j_uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
     neo4j_user = os.getenv("NEO4J_USER", "foodnot4self")
     neo4j_pw = os.getenv("NEO4J_PASSWORD", "foodnot4self")
-
-    # Step 1: KG gap analysis
-    gaps = analyze_kg_gaps(neo4j_uri, neo4j_user, neo4j_pw, gap_threshold)
-
-    # Step 2: select active clusters
-    active = select_active_clusters(gaps, requested_clusters)
-    print(f"Active clusters: {active}")
 
     already_fetched = get_already_fetched_pmcids(raw_dir)
     os.makedirs(raw_dir, exist_ok=True)
 
     all_pmcids: list[str] = []
-    fetched_files: list[str] = []
-    cluster_results: dict[str, list[str]] = {}
+    phase1_results: dict[str, list[str]] = {}
+    phase2_results: dict[str, list[str]] = {}
 
-    for cluster_name in active:
-        defn = TOPIC_CLUSTERS[cluster_name]
-        query = build_targeted_query(defn, nutrition_journals, days_back, use_mesh)
+    # ── Phase 1: KG-targeted gap queries (always run unless --clusters specified) ──
+    if not requested_clusters:
+        print("\n=== Phase 1: KG gap analysis → targeted queries ===")
+        gap_report = analyze_kg_gaps(
+            uri=neo4j_uri, user=neo4j_user, pw=neo4j_pw,
+            min_food_recs=cfg.get("gap_threshold", 3),
+            days_back=days_back,
+            max_per_type=cfg.get("max_gap_queries_per_type", 3),
+        )
+        print(gap_report.summary())
 
-        if dry_run:
-            print(f"\n[DRY RUN] {cluster_name}:\n  {query}")
-            continue
+        targeted_queries = gap_report.generated_queries[:max_gap_queries]
+        if not targeted_queries:
+            print("  No targeted queries generated (KG may be unreachable).")
+        else:
+            print(f"\n  Running {len(targeted_queries)} targeted gap queries (P1 first)...")
 
-        print(f"\nFetching cluster '{cluster_name}'...")
-        pmcids = search_pmc(query, max_results=max_per_cluster)
+        for gq in targeted_queries:
+            label = f"[{gq.gap_type}] {gq.entity}"
+            fetched = _fetch_from_query(label, gq.query, max_per_query, raw_dir, already_fetched, dry_run)
+            phase1_results[label] = [f"PMC{p}" for p in fetched]
+            all_pmcids.extend(fetched)
+    else:
+        print("\n=== Phase 1: skipped (specific clusters requested) ===")
 
-        new_pmcids = [p for p in pmcids if p not in already_fetched]
-        if not new_pmcids:
-            print(f"  No new papers for cluster '{cluster_name}'.")
-            cluster_results[cluster_name] = []
-            continue
+    # ── Phase 2: Topic cluster sweep ──────────────────────────────────────────
+    if not gap_only:
+        print("\n=== Phase 2: Topic cluster sweep ===")
 
-        cluster_fetched: list[str] = []
-        for pmcid in new_pmcids:
-            article = fetch_article_data(pmcid)
-            if article:
-                out_path = os.path.join(raw_dir, f"PMC{pmcid}.json")
-                with open(out_path, "w", encoding="utf-8") as f:
-                    json.dump(article, f, indent=4)
-                fetched_files.append(f"PMC{pmcid}.json")
-                already_fetched.add(pmcid)
-                cluster_fetched.append(f"PMC{pmcid}")
-                all_pmcids.append(pmcid)
+        # For cluster-based gap analysis, fall back to simple degree-based analysis
+        # (used only for cluster selection, not query generation)
+        try:
+            simple_gaps = _simple_gap_analysis(neo4j_uri, neo4j_user, neo4j_pw,
+                                                threshold=cfg.get("gap_threshold", 3))
+        except Exception:
+            simple_gaps = None
 
-        cluster_results[cluster_name] = cluster_fetched
-        print(f"  Fetched {len(cluster_fetched)} new papers for '{cluster_name}'.")
+        active = select_active_clusters(simple_gaps, requested_clusters)
+        print(f"Active clusters: {active}")
+
+        for cluster_name in active:
+            defn = TOPIC_CLUSTERS[cluster_name]
+            query = build_targeted_query(defn, nutrition_journals, days_back, use_mesh)
+            label = f"cluster:{cluster_name}"
+            fetched = _fetch_from_query(label, query, max_per_query, raw_dir, already_fetched, dry_run)
+            phase2_results[cluster_name] = [f"PMC{p}" for p in fetched]
+            all_pmcids.extend(fetched)
 
     if dry_run:
         print("\n[DRY RUN] Complete. No papers downloaded.")
-        return {"dry_run": True, "active_clusters": active}
+        return {"dry_run": True}
 
     run_id = get_run_id()
     payload = {
-        "active_clusters": active,
-        "gap_entities": list(gaps.keys()),
+        "phase1_targeted": phase1_results,
+        "phase2_clusters": phase2_results,
         "pmcids_fetched": [f"PMC{p}" for p in all_pmcids],
-        "file_paths": fetched_files,
-        "cluster_results": cluster_results,
+        "file_paths": [f"PMC{p}.json" for p in all_pmcids],
         "raw_papers_dir": raw_dir,
+        "total_fetched": len(all_pmcids),
     }
     write_manifest("smart_fetch", run_id, payload)
-    print(f"\nSmart fetch complete: {len(all_pmcids)} papers across {len(active)} clusters.")
+    print(f"\nSmart fetch complete: {len(all_pmcids)} new papers "
+          f"({len(phase1_results)} targeted + {len(phase2_results)} cluster queries).")
     return payload
+
+
+def _simple_gap_analysis(uri: str, user: str, pw: str, threshold: int = 3) -> dict[str, int] | None:
+    """Lightweight degree-based gap analysis used only for cluster selection."""
+    try:
+        from neo4j import GraphDatabase
+        driver = GraphDatabase.driver(uri, auth=(user, pw))
+        q = """
+        MATCH (n)
+        WHERE n:Disease OR n:Symptom OR n:Nutrient OR n:Food
+        WITH n, COUNT { (n)--() } AS deg
+        WHERE deg < $threshold
+        RETURN n.name AS name, deg
+        """
+        with driver.session() as session:
+            result = session.run(q, threshold=threshold)
+            gaps = {row["name"]: row["deg"] for row in result if row["name"]}
+        driver.close()
+        return gaps
+    except Exception:
+        return None
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
@@ -275,17 +326,22 @@ def main():
         "--clusters",
         type=str,
         default="",
-        help="Comma-separated cluster names to fetch (e.g. sarcopenia,cardiovascular). Default: auto.",
+        help="Only run these clusters (skips Phase 1 gap queries). e.g. sarcopenia,cardiovascular",
+    )
+    parser.add_argument(
+        "--gap-only",
+        action="store_true",
+        help="Only run Phase 1 entity-targeted gap queries; skip cluster sweep.",
     )
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Print queries without downloading.",
+        help="Print all queries without downloading anything.",
     )
     args = parser.parse_args()
 
     requested = [c.strip() for c in args.clusters.split(",") if c.strip()] or None
-    run_smart_fetch(requested_clusters=requested, dry_run=args.dry_run)
+    run_smart_fetch(requested_clusters=requested, dry_run=args.dry_run, gap_only=args.gap_only)
 
 
 if __name__ == "__main__":

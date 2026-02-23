@@ -65,10 +65,14 @@ smart_fetch:
     - "Clin Nutr"
     - "Front Nutr"
     - "Int J Environ Res Public Health"
-  gap_threshold: 3        # entities with < N relationships = underrepresented
-  max_per_cluster: 5      # papers per topic cluster per run
-  days_back: 365          # broader window than the 30-day default
+  gap_threshold: 3             # entities with < N relationships = underrepresented
+  max_per_cluster: 5           # papers per topic cluster per run (Phase 2)
+  days_back: 730               # 2-year window for gap queries (wider = more relevant papers)
   use_mesh: true
+
+  # Phase 1: KG-targeted gap query settings
+  max_gap_queries: 8           # total entity-targeted queries to run per smart-fetch call
+  max_gap_queries_per_type: 3  # max queries per gap type (no_food_recs, no_avoidance, etc.)
 
 continuous_build:
   papers_per_run: 3       # extract this many new papers per invocation

@@ -29,8 +29,9 @@ def run(script: str, description: str, env: dict) -> bool:
 
 
 ALL_STEPS = {
-    "fetch": ("fetch_papers.py", "1. Fetch agent (papers)"),
-    "smart-fetch": ("smart_fetch.py", "1b. Smart fetch (gap-aware)"),
+    "fetch": ("fetch_papers.py", "1. Fetch agent (journal sweep)"),
+    "smart-fetch": ("smart_fetch.py", "1b. Smart fetch (KG gap-targeted + cluster sweep)"),
+    "gap-report": ("kg_gap_analyzer.py", "0. KG gap report (what's missing, no download)"),
     "extract": ("extract_triples.py", "2. Extract agent (ontology-based triples)"),
     "ingest": ("ingest_to_neo4j.py", "3. Ingest agent (Neo4j)"),
 }
