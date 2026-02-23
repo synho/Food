@@ -52,13 +52,23 @@ export interface InterrogationResult {
     priority: number;
     question: string;
     context: string;
-    type: "confirm" | "number" | "text" | "select";
+    type: "confirm" | "number" | "text" | "select" | "landmine_symptom";
     value?: string;
     hint?: string;
     options?: string[];
     confidence?: string;
+    // Landmine symptom check fields
+    landmine_check?: boolean;
+    disease_name?: string;
+    disease_korean?: string;
+    risk_level?: string;
+    why_critical?: string;
+    yes_label?: string;
+    no_label?: string;
+    symptom_value?: string;
   }>;
   delta_message: string;
+  landmine_checks_remaining?: number;
 }
 
 /** A follow-up question to confirm an inferred value or fill a missing field. */

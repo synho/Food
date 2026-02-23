@@ -6,6 +6,8 @@ Given a UserContext, the agent:
   2. Queries the KG for data-driven insights (early signals, risk cascades, comorbidities)
   3. Generates the 2-3 most critical follow-up questions not yet answered
   4. Reports what it inferred vs what it needs to improve accuracy
+  5. Runs a per-disease "landmine symptom check" — conversational questions about
+     early warning signs for any landmine disease that has elevated risk
 
 The agent gets smarter as the user answers: answered_fields tracks what's been confirmed,
 so questions are never repeated and assessment depth increases over time.
@@ -227,6 +229,241 @@ def _infer_likely_conditions(
     return inferred[:4]
 
 
+# ── Landmine symptom checks ───────────────────────────────────────────────────
+# Per-disease: 3 warm, conversational questions about early warning signs.
+# Each check has:
+#   id            — unique question ID (used in answered_fields)
+#   question      — friendly, non-clinical phrasing
+#   context       — why we're asking (shown as subtext)
+#   symptom_value — value added to ctx.symptoms if user says "yes"
+#   options       — "yes_label" and "no_label" for the two response buttons
+
+LANDMINE_SYMPTOM_CHECKS: dict[str, list[dict]] = {
+    "Alzheimer's disease": [
+        {
+            "id": "lm_check:alzheimers:memory",
+            "question": "Have you noticed yourself forgetting things more than usual lately — "
+                        "like repeating questions, losing track of dates, or struggling to find words?",
+            "context": "Occasional forgetfulness is normal, but a noticeable pattern can be an early signal worth tracking.",
+            "symptom_value": "Memory loss",
+            "yes_label": "Yes, I've noticed this",
+            "no_label": "Not really",
+        },
+        {
+            "id": "lm_check:alzheimers:navigation",
+            "question": "Have you ever felt confused about where you are, or had trouble following "
+                        "a familiar route or routine?",
+            "context": "Spatial disorientation in familiar settings is one of the earliest signs to watch for.",
+            "symptom_value": "Confusion",
+            "yes_label": "Yes, occasionally",
+            "no_label": "No, not at all",
+        },
+        {
+            "id": "lm_check:alzheimers:fog",
+            "question": "Do you often feel mentally foggy — trouble concentrating, slow thinking, "
+                        "or feeling like your mind isn't as sharp as it used to be?",
+            "context": "Brain fog can reflect metabolic effects on cognition — especially relevant with Type 2 diabetes.",
+            "symptom_value": "Brain fog",
+            "yes_label": "Yes, fairly often",
+            "no_label": "Not particularly",
+        },
+    ],
+    "Stroke": [
+        {
+            "id": "lm_check:stroke:tia",
+            "question": "Have you ever had a sudden but brief episode of weakness, numbness, "
+                        "slurred speech, or vision changes that passed within minutes or hours?",
+            "context": "These 'mini-strokes' (TIAs) are the most important warning sign — each one is a call to act.",
+            "symptom_value": "TIA (mini-stroke)",
+            "yes_label": "Yes, something like that",
+            "no_label": "No, never",
+        },
+        {
+            "id": "lm_check:stroke:headache",
+            "question": "Do you get severe or unusual headaches — especially ones that come on "
+                        "suddenly and feel different from your normal headaches?",
+            "context": "Sudden severe headache (sometimes called 'thunderclap') can signal vascular pressure changes.",
+            "symptom_value": "Sudden severe headache",
+            "yes_label": "Yes, I do",
+            "no_label": "No",
+        },
+        {
+            "id": "lm_check:stroke:bp_check",
+            "question": "Do you regularly check your blood pressure, and if so — has it been "
+                        "consistently above 140/90 recently?",
+            "context": "Uncontrolled hypertension is the single biggest stroke risk factor — and it's silent.",
+            "symptom_value": "Uncontrolled blood pressure",
+            "yes_label": "Yes, it's been high",
+            "no_label": "No / I don't check",
+        },
+    ],
+    "Pancreatic cancer": [
+        {
+            "id": "lm_check:pancreatic:abdominal",
+            "question": "Have you had persistent pain in your upper abdomen or back that doesn't "
+                        "seem to have a clear cause?",
+            "context": "Dull, persistent upper abdominal or back pain is one of the few early signs of pancreatic disease.",
+            "symptom_value": "Upper abdominal pain",
+            "yes_label": "Yes, I have",
+            "no_label": "No",
+        },
+        {
+            "id": "lm_check:pancreatic:weight",
+            "question": "Have you lost weight recently without trying, or noticed a significant "
+                        "decrease in appetite?",
+            "context": "Unexplained weight loss is the most common presenting symptom — often dismissed as stress.",
+            "symptom_value": "Unexplained weight loss",
+            "yes_label": "Yes, some weight loss",
+            "no_label": "No",
+        },
+        {
+            "id": "lm_check:pancreatic:newdiabetes",
+            "question": "Has your blood sugar recently become harder to control, or were you newly "
+                        "diagnosed with diabetes in the past year or two?",
+            "context": "New-onset diabetes in someone over 50 can sometimes be an early pancreatic signal.",
+            "symptom_value": "New-onset diabetes (sudden)",
+            "yes_label": "Yes, recently changed",
+            "no_label": "No change",
+        },
+    ],
+    "Chronic kidney disease": [
+        {
+            "id": "lm_check:ckd:fatigue",
+            "question": "Do you feel unusually tired or fatigued — even after a full night's sleep — "
+                        "that you can't quite explain?",
+            "context": "Persistent fatigue is often the first symptom of reduced kidney function, as toxins accumulate.",
+            "symptom_value": "Fatigue",
+            "yes_label": "Yes, often",
+            "no_label": "Not really",
+        },
+        {
+            "id": "lm_check:ckd:swelling",
+            "question": "Have you noticed swelling in your ankles, feet, or legs — especially "
+                        "toward the end of the day?",
+            "context": "Fluid retention from impaired kidney filtration often shows up as ankle and foot swelling first.",
+            "symptom_value": "Swollen ankles/feet",
+            "yes_label": "Yes, I've noticed",
+            "no_label": "No",
+        },
+        {
+            "id": "lm_check:ckd:urine",
+            "question": "Have you noticed any changes in your urine — foamy or bubbly appearance, "
+                        "changes in colour, or going more or less often than usual?",
+            "context": "Foamy urine can indicate protein loss — one of the earliest measurable signs of kidney stress.",
+            "symptom_value": "Foamy urine",
+            "yes_label": "Yes, I've noticed changes",
+            "no_label": "No changes",
+        },
+    ],
+    "Cardiovascular disease": [
+        {
+            "id": "lm_check:cvd:exertion",
+            "question": "Do you get short of breath, chest tightness, or unusual fatigue when "
+                        "doing things that didn't used to bother you — like climbing stairs or walking briskly?",
+            "context": "Exertional symptoms are often the first sign the heart is working harder than it should.",
+            "symptom_value": "Shortness of breath on exertion",
+            "yes_label": "Yes, I've noticed",
+            "no_label": "No",
+        },
+        {
+            "id": "lm_check:cvd:palpitations",
+            "question": "Do you ever feel your heart racing, fluttering, or skipping beats — "
+                        "even when you're resting?",
+            "context": "Palpitations at rest can signal arrhythmia, which is one of the strongest stroke and cardiac risk factors.",
+            "symptom_value": "Palpitations",
+            "yes_label": "Yes, sometimes",
+            "no_label": "No",
+        },
+        {
+            "id": "lm_check:cvd:leg_pain",
+            "question": "Do your legs ache or cramp when you walk — and does the pain go away "
+                        "when you stop and rest?",
+            "context": "Calf pain that relieves with rest (claudication) can signal peripheral artery disease — a CVD warning sign.",
+            "symptom_value": "Leg pain when walking (PAD)",
+            "yes_label": "Yes, this happens",
+            "no_label": "No",
+        },
+    ],
+    "Major depressive disorder": [
+        {
+            "id": "lm_check:depression:mood",
+            "question": "Over the past few weeks, have you often felt persistently sad, empty, "
+                        "or just unable to enjoy things you usually like?",
+            "context": "A persistent low mood lasting more than two weeks — especially with loss of interest — is worth taking seriously.",
+            "symptom_value": "Persistent low mood",
+            "yes_label": "Yes, fairly often",
+            "no_label": "Not really",
+        },
+        {
+            "id": "lm_check:depression:sleep",
+            "question": "Has your sleep changed significantly — either sleeping much more than "
+                        "usual, or struggling to sleep even when tired?",
+            "context": "Sleep disruption is both a symptom and a driver of depression — it creates a reinforcing cycle.",
+            "symptom_value": "Sleep disturbance",
+            "yes_label": "Yes, my sleep has changed",
+            "no_label": "Sleep is okay",
+        },
+        {
+            "id": "lm_check:depression:withdrawal",
+            "question": "Have you been pulling back from friends, family, or activities you used "
+                        "to enjoy — and finding it hard to motivate yourself?",
+            "context": "Social withdrawal and loss of motivation are core early symptoms that often precede a full depressive episode.",
+            "symptom_value": "Social withdrawal",
+            "yes_label": "Yes, I've been withdrawing",
+            "no_label": "No, I'm still engaged",
+        },
+    ],
+}
+
+
+def _get_landmine_checks(ctx: UserContext, answered: set[str]) -> list[dict]:
+    """
+    Build landmine symptom check questions for diseases with elevated risk.
+
+    Returns a list of check dicts (at most 2 at a time — highest-risk disease first,
+    then the next unanswered question within that disease).
+    Each check has a `landmine_check: True` flag so the frontend can style it distinctly.
+    """
+    try:
+        from server.services.landmine_detector import get_landmines
+        result = get_landmines(ctx)
+    except Exception:
+        return []
+
+    checks = []
+    _order = {"high": 0, "medium": 1, "low": 2, "none": 3}
+    sorted_lm = sorted(result.get("landmines", []), key=lambda l: _order[l["risk_level"]])
+
+    for lm in sorted_lm:
+        if lm["risk_level"] not in ("high", "medium"):
+            continue
+        disease_checks = LANDMINE_SYMPTOM_CHECKS.get(lm["name"], [])
+        for chk in disease_checks:
+            chk_id = chk["id"]
+            answered_yes = f"{chk_id}:yes" in answered
+            answered_no  = f"{chk_id}:no"  in answered
+            if answered_yes or answered_no:
+                continue
+            checks.append({
+                **chk,
+                "disease_name": lm["name"],
+                "disease_korean": lm["korean"],
+                "risk_level": lm["risk_level"],
+                "why_critical": lm["why_critical"],
+                "field": "symptoms",
+                "type": "landmine_symptom",
+                "landmine_check": True,
+                "priority": 0,  # Always highest priority
+            })
+            # Only surface the first unanswered question per disease
+            break
+
+        if len(checks) >= 2:
+            break  # Surface at most 2 landmine checks per call
+
+    return checks
+
+
 # ── Critical question generation ─────────────────────────────────────────────
 
 def _generate_questions(
@@ -236,10 +473,14 @@ def _generate_questions(
     inferred: list[dict],
     answered: set[str],
 ) -> list[dict]:
-    """Generate the 2-3 most impactful unanswered questions."""
-    questions = []
+    """Generate the most impactful unanswered questions (up to 3)."""
+    questions: list[dict] = []
 
-    # 1. Confirm inferred conditions (highest priority — diagnosis shapes everything)
+    # 0. Landmine symptom checks — always highest priority for elevated-risk diseases
+    landmine_checks = _get_landmine_checks(ctx, answered)
+    questions.extend(landmine_checks)
+
+    # 1. Confirm inferred conditions (diagnosis shapes everything)
     for cond in inferred[:2]:
         if f"confirmed:{cond['name']}" in answered or f"denied:{cond['name']}" in answered:
             continue
@@ -253,32 +494,6 @@ def _generate_questions(
             "value": cond["name"],
             "confidence": cond["confidence"],
         })
-
-    # 1b. Landmine-priority questions: when a landmine disease has elevated risk, surface it first
-    try:
-        from server.services.landmine_detector import get_landmines, LANDMINE_PROFILES
-        landmine_result = get_landmines(ctx)
-        for lm in landmine_result.get("landmines", []):
-            if lm["risk_level"] in ("high", "medium") and lm["risk_factors_present"]:
-                lm_id = f"landmine_risk:{lm['name']}"
-                if lm_id not in answered:
-                    top_rf = lm["risk_factors_present"][0]
-                    top_sign = lm["early_warning_signs"][0] if lm["early_warning_signs"] else "early symptoms"
-                    questions.append({
-                        "id": lm_id,
-                        "field": "symptoms",
-                        "priority": 1,
-                        "question": (
-                            f"You have {top_rf} — this significantly raises your risk of "
-                            f"{lm['name']} ({lm['korean']}). Do you monitor for {top_sign}?"
-                        ),
-                        "context": lm["why_critical"],
-                        "type": "text",
-                        "hint": f"Any signs of {top_sign}, or 'not noticed'",
-                    })
-                    break  # Only surface highest-priority landmine per call
-    except Exception:
-        pass  # Landmine enrichment is best-effort
 
     # 2. Medications for serious conditions
     serious = {"Type 2 diabetes", "Hypertension", "Cardiovascular disease",
@@ -364,12 +579,13 @@ def _generate_questions(
                         "Healthy aging / longevity", "Better sleep", "Reduce inflammation"],
         })
 
-    # Sort by priority, deduplicate by id
-    seen_ids = set()
-    unique = []
-    for q in sorted(questions, key=lambda x: x["priority"]):
-        if q["id"] not in seen_ids and q["id"] not in answered:
-            seen_ids.add(q["id"])
+    # Sort by priority (landmine checks have priority=0), deduplicate by id
+    seen_ids: set[str] = set()
+    unique: list[dict] = []
+    for q in sorted(questions, key=lambda x: x.get("priority", 2)):
+        qid = q["id"]
+        if qid not in seen_ids and qid not in answered:
+            seen_ids.add(qid)
             unique.append(q)
 
     return unique[:3]  # Max 3 at a time
@@ -377,11 +593,17 @@ def _generate_questions(
 
 # ── Self-improvement delta ────────────────────────────────────────────────────
 
-def _improvement_delta(score: int, answered: set[str]) -> str:
+def _improvement_delta(score: int, answered: set[str], has_landmine_checks: bool) -> str:
     """Return a short message about what answering the questions would gain."""
     gains = 100 - score
     if gains <= 0:
         return "Assessment is comprehensive. Recommendations are fully personalized."
+    if has_landmine_checks:
+        return (
+            f"Assessment {score}% complete. "
+            "These quick questions help detect early warning signs of serious conditions — "
+            "your honest answers will update your map position."
+        )
     if answered:
         return f"Assessment {score}% complete. Answer the questions below to improve accuracy."
     return f"Assessment {score}% complete. A few answers below will sharpen your guidance significantly."
@@ -396,15 +618,17 @@ def interrogate(ctx: UserContext, answered_fields: list[str] | None = None) -> d
     Args:
         ctx: current UserContext
         answered_fields: list of question IDs already answered by the user
-                         (prevents re-asking; format: "confirm_condition:X", "age", etc.)
+                         (prevents re-asking; format: "confirm_condition:X", "age",
+                         "lm_check:alzheimers:memory:yes", "lm_check:alzheimers:memory:no", etc.)
 
     Returns dict with:
         completeness_score: int 0-100
         missing_fields: list[str]
         kg_insights: list[dict]
         inferred_conditions: list[dict]
-        critical_questions: list[dict]  — max 3, sorted by priority
+        critical_questions: list[dict]  — max 3, sorted by priority (landmine checks first)
         delta_message: str
+        landmine_checks_remaining: int  — how many unanswered landmine checks remain
     """
     answered = set(answered_fields or [])
 
@@ -415,7 +639,24 @@ def interrogate(ctx: UserContext, answered_fields: list[str] | None = None) -> d
     insights = _get_kg_insights(cond_canonical, sym_canonical)
     inferred = _infer_likely_conditions(ctx, insights, answered)
     questions = _generate_questions(ctx, missing, insights, inferred, answered)
-    delta = _improvement_delta(score, answered)
+
+    has_lm_checks = any(q.get("landmine_check") for q in questions)
+    delta = _improvement_delta(score, answered, has_lm_checks)
+
+    # Count remaining unanswered landmine checks (for progress indicator)
+    remaining_checks = 0
+    try:
+        from server.services.landmine_detector import get_landmines
+        result = get_landmines(ctx)
+        for lm in result.get("landmines", []):
+            if lm["risk_level"] not in ("high", "medium"):
+                continue
+            for chk in LANDMINE_SYMPTOM_CHECKS.get(lm["name"], []):
+                chk_id = chk["id"]
+                if f"{chk_id}:yes" not in answered and f"{chk_id}:no" not in answered:
+                    remaining_checks += 1
+    except Exception:
+        pass
 
     return {
         "completeness_score": score,
@@ -424,4 +665,5 @@ def interrogate(ctx: UserContext, answered_fields: list[str] | None = None) -> d
         "inferred_conditions": inferred,
         "critical_questions": questions,
         "delta_message": delta,
+        "landmine_checks_remaining": remaining_checks,
     }

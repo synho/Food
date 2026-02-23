@@ -106,6 +106,17 @@ const SEV_HEX: Record<Sev, string> = { high: "#ef4444", med: "#f97316", low: "#9
 const SEV_GLOW: Record<Sev, string> = { high: "#fca5a5", med: "#fdba74", low: "#e2e8f0" };
 
 // ─── Journey narrative ────────────────────────────────────────────────────────
+
+// Landmine early warning signs that, if present in symptoms, warrant a map mention
+const LANDMINE_SIGNAL_SYMPTOMS = new Set([
+  "Memory loss", "Brain fog", "Confusion",
+  "TIA (mini-stroke)", "Uncontrolled blood pressure",
+  "Shortness of breath on exertion", "Palpitations",
+  "Fatigue", "Swollen ankles/feet", "Foamy urine",
+  "Upper abdominal pain", "Unexplained weight loss",
+  "Persistent low mood", "Social withdrawal", "Sleep disturbance",
+]);
+
 function buildNarrative(
   age: number | null | undefined, gender: string | null | undefined,
   conditions: string[], symptoms: string[], userY: number,
@@ -128,6 +139,12 @@ function buildNarrative(
     t += ` Your reported symptoms (${symptoms.join(", ")}) indicate early navigation is advisable.`;
   } else {
     t += " Your health landscape looks open — maintain this trajectory.";
+  }
+
+  // Landmine warning signs confirmed
+  const confirmedSignals = symptoms.filter(s => LANDMINE_SIGNAL_SYMPTOMS.has(s));
+  if (confirmedSignals.length > 0) {
+    t += ` **Early warning signs detected** (${confirmedSignals.join(", ")}) — check the landmine markers on your map.`;
   }
 
   if (steps.length > 0) t += ` Your safest route begins: **${steps[0].action}**.`;
@@ -666,13 +683,51 @@ const SEV_INSIGHT: Record<string, string> = {
   low: "border-emerald-200 bg-emerald-50 text-emerald-800",
 };
 
-function CompletenessBar({ score }: { score: number }) {
+const LM_CHECK_BORDER: Record<string, string> = {
+  high: "border-red-300 bg-red-50/80",
+  medium: "border-orange-300 bg-orange-50/80",
+  low: "border-amber-200 bg-amber-50/60",
+  none: "border-slate-200 bg-slate-50",
+};
+const LM_CHECK_BTN_YES: Record<string, string> = {
+  high: "bg-red-600 hover:bg-red-700 text-white",
+  medium: "bg-orange-500 hover:bg-orange-600 text-white",
+  low: "bg-amber-500 hover:bg-amber-600 text-white",
+  none: "bg-slate-500 hover:bg-slate-600 text-white",
+};
+
+// Mine SVG icon (inline, small)
+function MineSvg({ color = "#dc2626", size = 14 }: { color?: string; size?: number }) {
+  const spikes = [0, 45, 90, 135, 180, 225, 270, 315];
+  const r = size / 2;
+  return (
+    <svg width={size + 6} height={size + 6} viewBox={`-${r+3} -${r+3} ${size+6} ${size+6}`} style={{ display: "inline-block", verticalAlign: "middle" }}>
+      <circle r={r} fill={color} />
+      <circle r={r * 0.35} fill="white" opacity="0.7" />
+      {spikes.map(a => {
+        const rad = a * Math.PI / 180;
+        return <line key={a} x1={Math.cos(rad)*r} y1={Math.sin(rad)*r}
+          x2={Math.cos(rad)*(r+3)} y2={Math.sin(rad)*(r+3)}
+          stroke={color} strokeWidth="1.5" strokeLinecap="round" />;
+      })}
+    </svg>
+  );
+}
+
+function CompletenessBar({ score, checksRemaining }: { score: number; checksRemaining?: number }) {
   const color = score >= 80 ? "#16a34a" : score >= 50 ? "#b45309" : "#dc2626";
   return (
     <div className="mb-3">
       <div className="flex items-center justify-between mb-1">
         <span className="text-xs font-semibold text-slate-600">Assessment completeness</span>
-        <span className="text-xs font-bold" style={{ color }}>{score}%</span>
+        <div className="flex items-center gap-2">
+          {(checksRemaining ?? 0) > 0 && (
+            <span className="rounded-full bg-orange-100 text-orange-700 px-2 py-0.5 text-xs font-medium">
+              {checksRemaining} landmine check{checksRemaining !== 1 ? "s" : ""}
+            </span>
+          )}
+          <span className="text-xs font-bold" style={{ color }}>{score}%</span>
+        </div>
       </div>
       <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
         <div className="h-full rounded-full transition-all duration-500"
@@ -691,14 +746,68 @@ function InterrogationPanel({
 }) {
   const [inputVals, setInputVals] = useState<Record<string, string>>({});
   const { critical_questions: questions, kg_insights: insights,
-          inferred_conditions: inferred, completeness_score: score, delta_message: delta } = data;
+          inferred_conditions: inferred, completeness_score: score,
+          delta_message: delta, landmine_checks_remaining: checksRemaining } = data;
+
+  const landmineQs = questions.filter(q => q.landmine_check);
+  const regularQs  = questions.filter(q => !q.landmine_check);
 
   if (questions.length === 0 && insights.length === 0 && inferred.length === 0) return null;
 
   return (
     <div className="rounded-2xl border border-blue-200 bg-blue-50/60 p-4 shadow-sm space-y-3">
-      <CompletenessBar score={score} />
+      <CompletenessBar score={score} checksRemaining={checksRemaining} />
       <p className="text-xs text-slate-600 leading-relaxed">{delta}</p>
+
+      {/* ── Landmine symptom checks ─────────────────────────────────────── */}
+      {landmineQs.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-1.5">
+            <MineSvg color="#dc2626" size={12} />
+            <p className="text-xs font-bold uppercase tracking-wide text-red-700">
+              Landmine Symptom Check
+            </p>
+          </div>
+          {landmineQs.map((q) => {
+            const rl = q.risk_level ?? "medium";
+            return (
+              <div key={q.id}
+                className={`rounded-xl border-2 p-3.5 space-y-2.5 ${LM_CHECK_BORDER[rl]}`}>
+                {/* Disease header */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <MineSvg color={RISK_BORDER[rl]} size={11} />
+                  <span className="text-xs font-bold text-slate-800">{q.disease_name}</span>
+                  <span className="text-xs text-slate-500">({q.disease_korean})</span>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${RISK_BADGE[rl]}`}>
+                    {rl.toUpperCase()} RISK
+                  </span>
+                </div>
+                {/* The question itself */}
+                <p className="text-sm text-slate-800 leading-relaxed font-medium">{q.question}</p>
+                {/* Why we're asking */}
+                <p className="text-xs text-slate-500 leading-snug italic">{q.context}</p>
+                {/* Why it matters */}
+                <p className="text-xs rounded bg-white/70 px-2.5 py-1.5 text-slate-600 border border-slate-200">
+                  <span className="font-semibold">Why this matters: </span>{q.why_critical}
+                </p>
+                {/* Yes / No buttons */}
+                <div className="flex gap-2 pt-0.5">
+                  <button type="button"
+                    onClick={() => onAnswer(`${q.id}:yes`, q.field, q.symptom_value ?? "")}
+                    className={`flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${LM_CHECK_BTN_YES[rl]}`}>
+                    {q.yes_label ?? "Yes, I've noticed this"}
+                  </button>
+                  <button type="button"
+                    onClick={() => onAnswer(`${q.id}:no`, q.field, "")}
+                    className="flex-1 rounded-lg bg-white border border-slate-200 px-3 py-2 text-xs text-slate-600 hover:bg-slate-50 transition-colors">
+                    {q.no_label ?? "No, not really"}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Inferred conditions */}
       {inferred.length > 0 && (
@@ -734,13 +843,13 @@ function InterrogationPanel({
         </div>
       )}
 
-      {/* Critical questions */}
-      {questions.length > 0 && (
+      {/* Regular assessment questions */}
+      {regularQs.length > 0 && (
         <div className="space-y-2">
           <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
-            Sharpen your assessment ({questions.length} question{questions.length !== 1 ? "s" : ""})
+            Sharpen your assessment ({regularQs.length} question{regularQs.length !== 1 ? "s" : ""})
           </p>
-          {questions.map((q) => (
+          {regularQs.map((q) => (
             <div key={q.id} className="rounded-xl border border-slate-200 bg-white p-3 space-y-2">
               <p className="text-xs font-semibold text-slate-800">{q.question}</p>
               {q.context && <p className="text-xs text-slate-500 leading-snug">{q.context}</p>}
@@ -763,7 +872,7 @@ function InterrogationPanel({
               {(q.type === "text" || q.type === "number") && (
                 <div className="flex gap-2">
                   <input
-                    type={q.type}
+                    type={q.type === "number" ? "number" : "text"}
                     placeholder={q.hint ?? ""}
                     value={inputVals[q.id] ?? ""}
                     onChange={e => setInputVals(v => ({ ...v, [q.id]: e.target.value }))}
@@ -971,21 +1080,31 @@ export default function HealthMapPage() {
     const newAnswered = [...answeredIds, id];
     setAnsweredIds(newAnswered);
 
+    // Landmine symptom check: "yes" adds the symptom and re-renders the map;
+    // "no" (id ends with :no) just records the answer — no context change.
+    const isLandmineYes = id.startsWith("lm_check:") && id.endsWith(":yes");
+    const isLandmineNo  = id.startsWith("lm_check:") && id.endsWith(":no");
+
     // Apply answer to context if it adds information
     let patch: Partial<UserContext> = {};
-    if (field === "conditions" && value) {
-      patch = { conditions: [...(loadedCtx?.conditions ?? []), value].filter((v, i, a) => a.indexOf(v) === i) };
-    } else if (field === "medications" && value && value.toLowerCase() !== "none") {
-      patch = { medications: [...(loadedCtx?.medications ?? []), value].filter((v, i, a) => a.indexOf(v) === i) };
-    } else if (field === "symptoms" && value) {
+    if (isLandmineYes && value) {
+      // Confirmed early warning sign → add to symptoms → map position shifts
       patch = { symptoms: [...(loadedCtx?.symptoms ?? []), value].filter((v, i, a) => a.indexOf(v) === i) };
-    } else if (field === "goals" && value) {
-      patch = { goals: [...(loadedCtx?.goals ?? []), value].filter((v, i, a) => a.indexOf(v) === i) };
-    } else if (field === "way_of_living" && value) {
-      patch = { way_of_living: value };
-    } else if (field === "age" && value) {
-      const n = parseInt(value, 10);
-      if (!isNaN(n) && n > 0) patch = { age: n };
+    } else if (!isLandmineNo) {
+      if (field === "conditions" && value) {
+        patch = { conditions: [...(loadedCtx?.conditions ?? []), value].filter((v, i, a) => a.indexOf(v) === i) };
+      } else if (field === "medications" && value && value.toLowerCase() !== "none") {
+        patch = { medications: [...(loadedCtx?.medications ?? []), value].filter((v, i, a) => a.indexOf(v) === i) };
+      } else if (field === "symptoms" && value) {
+        patch = { symptoms: [...(loadedCtx?.symptoms ?? []), value].filter((v, i, a) => a.indexOf(v) === i) };
+      } else if (field === "goals" && value) {
+        patch = { goals: [...(loadedCtx?.goals ?? []), value].filter((v, i, a) => a.indexOf(v) === i) };
+      } else if (field === "way_of_living" && value) {
+        patch = { way_of_living: value };
+      } else if (field === "age" && value) {
+        const n = parseInt(value, 10);
+        if (!isNaN(n) && n > 0) patch = { age: n };
+      }
     }
 
     const updated = Object.keys(patch).length > 0 ? { ...loadedCtx, ...patch } : loadedCtx;
@@ -994,13 +1113,16 @@ export default function HealthMapPage() {
       try { localStorage.setItem("health_context", JSON.stringify(updated)); } catch { /* ignore */ }
       submitContext(updated as UserContext);
     } else {
-      // No context change, but refresh interrogation with new answered list
+      // No context change — refresh interrogation + landmines with new answered list
       if (loadedCtx) {
         setInterrogating(true);
         fetchInterrogation(loadedCtx, newAnswered)
           .then(setInterrogation)
           .catch(() => {})
           .finally(() => setInterrogating(false));
+        fetchLandmines(loadedCtx)
+          .then(setLandmineData)
+          .catch(() => {});
       }
     }
   }, [answeredIds, loadedCtx, submitContext]);
