@@ -6,7 +6,7 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 
-from config_loader import get_paths_config, get_extract_config
+from config_loader import get_paths_config, get_extract_config, get_continuous_build_config
 from ontology import get_ontology_prompt_section, normalize_entity_type, normalize_entity_name, normalize_predicate
 from artifacts import AGENT_EXTRACT, get_run_id, read_manifest, write_manifest
 from consolidate_graph import consolidate_graph
@@ -42,6 +42,21 @@ def _demo_triples_from_paper(article_data, pmcid):
         "pub_date": pub_date,
         "source_type": "PMC",
     }]
+
+
+def _parse_gemini_retry_delay(exc, default_sec: int = 65, max_sec: int = 120) -> int:
+    """
+    Parse the retryDelay from a Gemini rate-limit exception.
+    Falls back to default_sec if parsing fails.
+    """
+    try:
+        details = exc.details.get("error", {}).get("details", [])
+        for item in details:
+            if "retryDelay" in item:
+                return min(int(str(item["retryDelay"]).rstrip("s")), max_sec)
+    except Exception:
+        pass
+    return default_sec
 
 
 def extract_triples_from_text(text, pmcid):
@@ -90,8 +105,9 @@ Text to analyze:
             return json.loads(response.text)
         except Exception as e:
             if "429" in str(e):
-                print(f"Rate limit hit for {pmcid}. Retrying in 65 seconds... (Attempt {attempt+1}/{max_retries})")
-                time.sleep(65)
+                wait = _parse_gemini_retry_delay(e)
+                print(f"Rate limit hit for {pmcid}. Retrying in {wait}s... (Attempt {attempt+1}/{max_retries})")
+                time.sleep(wait)
                 continue
             print(f"Error during Gemini extraction for {pmcid}: {e}")
             return []
@@ -110,13 +126,24 @@ def main():
         return
 
     all_triples = []
-    
-    for file_path in paper_files:
+    cb_cfg = get_continuous_build_config()
+    inter_paper_delay = cb_cfg.get("extract_delay_sec", 0)
+
+    for idx, file_path in enumerate(paper_files, 1):
         with open(file_path, "r", encoding="utf-8") as f:
             article_data = json.load(f)
-            
+
         pmcid = article_data.get("pmcid", "Unknown")
-        print(f"Processing {pmcid}...")
+        print(f"[{idx}/{len(paper_files)}] Processing {pmcid}...")
+
+        # Skip already-extracted papers (idempotent across runs)
+        output_file = os.path.join(output_dir, f"{pmcid}_triples.json")
+        if os.path.exists(output_file):
+            with open(output_file, "r", encoding="utf-8") as ef:
+                existing = json.load(ef)
+            all_triples.extend(existing)
+            print(f"  Skipping {pmcid} (already extracted, {len(existing)} triples cached).")
+            continue
         
         # We will use the abstract for the primary extraction as it usually contains the core findings
         # If abstract is missing/short, fallback to full_text_preview
@@ -152,10 +179,14 @@ def main():
             all_triples.extend(triples)
             
             # Save individual extraction results
-            output_file = os.path.join(output_dir, f"{pmcid}_triples.json")
             with open(output_file, "w", encoding="utf-8") as f:
                 json.dump(triples, f, indent=4)
-                
+
+        # Pause between Gemini calls to respect rate limits
+        if inter_paper_delay > 0 and not DEMO_MODE and idx < len(paper_files):
+            print(f"  Waiting {inter_paper_delay}s before next paper...")
+            time.sleep(inter_paper_delay)
+
     # Consolidate ALL *_triples.json (including prior batches) into master_graph.json.
     # consolidate_graph is the single master writer — avoids incomplete master on incremental runs.
     master_output = consolidate_graph()

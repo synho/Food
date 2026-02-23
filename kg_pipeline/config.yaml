@@ -1,0 +1,59 @@
+# Pipeline config: recent-first, high-impact journals (see docs/PIPELINE_STRATEGY.md)
+
+fetch:
+  # Phase 4 expansion: use days_back: 90, max_results: 50 (or 100) for broader KG (docs/PIPELINE_STRATEGY.md)
+  days_back: 30          # Search papers from last N days (30 = conservative; 90 = Phase 4 expansion)
+  max_results: 15       # Max papers per run (50–100 for Phase 4 expansion)
+  request_delay_sec: 1   # Delay between NCBI requests (be polite)
+  skip_existing: true    # Skip PMCIDs that already have a file in raw_papers (incremental fetch)
+  humans_only: true      # Restrict to human studies only (no animal models); uses "humans"[MeSH Terms]
+
+  # Optional: narrow search by topic; empty = no keyword filter (broadest, more results)
+  topic_keywords: []
+  # Optional: second query for aging/biology (merged with topic_keywords results). See docs/AGING_AND_HUMAN_BIOLOGY.md
+  aging_keywords: ["aging", "sarcopenia", "bone health", "life course"]
+
+  # High-impact open access medical journals (PubMed journal names)
+  journals:
+    - "Nat Med"           # Nature Medicine
+    - "Lancet"
+    - "N Engl J Med"      # New England Journal of Medicine
+    - "JAMA"
+    - "BMJ"
+    - "Cell"
+    - "Science"
+    - "Nature"
+    - "Ann Intern Med"
+    - "Am J Clin Nutr"    # American Journal of Clinical Nutrition
+
+paths:
+  raw_papers: "data/raw_papers"
+  extracted_triples: "data/extracted_triples"
+  master_graph: "data/extracted_triples/master_graph.json"
+  manifests: "data/manifests"   # per-run manifests for cascade; each agent reads previous output from here
+
+# Extract agent: use a cheap model first; switch to a more accurate (expensive) model only after verifying accuracy (docs/PIPELINE_AGENTS.md)
+extract:
+  model: "gemini-2.0-flash-lite"   # Low cost; consider gemini-2.0-flash or pro after accuracy checks
+
+smart_fetch:
+  nutrition_journals:
+    - "Nutrients"
+    - "Br J Nutr"
+    - "J Nutr"
+    - "Eur J Nutr"
+    - "Nutr Rev"
+    - "Clin Nutr"
+    - "Front Nutr"
+    - "Int J Environ Res Public Health"
+  gap_threshold: 3        # entities with < N relationships = underrepresented
+  max_per_cluster: 5      # papers per topic cluster per run
+  days_back: 365          # broader window than the 30-day default
+  use_mesh: true
+
+continuous_build:
+  papers_per_run: 3       # extract this many new papers per invocation
+  extract_delay_sec: 45   # pause between Gemini calls
+  max_retries: 3
+  use_api_retry_after: true   # parse retryDelay from Gemini error JSON
+  max_wait_sec: 120       # if retryDelay > this, skip the paper

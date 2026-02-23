@@ -134,6 +134,8 @@ def recommendations_foods(ctx: UserContext):
     return get_recommendations(
         conditions=ctx.conditions or [],
         symptoms=ctx.symptoms or [],
+        age=ctx.age,
+        gender=ctx.gender,
         limit=20,
     )
 

@@ -6,10 +6,20 @@ __pycache__/
 # Data & Environment
 kg_pipeline/.env
 kg_pipeline/data/raw_papers/
-kg_pipeline/data/extracted_triples/
+kg_pipeline/data/extracted_triples/*
+!kg_pipeline/data/extracted_triples/seed_contains_triples.json
+kg_pipeline/data/manifests/
 
 # Neo4j Local Data
 kg_pipeline/neo4j/
+
+# Next.js (web)
+web/.next/
+web/node_modules/
+web/.env.local
+
+# Local run (PIDs, logs)
+.run/
 
 # OS
 .DS_Store
