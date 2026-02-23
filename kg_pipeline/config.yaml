@@ -71,8 +71,12 @@ smart_fetch:
   use_mesh: true
 
   # Phase 1: KG-targeted gap query settings
-  max_gap_queries: 8           # total entity-targeted queries to run per smart-fetch call
-  max_gap_queries_per_type: 3  # max queries per gap type (no_food_recs, no_avoidance, etc.)
+  max_gap_queries: 12          # total entity-targeted queries per smart-fetch (more = more coverage)
+  max_gap_queries_per_type: 4  # max queries per gap type
+
+  # Parallel worker settings (auto-tuned by NCBI_API_KEY env var)
+  # Without key: 3 workers, 2.5 req/s  |  With key: 5 workers, 7 req/s
+  # Set NCBI_API_KEY in kg_pipeline/.env for higher throughput (free at ncbi.nlm.nih.gov)
 
 continuous_build:
   papers_per_run: 3       # extract this many new papers per invocation

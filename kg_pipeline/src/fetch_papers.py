@@ -12,6 +12,10 @@ from artifacts import AGENT_FETCH, get_run_id, write_manifest
 ESEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
 EFETCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
 
+_NCBI_TOOL  = "food-health-navigator"
+_NCBI_EMAIL = "healthnav-pipeline@local"
+
+
 def build_search_query(journals, days_back=30, topic_keywords=None, humans_only=True):
     """
     Builds an NCBI search query: journals + date range + optional topic keywords.
@@ -33,23 +37,27 @@ def build_search_query(journals, days_back=30, topic_keywords=None, humans_only=
 def search_pmc(query, max_results=100):
     """
     Searches PubMed Central and returns a list of PMCID.
-    Retries up to 3 times on NCBI 429 rate-limit responses (65 s wait).
+    Uses NCBI_API_KEY env var if available (10 req/s vs 3 req/s).
+    Retries with exponential backoff on 429.
     """
     print(f"Searching PMC with query: {query}")
+    api_key = os.getenv("NCBI_API_KEY", "").strip()
     params = {
-        "db": "pmc",
-        "term": query,
-        "retmode": "json",
-        "retmax": max_results,
-        "sort": "date"  # Prioritize latest
+        "db": "pmc", "term": query, "retmode": "json",
+        "retmax": max_results, "sort": "date",
+        "tool": _NCBI_TOOL, "email": _NCBI_EMAIL,
     }
+    if api_key:
+        params["api_key"] = api_key
+
     max_retries = 3
     for attempt in range(max_retries):
         response = requests.get(ESEARCH_URL, params=params)
         if response.status_code == 429:
+            wait = 10 * (3 ** attempt)  # 10s, 30s, 90s — shorter than old 65s
             if attempt < max_retries - 1:
-                print(f"NCBI rate limit (429). Retrying in 65 seconds... (Attempt {attempt + 1}/{max_retries})")
-                time.sleep(65)
+                print(f"NCBI rate limit (429). Retrying in {wait}s... (Attempt {attempt + 1}/{max_retries})")
+                time.sleep(wait)
                 continue
         response.raise_for_status()
         data = response.json()
@@ -61,13 +69,16 @@ def search_pmc(query, max_results=100):
 def fetch_article_data(pmcid):
     """
     Fetches the full XML data for a given PMCID and extracts relevant sections.
+    Uses NCBI_API_KEY env var if available.
     """
+    api_key = os.getenv("NCBI_API_KEY", "").strip()
     params = {
-        "db": "pmc",
-        "id": pmcid,
-        "retmode": "xml"
+        "db": "pmc", "id": pmcid, "retmode": "xml",
+        "tool": _NCBI_TOOL, "email": _NCBI_EMAIL,
     }
-    
+    if api_key:
+        params["api_key"] = api_key
+
     try:
         response = requests.get(EFETCH_URL, params=params)
         response.raise_for_status()

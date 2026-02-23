@@ -23,7 +23,7 @@ from pathlib import Path
 
 from config_loader import get_paths_config, get_smart_fetch_config
 from artifacts import get_run_id, write_manifest
-from fetch_papers import search_pmc, fetch_article_data
+from fetch_workers import parallel_search, parallel_fetch_articles
 from kg_gap_analyzer import analyze_kg_gaps
 
 # ── Topic cluster definitions ─────────────────────────────────────────────────
@@ -159,42 +159,6 @@ def get_already_fetched_pmcids(raw_dir: str) -> set[str]:
     return existing
 
 
-# ── Shared fetch helper ───────────────────────────────────────────────────────
-
-def _fetch_from_query(
-    label: str,
-    query: str,
-    max_results: int,
-    raw_dir: str,
-    already_fetched: set[str],
-    dry_run: bool,
-) -> list[str]:
-    """Search PMC with query, download new papers, return list of fetched PMCIDs."""
-    if dry_run:
-        print(f"\n[DRY RUN] {label}:\n  {query[:160]}...")
-        return []
-
-    print(f"\nFetching: {label}")
-    pmcids = search_pmc(query, max_results=max_results)
-    new_pmcids = [p for p in pmcids if p not in already_fetched]
-    if not new_pmcids:
-        print(f"  No new papers found.")
-        return []
-
-    fetched: list[str] = []
-    for pmcid in new_pmcids:
-        article = fetch_article_data(pmcid)
-        if article:
-            out_path = os.path.join(raw_dir, f"PMC{pmcid}.json")
-            with open(out_path, "w", encoding="utf-8") as f:
-                json.dump(article, f, indent=4)
-            already_fetched.add(pmcid)
-            fetched.append(pmcid)
-
-    print(f"  Fetched {len(fetched)} new papers.")
-    return fetched
-
-
 # ── Main orchestration ────────────────────────────────────────────────────────
 
 def run_smart_fetch(
@@ -203,36 +167,44 @@ def run_smart_fetch(
     gap_only: bool = False,
 ) -> dict:
     """
-    Two-phase KG-aware fetch:
-      Phase 1 — Entity-targeted: query Neo4j for specific missing relationships,
-        generate precise PubMed queries, fetch FIRST (highest priority).
-      Phase 2 — Cluster sweep: broad topic clusters for breadth coverage.
-        Skipped when gap_only=True or when requested_clusters is specified.
+    Three-stage KG-aware parallel fetch:
+
+      Stage 1 — Build query plan:
+        Run KG gap analysis + select active clusters. No network yet.
+
+      Stage 2 — Parallel search (all queries at once):
+        Run all esearch queries concurrently (workers × queries simultaneously).
+        Collect and deduplicate PMCIDs across all queries. Priority order preserved.
+
+      Stage 3 — Parallel download (all new papers at once):
+        Download all new articles concurrently. Rate-limited via shared TokenBucket.
+        Circuit breaker pauses workers on surge of 429s.
+
+    Result: same papers fetched as before, but in a fraction of the time.
     """
     cfg = get_smart_fetch_config()
     paths = get_paths_config()
     raw_dir = paths["raw_papers"]
 
     nutrition_journals = cfg["nutrition_journals"]
-    max_per_query = cfg.get("max_per_cluster", 5)
-    days_back = cfg.get("days_back", 365)
-    use_mesh = cfg.get("use_mesh", True)
+    max_per_query  = cfg.get("max_per_cluster", 5)
+    days_back      = cfg.get("days_back", 365)
+    use_mesh       = cfg.get("use_mesh", True)
     max_gap_queries = cfg.get("max_gap_queries", 8)
 
-    neo4j_uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
-    neo4j_user = os.getenv("NEO4J_USER", "foodnot4self")
-    neo4j_pw = os.getenv("NEO4J_PASSWORD", "foodnot4self")
+    neo4j_uri  = os.getenv("NEO4J_URI",      "bolt://localhost:7687")
+    neo4j_user = os.getenv("NEO4J_USER",     "foodnot4self")
+    neo4j_pw   = os.getenv("NEO4J_PASSWORD", "foodnot4self")
 
     already_fetched = get_already_fetched_pmcids(raw_dir)
     os.makedirs(raw_dir, exist_ok=True)
 
-    all_pmcids: list[str] = []
-    phase1_results: dict[str, list[str]] = {}
-    phase2_results: dict[str, list[str]] = {}
+    # ── Stage 1: Build query plan ─────────────────────────────────────────────
+    all_queries: dict[str, str] = {}   # {label: query_string}
+    query_phases: dict[str, str] = {}  # {label: "phase1"|"phase2"}
 
-    # ── Phase 1: KG-targeted gap queries (always run unless --clusters specified) ──
     if not requested_clusters:
-        print("\n=== Phase 1: KG gap analysis → targeted queries ===")
+        print("\n=== Stage 1: KG gap analysis ===")
         gap_report = analyze_kg_gaps(
             uri=neo4j_uri, user=neo4j_user, pw=neo4j_pw,
             min_food_recs=cfg.get("gap_threshold", 3),
@@ -241,59 +213,90 @@ def run_smart_fetch(
         )
         print(gap_report.summary())
 
-        targeted_queries = gap_report.generated_queries[:max_gap_queries]
-        if not targeted_queries:
-            print("  No targeted queries generated (KG may be unreachable).")
-        else:
-            print(f"\n  Running {len(targeted_queries)} targeted gap queries (P1 first)...")
-
-        for gq in targeted_queries:
+        for gq in gap_report.generated_queries[:max_gap_queries]:
             label = f"[{gq.gap_type}] {gq.entity}"
-            fetched = _fetch_from_query(label, gq.query, max_per_query, raw_dir, already_fetched, dry_run)
-            phase1_results[label] = [f"PMC{p}" for p in fetched]
-            all_pmcids.extend(fetched)
+            all_queries[label] = gq.query
+            query_phases[label] = "phase1"
+            if dry_run:
+                print(f"\n[DRY RUN] {label}:\n  {gq.query[:160]}…")
     else:
-        print("\n=== Phase 1: skipped (specific clusters requested) ===")
+        print("\n=== Stage 1: skipped (specific clusters requested) ===")
 
-    # ── Phase 2: Topic cluster sweep ──────────────────────────────────────────
     if not gap_only:
-        print("\n=== Phase 2: Topic cluster sweep ===")
-
-        # For cluster-based gap analysis, fall back to simple degree-based analysis
-        # (used only for cluster selection, not query generation)
         try:
             simple_gaps = _simple_gap_analysis(neo4j_uri, neo4j_user, neo4j_pw,
-                                                threshold=cfg.get("gap_threshold", 3))
+                                               threshold=cfg.get("gap_threshold", 3))
         except Exception:
             simple_gaps = None
 
         active = select_active_clusters(simple_gaps, requested_clusters)
-        print(f"Active clusters: {active}")
-
+        print(f"\n  Active clusters: {active}")
         for cluster_name in active:
             defn = TOPIC_CLUSTERS[cluster_name]
             query = build_targeted_query(defn, nutrition_journals, days_back, use_mesh)
             label = f"cluster:{cluster_name}"
-            fetched = _fetch_from_query(label, query, max_per_query, raw_dir, already_fetched, dry_run)
-            phase2_results[cluster_name] = [f"PMC{p}" for p in fetched]
-            all_pmcids.extend(fetched)
+            all_queries[label] = query
+            query_phases[label] = "phase2"
+            if dry_run:
+                print(f"\n[DRY RUN] {label}:\n  {query[:160]}…")
 
     if dry_run:
-        print("\n[DRY RUN] Complete. No papers downloaded.")
-        return {"dry_run": True}
+        print(f"\n[DRY RUN] {len(all_queries)} queries planned. No papers downloaded.")
+        return {"dry_run": True, "queries_planned": len(all_queries)}
+
+    if not all_queries:
+        print("No queries to run.")
+        return {"total_fetched": 0}
+
+    # ── Stage 2: Parallel search (all queries at once) ────────────────────────
+    print(f"\n=== Stage 2: Parallel search ({len(all_queries)} queries) ===")
+    search_results = parallel_search(all_queries, max_results_per_query=max_per_query)
+
+    # Collect & deduplicate PMCIDs — phase1 queries have priority (listed first)
+    phase1_pmcids: list[str] = []
+    phase2_pmcids: list[str] = []
+    seen_pmcids: set[str] = set(already_fetched)
+
+    for label, pmcids in search_results.items():
+        for p in pmcids:
+            if p not in seen_pmcids:
+                seen_pmcids.add(p)
+                if query_phases.get(label) == "phase1":
+                    phase1_pmcids.append(p)
+                else:
+                    phase2_pmcids.append(p)
+
+    all_new = phase1_pmcids + phase2_pmcids
+    print(f"  Total unique new PMCIDs: {len(all_new)} "
+          f"(phase1: {len(phase1_pmcids)}, phase2: {len(phase2_pmcids)})")
+
+    if not all_new:
+        print("  No new papers found across all queries.")
+        run_id = get_run_id()
+        write_manifest("smart_fetch", run_id, {
+            "phase1_pmcids": [], "phase2_pmcids": [],
+            "pmcids_fetched": [], "total_fetched": 0,
+        })
+        return {"total_fetched": 0}
+
+    # ── Stage 3: Parallel download (all new papers at once) ───────────────────
+    print(f"\n=== Stage 3: Parallel download ({len(all_new)} papers) ===")
+    fetched = parallel_fetch_articles(all_new, raw_dir, already_fetched=already_fetched)
 
     run_id = get_run_id()
     payload = {
-        "phase1_targeted": phase1_results,
-        "phase2_clusters": phase2_results,
-        "pmcids_fetched": [f"PMC{p}" for p in all_pmcids],
-        "file_paths": [f"PMC{p}.json" for p in all_pmcids],
+        "phase1_pmcids": [f"PMC{p}" for p in phase1_pmcids],
+        "phase2_pmcids": [f"PMC{p}" for p in phase2_pmcids],
+        "pmcids_fetched": [f"PMC{p}" for p in fetched],
+        "file_paths":    [f"PMC{p}.json" for p in fetched],
         "raw_papers_dir": raw_dir,
-        "total_fetched": len(all_pmcids),
+        "total_fetched": len(fetched),
+        "queries_run": len(all_queries),
+        "search_results": {k: len(v) for k, v in search_results.items()},
     }
     write_manifest("smart_fetch", run_id, payload)
-    print(f"\nSmart fetch complete: {len(all_pmcids)} new papers "
-          f"({len(phase1_results)} targeted + {len(phase2_results)} cluster queries).")
+    print(f"\nSmart fetch complete: {len(fetched)} new papers "
+          f"from {len(all_queries)} parallel queries.")
     return payload
 
 
