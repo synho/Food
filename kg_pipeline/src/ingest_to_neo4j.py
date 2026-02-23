@@ -72,7 +72,8 @@ class KnowledgeGraphIngestor:
             r.source_type = $source_type,
             r.journal = $journal,
             r.pub_date = $pub_date,
-            r.evidence_type = $evidence_type
+            r.evidence_type = $evidence_type,
+            r.evidence_strength = $evidence_strength
         """
         tx.run(query,
                subject_name=subject_name,
@@ -82,7 +83,8 @@ class KnowledgeGraphIngestor:
                source_type=triple.get("source_type", "PMC"),
                journal=triple.get("journal", ""),
                pub_date=triple.get("pub_date", ""),
-               evidence_type=triple.get("evidence_type", ""))
+               evidence_type=triple.get("evidence_type", ""),
+               evidence_strength=int(triple.get("evidence_strength", 1)))
 
 def main():
     paths = get_paths_config()

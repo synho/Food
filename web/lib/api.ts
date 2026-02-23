@@ -4,6 +4,7 @@
 import type {
   UserContext,
   ContextFromTextResult,
+  InterrogationResult,
   RecommendationsResponse,
   PositionResponse,
   SafestPathResponse,
@@ -100,6 +101,20 @@ export async function fetchContextFromText(text: string): Promise<ContextFromTex
   // Support both old shape ({age, conditions, ...}) and new shape ({context, inferred, follow_up})
   if ("context" in data) return data as ContextFromTextResult;
   return { context: data as UserContext, inferred: [], follow_up: [] };
+}
+
+/** Agentic health map interrogation — completeness score + KG-driven critical questions. */
+export async function fetchInterrogation(
+  context: UserContext,
+  answeredFields: string[] = [],
+): Promise<InterrogationResult> {
+  const res = await fetch(`${API}/api/health-map/interrogate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ context, answered_fields: answeredFields }),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
 }
 
 /** KG stats for dashboard (Neo4j + optional pipeline). */

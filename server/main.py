@@ -129,6 +129,24 @@ def suggest(q: str = "", field: str = "conditions"):
     return {"suggestions": get_suggestions(q or "", f)}
 
 
+class InterrogateRequest(BaseModel):
+    context: UserContext = Field(default_factory=UserContext)
+    answered_fields: list[str] = Field(default_factory=list,
+        description="Question IDs already answered by user — prevents re-asking")
+
+
+@app.post("/api/health-map/interrogate")
+def health_map_interrogate(body: InterrogateRequest):
+    """
+    Agentic health map assessment.
+    Returns completeness score (0-100), KG-driven insights, inferred conditions,
+    and the 2-3 most critical follow-up questions not yet answered.
+    Each call evolves: pass answered_fields from prior responses to get new questions.
+    """
+    from server.services.health_map_agent import interrogate
+    return interrogate(body.context, body.answered_fields)
+
+
 class FromTextRequest(BaseModel):
     text: str = Field(default="", description="Free-form self-introduction text")
 

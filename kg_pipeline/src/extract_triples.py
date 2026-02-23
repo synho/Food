@@ -8,6 +8,7 @@ from config_loader import get_paths_config, get_extract_config, get_continuous_b
 from ontology import get_ontology_prompt_section, normalize_entity_type, normalize_entity_name, normalize_predicate
 from artifacts import AGENT_EXTRACT, get_run_id, read_manifest, write_manifest
 from consolidate_graph import consolidate_graph
+from triple_validator import validate_and_score, report as validator_report
 
 load_dotenv()
 
@@ -227,6 +228,12 @@ def main():
             print(f"  Waiting {inter_paper_delay}s before next paper...")
             time.sleep(inter_paper_delay)
 
+    # Validate and score all triples before consolidation
+    all_valid, all_rejected, vstats = validate_and_score(all_triples)
+    print(validator_report(vstats))
+    if all_rejected:
+        print(f"  Rejected {len(all_rejected)} low-quality triples (zero-error policy).")
+
     # Consolidate ALL *_triples.json (including prior batches) into master_graph.json.
     # consolidate_graph is the single master writer — avoids incomplete master on incremental runs.
     master_output = consolidate_graph()
@@ -235,10 +242,12 @@ def main():
     papers_processed = [os.path.splitext(os.path.basename(p))[0] for p in paper_files]
     write_manifest(AGENT_EXTRACT, run_id, {
         "papers_processed": papers_processed,
-        "total_triples": len(all_triples),
+        "total_triples": len(all_valid),
+        "rejected_triples": len(all_rejected),
+        "validation_stats": vstats,
         "master_graph_path": master_output,
     })
-    print(f"Successfully extracted {len(all_triples)} total relationships across {len(paper_files)} papers.")
+    print(f"Successfully extracted {len(all_valid)} valid relationships across {len(paper_files)} papers.")
 
 if __name__ == "__main__":
     main()

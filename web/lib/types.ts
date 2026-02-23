@@ -1,3 +1,34 @@
+/** Agentic health map interrogation response. */
+export interface InterrogationResult {
+  completeness_score: number;          // 0-100
+  missing_fields: string[];
+  kg_insights: Array<{
+    type: "risk_cascade" | "protective_food" | "avoidance" | "early_signal";
+    text: string;
+    entity: string;
+    evidence_count: number;
+    severity: "high" | "medium" | "low";
+  }>;
+  inferred_conditions: Array<{
+    name: string;
+    confidence: string;
+    reason: string;
+  }>;
+  critical_questions: Array<{
+    id: string;
+    field: string;
+    priority: number;
+    question: string;
+    context: string;
+    type: "confirm" | "number" | "text" | "select";
+    value?: string;
+    hint?: string;
+    options?: string[];
+    confidence?: string;
+  }>;
+  delta_message: string;
+}
+
 /** A follow-up question to confirm an inferred value or fill a missing field. */
 export interface FollowUpQuestion {
   field: string;        // "age" | "conditions" | "gender" | "goals"

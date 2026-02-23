@@ -3,12 +3,13 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
-  fetchPosition, fetchSafestPath, fetchEarlySignals, fetchFoodChain, fetchContextFromText,
+  fetchPosition, fetchSafestPath, fetchEarlySignals, fetchFoodChain,
+  fetchContextFromText, fetchInterrogation,
 } from "@/lib/api";
 import type { FoodChainResponse } from "@/lib/api";
 import type {
   UserContext, PositionResponse, SafestPathResponse,
-  EarlySignalGuidanceResponse, NearbyRisk, PathStep,
+  EarlySignalGuidanceResponse, NearbyRisk, PathStep, InterrogationResult,
 } from "@/lib/types";
 
 // ─── Map canvas ───────────────────────────────────────────────────────────────
@@ -478,6 +479,153 @@ function ChainPanel({ chain }: { chain: FoodChainResponse }) {
   );
 }
 
+// ─── Interrogation panel ─────────────────────────────────────────────────────
+const SEV_INSIGHT: Record<string, string> = {
+  high: "border-red-200 bg-red-50 text-red-800",
+  medium: "border-amber-200 bg-amber-50 text-amber-800",
+  low: "border-emerald-200 bg-emerald-50 text-emerald-800",
+};
+
+function CompletenessBar({ score }: { score: number }) {
+  const color = score >= 80 ? "#16a34a" : score >= 50 ? "#b45309" : "#dc2626";
+  return (
+    <div className="mb-3">
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-xs font-semibold text-slate-600">Assessment completeness</span>
+        <span className="text-xs font-bold" style={{ color }}>{score}%</span>
+      </div>
+      <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+        <div className="h-full rounded-full transition-all duration-500"
+          style={{ width: `${score}%`, backgroundColor: color }} />
+      </div>
+    </div>
+  );
+}
+
+function InterrogationPanel({
+  data, answeredIds, onAnswer,
+}: {
+  data: InterrogationResult;
+  answeredIds: string[];
+  onAnswer: (id: string, field: string, value: string) => void;
+}) {
+  const [inputVals, setInputVals] = useState<Record<string, string>>({});
+  const { critical_questions: questions, kg_insights: insights,
+          inferred_conditions: inferred, completeness_score: score, delta_message: delta } = data;
+
+  if (questions.length === 0 && insights.length === 0 && inferred.length === 0) return null;
+
+  return (
+    <div className="rounded-2xl border border-blue-200 bg-blue-50/60 p-4 shadow-sm space-y-3">
+      <CompletenessBar score={score} />
+      <p className="text-xs text-slate-600 leading-relaxed">{delta}</p>
+
+      {/* Inferred conditions */}
+      {inferred.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-xs font-bold uppercase tracking-wide text-slate-500">KG signals</p>
+          {inferred.map((c, i) => (
+            <div key={i} className={`rounded-lg border px-2.5 py-2 text-xs ${SEV_INSIGHT["medium"]}`}>
+              <span className="font-semibold">{c.name}</span>
+              <span className="ml-1.5 rounded-full bg-white/60 px-1.5 py-0.5 text-xs">
+                {c.confidence}
+              </span>
+              <p className="mt-0.5 opacity-80">{c.reason}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* KG insights (risk cascades, avoidance) */}
+      {insights.filter(i => i.type === "risk_cascade" || i.type === "avoidance").slice(0, 3).length > 0 && (
+        <div className="space-y-1">
+          <p className="text-xs font-bold uppercase tracking-wide text-slate-500">KG insights</p>
+          {insights
+            .filter(i => i.type === "risk_cascade" || i.type === "avoidance")
+            .slice(0, 3)
+            .map((ins, i) => (
+              <div key={i} className={`rounded border px-2.5 py-1.5 text-xs ${SEV_INSIGHT[ins.severity]}`}>
+                {ins.text}
+                {ins.evidence_count > 0 && (
+                  <span className="ml-1.5 opacity-60">({ins.evidence_count} source{ins.evidence_count !== 1 ? "s" : ""})</span>
+                )}
+              </div>
+            ))}
+        </div>
+      )}
+
+      {/* Critical questions */}
+      {questions.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+            Sharpen your assessment ({questions.length} question{questions.length !== 1 ? "s" : ""})
+          </p>
+          {questions.map((q) => (
+            <div key={q.id} className="rounded-xl border border-slate-200 bg-white p-3 space-y-2">
+              <p className="text-xs font-semibold text-slate-800">{q.question}</p>
+              {q.context && <p className="text-xs text-slate-500 leading-snug">{q.context}</p>}
+
+              {q.type === "confirm" && (
+                <div className="flex gap-2">
+                  <button type="button"
+                    onClick={() => onAnswer(q.id, q.field, q.value!)}
+                    className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700">
+                    Yes, confirmed
+                  </button>
+                  <button type="button"
+                    onClick={() => onAnswer(`denied:${q.value}`, q.field, "")}
+                    className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-200">
+                    No
+                  </button>
+                </div>
+              )}
+
+              {(q.type === "text" || q.type === "number") && (
+                <div className="flex gap-2">
+                  <input
+                    type={q.type}
+                    placeholder={q.hint ?? ""}
+                    value={inputVals[q.id] ?? ""}
+                    onChange={e => setInputVals(v => ({ ...v, [q.id]: e.target.value }))}
+                    onKeyDown={e => {
+                      if (e.key === "Enter" && (inputVals[q.id] ?? "").trim())
+                        onAnswer(q.id, q.field, (inputVals[q.id] ?? "").trim());
+                    }}
+                    className="flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs focus:border-blue-400 focus:outline-none"
+                  />
+                  <button type="button"
+                    onClick={() => {
+                      const v = (inputVals[q.id] ?? "").trim();
+                      if (v) onAnswer(q.id, q.field, v);
+                    }}
+                    className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700">
+                    Add
+                  </button>
+                  <button type="button"
+                    onClick={() => onAnswer(q.id, "", "")}
+                    className="text-xs text-slate-400 hover:underline">Skip</button>
+                </div>
+              )}
+
+              {q.type === "select" && q.options && (
+                <div className="flex flex-wrap gap-1.5">
+                  {q.options.map(opt => (
+                    <button key={opt} type="button"
+                      onClick={() => onAnswer(q.id, q.field, opt)}
+                      className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-colors">
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Profile chip summary ─────────────────────────────────────────────────────
 function ProfileChips({ ctx }: { ctx: UserContext }) {
   const chips: Array<{ label: string; color: string }> = [];
@@ -527,6 +675,11 @@ export default function HealthMapPage() {
   const [introLoading, setIntroLoading]   = useState(false);
   const [introError, setIntroError]       = useState<string | null>(null);
 
+  // ── Interrogation agent ──────────────────────────────────────────────────
+  const [interrogation, setInterrogation] = useState<InterrogationResult | null>(null);
+  const [answeredIds, setAnsweredIds]     = useState<string[]>([]);
+  const [interrogating, setInterrogating] = useState(false);
+
   // ── Food chain explorer ──────────────────────────────────────────────────
   const [foodInput, setFoodInput]         = useState("");
   const [chainLoading, setChainLoading]   = useState(false);
@@ -555,6 +708,12 @@ export default function HealthMapPage() {
         userX: ageToX(ctx.age),
         userY: conditionsToY(ctx.conditions ?? [], ctx.symptoms ?? [], ctx.age),
       });
+      // Async: run interrogation agent after map loads
+      setInterrogating(true);
+      fetchInterrogation(ctx, answeredIds)
+        .then(setInterrogation)
+        .catch(() => {/* silent — interrogation is enhancement only */})
+        .finally(() => setInterrogating(false));
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Request failed";
       setError(/failed to fetch|network error|load failed/i.test(msg)
@@ -563,7 +722,7 @@ export default function HealthMapPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [answeredIds]);
 
   // ── On mount: read context from localStorage and auto-locate ─────────────
   useEffect(() => {
@@ -585,7 +744,8 @@ export default function HealthMapPage() {
     setIntroLoading(true);
     setIntroError(null);
     try {
-      const ctx = await fetchContextFromText(introText);
+      const result = await fetchContextFromText(introText);
+      const ctx = result.context;
       setLoadedCtx(ctx);
       try { localStorage.setItem("health_context", JSON.stringify(ctx)); } catch { /* ignore */ }
       await submitContext(ctx);
@@ -603,8 +763,8 @@ export default function HealthMapPage() {
     setRefineLoading(true);
     setRefineError(null);
     try {
-      const parsed = await fetchContextFromText(refineText);
-      const merged = mergeContexts(loadedCtx ?? {}, parsed);
+      const result = await fetchContextFromText(refineText);
+      const merged = mergeContexts(loadedCtx ?? {}, result.context);
       setLoadedCtx(merged);
       setRefineText("");
       setShowRefine(false);
@@ -617,6 +777,45 @@ export default function HealthMapPage() {
       setRefineLoading(false);
     }
   };
+
+  // ── Interrogation answer handler ─────────────────────────────────────────
+  const handleAnswer = useCallback((id: string, field: string, value: string) => {
+    const newAnswered = [...answeredIds, id];
+    setAnsweredIds(newAnswered);
+
+    // Apply answer to context if it adds information
+    let patch: Partial<UserContext> = {};
+    if (field === "conditions" && value) {
+      patch = { conditions: [...(loadedCtx?.conditions ?? []), value].filter((v, i, a) => a.indexOf(v) === i) };
+    } else if (field === "medications" && value && value.toLowerCase() !== "none") {
+      patch = { medications: [...(loadedCtx?.medications ?? []), value].filter((v, i, a) => a.indexOf(v) === i) };
+    } else if (field === "symptoms" && value) {
+      patch = { symptoms: [...(loadedCtx?.symptoms ?? []), value].filter((v, i, a) => a.indexOf(v) === i) };
+    } else if (field === "goals" && value) {
+      patch = { goals: [...(loadedCtx?.goals ?? []), value].filter((v, i, a) => a.indexOf(v) === i) };
+    } else if (field === "way_of_living" && value) {
+      patch = { way_of_living: value };
+    } else if (field === "age" && value) {
+      const n = parseInt(value, 10);
+      if (!isNaN(n) && n > 0) patch = { age: n };
+    }
+
+    const updated = Object.keys(patch).length > 0 ? { ...loadedCtx, ...patch } : loadedCtx;
+    if (updated && Object.keys(patch).length > 0) {
+      setLoadedCtx(updated as UserContext);
+      try { localStorage.setItem("health_context", JSON.stringify(updated)); } catch { /* ignore */ }
+      submitContext(updated as UserContext);
+    } else {
+      // No context change, but refresh interrogation with new answered list
+      if (loadedCtx) {
+        setInterrogating(true);
+        fetchInterrogation(loadedCtx, newAnswered)
+          .then(setInterrogation)
+          .catch(() => {})
+          .finally(() => setInterrogating(false));
+      }
+    }
+  }, [answeredIds, loadedCtx, submitContext]);
 
   // ── Food chain ───────────────────────────────────────────────────────────
   const handleFoodChain = async (e: React.FormEvent) => {
@@ -772,6 +971,24 @@ export default function HealthMapPage() {
                 <p className="text-xs text-slate-600 leading-relaxed">
                   <NarrativeText text={narrative} />
                 </p>
+              </div>
+            )}
+
+            {/* ── Interrogation agent panel ───────────────────────────────── */}
+            {(interrogation || interrogating) && (
+              <div>
+                {interrogating && !interrogation && (
+                  <div className="rounded-2xl border border-blue-100 bg-blue-50/40 p-4 text-xs text-slate-500 animate-pulse">
+                    Analysing your profile…
+                  </div>
+                )}
+                {interrogation && (
+                  <InterrogationPanel
+                    data={interrogation}
+                    answeredIds={answeredIds}
+                    onAnswer={handleAnswer}
+                  />
+                )}
               </div>
             )}
 
