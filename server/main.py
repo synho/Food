@@ -4,8 +4,12 @@ Zero-error: recommendations/restrictions only with evidence. Standardized terms 
 Run from repo root: uvicorn server.main:app --reload
 """
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 import os
+
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).resolve().parent / ".env")
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
