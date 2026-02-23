@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --badge-info: #3b82f6;
+  --badge-knowledge: #22c55e;
+  --badge-wisdom: #eab308;
+}

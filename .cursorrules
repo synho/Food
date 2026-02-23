@@ -1,0 +1,16 @@
+# 헬스맵 KG 파이프라인 개발 규칙
+
+## 1. 자율 작업 원칙 (Agentic Workflow)
+- 작업을 시작하기 전 반드시 `kg_pipeline/config.yaml`과 **`.cursor/plans/roadmap.md`**(MASTER_PLAN)를 먼저 읽을 것.
+- 파이프라인 코드 수정 후에는 반드시 **kg_pipeline** 디렉터리에서 `python src/validate_run.py --neo4j`를 실행하여 회귀 테스트를 수행할 것.
+- 터미널 에러 발생 시 사용자의 지시를 기다리지 말고, 에러 메시지를 분석하여 즉시 수정을 시도할 것.
+
+## 2. 기술 스택 및 제약
+- DB: Neo4j (foodnot4self / foodnot4self)
+- LLM: Gemini 2.0 Flash Lite (추출 효율 최적화)
+- 데이터 원칙: Zero-error tolerance. 모든 관계(Triple)에는 `source_id`와 `pub_date`가 필수.
+- **용어 표준화(매우 중요)**: 모든 용어는 표준화할 것. 엔티티 이름·API 필드·UI 라벨·문서는 하나의 캐노니컬 형태 사용. 파이프라인은 `ontology.py`의 CANONICAL_ENTITY_NAMES/ENTITY_TYPE_ALIASES 확장 및 normalize_entity_name·normalize_entity_type 일관 적용. 서버/API 응답도 KG 조회·반환 시 동일 캐노니컬 이름 사용.
+
+## 3. 자동화 워크플로우
+- 새로운 에이전트 추가 시 `manifest` 파일 생성 로직이 포함되었는지 확인할 것.
+- Docker 서비스(Neo4j)가 꺼져 있다면 **kg_pipeline** 디렉터리에서 자동으로 `docker-compose up -d`를 실행할 것.

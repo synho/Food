@@ -1,0 +1,34 @@
+# Git and env
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+
+# Python
+**/__pycache__
+**/*.py[cod]
+**/.venv
+**/venv
+.venv
+
+# Node
+**/node_modules
+**/.next
+
+# Data and local state
+kg_pipeline/neo4j
+kg_pipeline/data
+**/neo4j/data
+**/neo4j/logs
+**/neo4j/import
+**/neo4j/plugins
+
+# IDE and docs (optional, keeps image smaller)
+.cursor
+*.md
+!README.md
+
+# Misc
+.DS_Store
+*.log

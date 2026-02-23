@@ -1,3 +1,13 @@
+# Secrets
+/.env
+server/.env
+
+# IDE
+.cursor/
+
+# Build artifacts
+web/tsconfig.tsbuildinfo
+
 # Python
 kg_pipeline/venv/
 __pycache__/
