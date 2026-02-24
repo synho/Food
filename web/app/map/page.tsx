@@ -1048,33 +1048,6 @@ export default function HealthMapPage() {
   const [landmineData, setLandmineData]   = useState<LandmineResult | null>(null);
   const [selectedLandmine, setSelectedLandmine] = useState<LandmineDisease | null>(null);
 
-  // ── Profile remove / clear ───────────────────────────────────────────────
-  const handleRemoveFromProfile = useCallback((field: string, value: string) => {
-    if (!loadedCtx) return;
-    let updated: UserContext = { ...loadedCtx };
-    if (field === "conditions")  updated = { ...updated, conditions:  (updated.conditions  ?? []).filter(v => v !== value) };
-    else if (field === "symptoms")    updated = { ...updated, symptoms:    (updated.symptoms    ?? []).filter(v => v !== value) };
-    else if (field === "medications") updated = { ...updated, medications: (updated.medications ?? []).filter(v => v !== value) };
-    else if (field === "goals")       updated = { ...updated, goals:       (updated.goals       ?? []).filter(v => v !== value) };
-    else if (field === "age")         updated = { ...updated, age: null };
-    else if (field === "gender")      updated = { ...updated, gender: null };
-    else return;
-    setLoadedCtx(updated);
-    try { localStorage.setItem("health_context", JSON.stringify(updated)); } catch { /* ignore */ }
-    submitContext(updated);
-  }, [loadedCtx, submitContext]);
-
-  const handleClearProfile = useCallback(() => {
-    setLoadedCtx(null);
-    setMapData(null);
-    setInterrogation(null);
-    setAnsweredIds([]);
-    setLandmineData(null);
-    setSelectedLandmine(null);
-    setSelectedRisk(null);
-    try { localStorage.removeItem("health_context"); } catch { /* ignore */ }
-  }, []);
-
   // ── Food chain explorer ──────────────────────────────────────────────────
   const [foodInput, setFoodInput]         = useState("");
   const [chainLoading, setChainLoading]   = useState(false);
@@ -1122,6 +1095,33 @@ export default function HealthMapPage() {
       setLoading(false);
     }
   }, [answeredIds]);
+
+  // ── Profile remove / clear — must be after submitContext ──────────────────
+  const handleRemoveFromProfile = useCallback((field: string, value: string) => {
+    if (!loadedCtx) return;
+    let updated: UserContext = { ...loadedCtx };
+    if (field === "conditions")       updated = { ...updated, conditions:  (updated.conditions  ?? []).filter(v => v !== value) };
+    else if (field === "symptoms")    updated = { ...updated, symptoms:    (updated.symptoms    ?? []).filter(v => v !== value) };
+    else if (field === "medications") updated = { ...updated, medications: (updated.medications ?? []).filter(v => v !== value) };
+    else if (field === "goals")       updated = { ...updated, goals:       (updated.goals       ?? []).filter(v => v !== value) };
+    else if (field === "age")         updated = { ...updated, age: null };
+    else if (field === "gender")      updated = { ...updated, gender: null };
+    else return;
+    setLoadedCtx(updated);
+    try { localStorage.setItem("health_context", JSON.stringify(updated)); } catch { /* ignore */ }
+    submitContext(updated);
+  }, [loadedCtx, submitContext]);
+
+  const handleClearProfile = useCallback(() => {
+    setLoadedCtx(null);
+    setMapData(null);
+    setInterrogation(null);
+    setAnsweredIds([]);
+    setLandmineData(null);
+    setSelectedLandmine(null);
+    setSelectedRisk(null);
+    try { localStorage.removeItem("health_context"); } catch { /* ignore */ }
+  }, []);
 
   // ── On mount: read context from localStorage and auto-locate ─────────────
   useEffect(() => {
