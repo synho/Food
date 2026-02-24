@@ -36,7 +36,11 @@ from server.neo4j_client import close_driver
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Start adaptive pipeline scheduler (background thread)
+    from server.pipeline_scheduler import scheduler
+    scheduler.start(initial_delay_minutes=int(os.getenv("SCHEDULER_INITIAL_DELAY_MIN", "10")))
     yield
+    scheduler.stop()
     close_driver()
 
 
@@ -72,6 +76,20 @@ app.add_middleware(TieredAccessMiddleware)
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/api/pipeline/status")
+def pipeline_status():
+    """Pipeline scheduler status: state, last run, next run, adaptive interval."""
+    from server.pipeline_scheduler import scheduler
+    return scheduler.status()
+
+
+@app.post("/api/pipeline/trigger")
+def pipeline_trigger():
+    """Force an immediate pipeline run (smart-fetch → extract → ingest)."""
+    from server.pipeline_scheduler import scheduler
+    return scheduler.trigger_now()
 
 
 @app.get("/api/kg/food-chain")

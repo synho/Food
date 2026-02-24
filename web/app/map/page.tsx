@@ -5,8 +5,9 @@ import Link from "next/link";
 import {
   fetchPosition, fetchSafestPath, fetchEarlySignals, fetchFoodChain,
   fetchContextFromText, fetchInterrogation, fetchLandmines,
+  fetchPipelineStatus, triggerPipeline,
 } from "@/lib/api";
-import type { FoodChainResponse } from "@/lib/api";
+import type { FoodChainResponse, PipelineStatus } from "@/lib/api";
 import type {
   UserContext, PositionResponse, SafestPathResponse,
   EarlySignalGuidanceResponse, NearbyRisk, PathStep, InterrogationResult,
@@ -915,21 +916,95 @@ function InterrogationPanel({
   );
 }
 
-// ─── Profile chip summary ─────────────────────────────────────────────────────
-function ProfileChips({ ctx }: { ctx: UserContext }) {
-  const chips: Array<{ label: string; color: string }> = [];
-  if (ctx.age) chips.push({ label: `Age ${ctx.age}`, color: "bg-blue-100 text-blue-800" });
-  if (ctx.gender) chips.push({ label: ctx.gender, color: "bg-slate-100 text-slate-700" });
-  (ctx.conditions ?? []).forEach(c => chips.push({ label: c, color: "bg-amber-100 text-amber-800" }));
-  (ctx.symptoms ?? []).forEach(s => chips.push({ label: s, color: "bg-orange-100 text-orange-800" }));
-  (ctx.medications ?? []).forEach(m => chips.push({ label: m, color: "bg-purple-100 text-purple-800" }));
-  (ctx.goals ?? []).forEach(g => chips.push({ label: g, color: "bg-emerald-100 text-emerald-800" }));
+// ─── Profile editor ───────────────────────────────────────────────────────────
+const CHIP_COLORS: Record<string, string> = {
+  age:        "bg-blue-100 text-blue-800 border-blue-200",
+  gender:     "bg-slate-100 text-slate-700 border-slate-200",
+  conditions: "bg-amber-100 text-amber-800 border-amber-200",
+  symptoms:   "bg-orange-100 text-orange-800 border-orange-200",
+  medications:"bg-purple-100 text-purple-800 border-purple-200",
+  goals:      "bg-emerald-100 text-emerald-800 border-emerald-200",
+};
+
+function ProfileEditor({
+  ctx, onRemove, onClear,
+}: {
+  ctx: UserContext;
+  onRemove: (field: string, value: string) => void;
+  onClear: () => void;
+}) {
+  type Chip = { field: string; value: string; label: string };
+  const chips: Chip[] = [];
+  if (ctx.age)    chips.push({ field: "age",    value: String(ctx.age),   label: `Age ${ctx.age}` });
+  if (ctx.gender) chips.push({ field: "gender", value: ctx.gender,        label: ctx.gender });
+  (ctx.conditions  ?? []).forEach(v => chips.push({ field: "conditions",  value: v, label: v }));
+  (ctx.symptoms    ?? []).forEach(v => chips.push({ field: "symptoms",    value: v, label: v }));
+  (ctx.medications ?? []).forEach(v => chips.push({ field: "medications", value: v, label: v }));
+  (ctx.goals       ?? []).forEach(v => chips.push({ field: "goals",       value: v, label: v }));
+
   if (chips.length === 0) return null;
   return (
-    <div className="flex flex-wrap gap-1.5">
-      {chips.map(({ label, color }, i) => (
-        <span key={i} className={`rounded-full px-2.5 py-1 text-xs font-medium ${color}`}>{label}</span>
-      ))}
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-1.5">
+        {chips.map(({ field, value, label }, i) => (
+          <span key={i}
+            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium ${CHIP_COLORS[field] ?? "bg-slate-100 text-slate-700 border-slate-200"}`}>
+            {label}
+            <button type="button"
+              onClick={() => onRemove(field, value)}
+              className="ml-0.5 rounded-full hover:bg-black/10 leading-none w-3.5 h-3.5 flex items-center justify-center text-[10px] font-bold"
+              title={`Remove ${label}`}>
+              ×
+            </button>
+          </span>
+        ))}
+      </div>
+      <button type="button" onClick={onClear}
+        className="text-xs text-slate-400 hover:text-red-500 transition-colors">
+        Clear all profile info
+      </button>
+    </div>
+  );
+}
+
+// ─── Pipeline status widget ───────────────────────────────────────────────────
+function PipelineWidget() {
+  const [status, setStatus] = useState<PipelineStatus | null>(null);
+  const [triggering, setTriggering] = useState(false);
+
+  useEffect(() => {
+    fetchPipelineStatus().then(setStatus).catch(() => {});
+    const id = setInterval(() => fetchPipelineStatus().then(setStatus).catch(() => {}), 30000);
+    return () => clearInterval(id);
+  }, []);
+
+  if (!status) return null;
+  const isRunning = status.state === "running";
+  return (
+    <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs flex items-center justify-between gap-2">
+      <div className="flex items-center gap-1.5">
+        <span className={`h-2 w-2 rounded-full ${isRunning ? "bg-green-400 animate-pulse" : "bg-slate-300"}`} />
+        <span className="text-slate-500">
+          {isRunning
+            ? "Fetching new evidence…"
+            : status.next_run_in_minutes != null
+              ? `Next update in ${status.next_run_in_minutes}m`
+              : "Scheduler ready"}
+        </span>
+        {status.last_new_papers != null && !isRunning && (
+          <span className="text-slate-400">· +{status.last_new_papers} papers last run</span>
+        )}
+      </div>
+      <button type="button"
+        disabled={isRunning || triggering}
+        onClick={async () => {
+          setTriggering(true);
+          await triggerPipeline().catch(() => {});
+          setTimeout(() => { fetchPipelineStatus().then(setStatus).catch(() => {}); setTriggering(false); }, 1000);
+        }}
+        className="rounded px-2 py-0.5 text-xs bg-white border border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-600 disabled:opacity-40 transition-colors">
+        {isRunning || triggering ? "Running…" : "Run now"}
+      </button>
     </div>
   );
 }
@@ -972,6 +1047,33 @@ export default function HealthMapPage() {
   // ── Landmine detection ───────────────────────────────────────────────────
   const [landmineData, setLandmineData]   = useState<LandmineResult | null>(null);
   const [selectedLandmine, setSelectedLandmine] = useState<LandmineDisease | null>(null);
+
+  // ── Profile remove / clear ───────────────────────────────────────────────
+  const handleRemoveFromProfile = useCallback((field: string, value: string) => {
+    if (!loadedCtx) return;
+    let updated: UserContext = { ...loadedCtx };
+    if (field === "conditions")  updated = { ...updated, conditions:  (updated.conditions  ?? []).filter(v => v !== value) };
+    else if (field === "symptoms")    updated = { ...updated, symptoms:    (updated.symptoms    ?? []).filter(v => v !== value) };
+    else if (field === "medications") updated = { ...updated, medications: (updated.medications ?? []).filter(v => v !== value) };
+    else if (field === "goals")       updated = { ...updated, goals:       (updated.goals       ?? []).filter(v => v !== value) };
+    else if (field === "age")         updated = { ...updated, age: null };
+    else if (field === "gender")      updated = { ...updated, gender: null };
+    else return;
+    setLoadedCtx(updated);
+    try { localStorage.setItem("health_context", JSON.stringify(updated)); } catch { /* ignore */ }
+    submitContext(updated);
+  }, [loadedCtx, submitContext]);
+
+  const handleClearProfile = useCallback(() => {
+    setLoadedCtx(null);
+    setMapData(null);
+    setInterrogation(null);
+    setAnsweredIds([]);
+    setLandmineData(null);
+    setSelectedLandmine(null);
+    setSelectedRisk(null);
+    try { localStorage.removeItem("health_context"); } catch { /* ignore */ }
+  }, []);
 
   // ── Food chain explorer ──────────────────────────────────────────────────
   const [foodInput, setFoodInput]         = useState("");
@@ -1202,8 +1304,12 @@ export default function HealthMapPage() {
                   </p>
                 </div>
 
-                {/* Profile chips */}
-                <ProfileChips ctx={loadedCtx!} />
+                {/* Editable profile chips */}
+                <ProfileEditor
+                  ctx={loadedCtx!}
+                  onRemove={handleRemoveFromProfile}
+                  onClear={handleClearProfile}
+                />
 
                 {/* "Add more" toggle */}
                 <button
@@ -1358,6 +1464,9 @@ export default function HealthMapPage() {
             {selectedLandmine && (
               <LandminePanel landmine={selectedLandmine} onClose={() => setSelectedLandmine(null)} />
             )}
+
+            {/* ── Pipeline status widget ──────────────────────────────────── */}
+            <PipelineWidget />
           </div>
 
           {/* ── RIGHT: Map ───────────────────────────────────────────────── */}

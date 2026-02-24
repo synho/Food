@@ -31,10 +31,16 @@ _SKIP_CONDITIONS = {
 _NUTRITION_JOURNALS = [
     "Nutrients", "Br J Nutr", "J Nutr", "Eur J Nutr",
     "Am J Clin Nutr", "Nutr Rev", "Clin Nutr", "Front Nutr",
+    "Int J Environ Res Public Health", "J Acad Nutr Diet",
 ]
 _MEDICAL_JOURNALS = [
     "Nat Med", "Lancet", "N Engl J Med", "JAMA", "BMJ",
     "Ann Intern Med", "Am J Clin Nutr",
+    # Specialty journals for landmine diseases
+    "JAMA Neurol", "Lancet Neurol", "Alzheimers Dement", "Neurology",
+    "Kidney Int", "J Am Soc Nephrol",
+    "Lancet Oncol", "Gut",
+    "JAMA Psychiatry", "Mol Psychiatry",
 ]
 _FOOD_CHEM_JOURNALS = [
     "Food Chem", "J Food Compos Anal", "LWT", "Food Res Int",

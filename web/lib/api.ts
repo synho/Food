@@ -123,6 +123,32 @@ export async function fetchInterrogation(
   return res.json();
 }
 
+/** Pipeline scheduler status. */
+export interface PipelineStatus {
+  state: "idle" | "running";
+  last_run: string | null;
+  next_run: string | null;
+  next_run_in_minutes: number | null;
+  interval_minutes: number;
+  last_new_papers: number | null;
+  last_valid_triples: number | null;
+  last_elapsed_s: number | null;
+  runs_completed: number;
+  venv_found: boolean;
+}
+
+export async function fetchPipelineStatus(): Promise<PipelineStatus> {
+  const res = await fetch(`${API}/api/pipeline/status`);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+export async function triggerPipeline(): Promise<{ status: string }> {
+  const res = await fetch(`${API}/api/pipeline/trigger`, { method: "POST" });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
 /** KG stats for dashboard (Neo4j + optional pipeline). */
 export interface KgStats {
   neo4j: {
