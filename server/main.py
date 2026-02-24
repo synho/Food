@@ -36,6 +36,9 @@ from server.neo4j_client import close_driver
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Initialize persistent storage
+    from server.db import init_db
+    init_db()
     # Start adaptive pipeline scheduler (background thread)
     from server.pipeline_scheduler import scheduler
     scheduler.start(initial_delay_minutes=int(os.getenv("SCHEDULER_INITIAL_DELAY_MIN", "10")))
@@ -92,6 +95,20 @@ def pipeline_trigger():
     return scheduler.trigger_now()
 
 
+@app.get("/api/pipeline/history")
+def pipeline_history(limit: int = 20):
+    """Pipeline run history from persistent storage (survives restarts)."""
+    from server.db import get_run_history
+    return get_run_history(limit=min(limit, 100))
+
+
+@app.get("/api/pipeline/yield")
+def pipeline_yield():
+    """Per-query fetch yield statistics — shows which queries produce useful triples."""
+    from server.db import get_yield_stats
+    return get_yield_stats()
+
+
 @app.get("/api/kg/food-chain")
 def kg_food_chain(food: str = ""):
     """
@@ -111,12 +128,26 @@ def kg_food_chain(food: str = ""):
 def kg_stats():
     """
     Knowledge Graph statistics for dashboard: Neo4j node/relationship counts,
-    breakdown by label and relationship type. Optionally pipeline triples if
-    MASTER_GRAPH_PATH is set and the file exists.
+    breakdown by label and relationship type. Includes 30-day trend from SQLite.
+    Optionally pipeline triples if MASTER_GRAPH_PATH is set.
     """
     import os
     from server.neo4j_client import get_kg_stats as neo4j_kg_stats
-    out = {"neo4j": neo4j_kg_stats()}
+    from server.db import save_kg_snapshot, get_kg_trend
+    neo4j_data = neo4j_kg_stats()
+    out = {"neo4j": neo4j_data}
+    # Save daily snapshot if we got valid data
+    if "nodes" in neo4j_data and not neo4j_data.get("error"):
+        try:
+            save_kg_snapshot(
+                total_nodes=neo4j_data["nodes"],
+                total_relationships=neo4j_data["relationships"],
+                by_label=neo4j_data.get("by_label"),
+                by_relationship_type=neo4j_data.get("by_relationship_type"),
+            )
+        except Exception:
+            pass
+    out["trend"] = get_kg_trend(30)
     master_path = os.getenv("MASTER_GRAPH_PATH")
     if master_path and os.path.isfile(master_path):
         try:
@@ -133,6 +164,23 @@ def kg_stats():
         except Exception:
             pass
     return out
+
+
+@app.get("/api/kg/demand")
+def kg_demand(limit: int = 20):
+    """Top queried conditions/symptoms ranked by demand — drives gap prioritization."""
+    from server.db import get_top_demand
+    return get_top_demand(limit=min(limit, 100))
+
+
+@app.get("/api/kg/contradictions")
+def kg_contradictions():
+    """
+    Return detected evidence contradictions — entities that both help and harm
+    the same disease. Each record includes verdict: negative_contested, positive_contested, or debated.
+    """
+    from server.db import get_contradictions
+    return get_contradictions()
 
 
 @app.get("/api/suggest")
@@ -153,6 +201,18 @@ class InterrogateRequest(BaseModel):
         description="Question IDs already answered by user — prevents re-asking")
 
 
+def _log_demand_from_context(ctx: UserContext) -> None:
+    """Lightweight background demand logging from user context."""
+    try:
+        from server.db import log_demand
+        if ctx.conditions:
+            log_demand(ctx.conditions, "condition")
+        if ctx.symptoms:
+            log_demand(ctx.symptoms, "symptom")
+    except Exception:
+        pass  # Non-critical
+
+
 @app.post("/api/health-map/landmines")
 def health_map_landmines(ctx: UserContext):
     """
@@ -160,6 +220,7 @@ def health_map_landmines(ctx: UserContext):
     Returns all 6 landmine diseases with risk_level (none|low|medium|high),
     risk factors present/missing, early warning signs, escape routes, and KG evidence.
     """
+    _log_demand_from_context(ctx)
     from server.services.landmine_detector import get_landmines
     return get_landmines(ctx)
 
@@ -201,6 +262,7 @@ def recommendations_foods(request: Request, ctx: UserContext):
     User context (conditions, symptoms) is normalized to canonical names for KG lookup.
     Free plan: up to 5 items. Paid plan: up to 20 items.
     """
+    _log_demand_from_context(ctx)
     return get_recommendations(
         conditions=ctx.conditions or [],
         symptoms=ctx.symptoms or [],
@@ -217,6 +279,7 @@ def health_map_position(request: Request, ctx: UserContext):
     Where the user is on the map (active conditions/symptoms) and nearby risks (diseases, early signals).
     Free plan: up to 5 nearby risks. Paid plan: up to 30.
     """
+    _log_demand_from_context(ctx)
     return get_position(
         conditions=ctx.conditions or [],
         symptoms=ctx.symptoms or [],
@@ -321,3 +384,41 @@ def me_context_restore(restore_token: str = ""):
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Invalid or expired restore code.")
     return ctx.model_dump()
+
+
+# ----- Longitudinal user tracking (snapshots + trajectory) -----
+
+class SnapshotRequest(BaseModel):
+    user_token: str = Field(description="Hash of user context for grouping (no PII)")
+    context: UserContext = Field(default_factory=UserContext)
+    position_x: float | None = None
+    position_y: float | None = None
+    zone: str | None = None
+    landmine_risks: dict | None = Field(default=None, description="JSON: {disease: risk_level}")
+
+
+@app.post("/api/me/snapshot")
+def me_snapshot(body: SnapshotRequest):
+    """Save a context snapshot after map render. Returns snapshot id."""
+    from server.db import save_snapshot
+    snapshot_id = save_snapshot(
+        user_token=body.user_token,
+        age=body.context.age,
+        conditions=body.context.conditions,
+        symptoms=body.context.symptoms,
+        position_x=body.position_x,
+        position_y=body.position_y,
+        zone=body.zone,
+        landmine_risks=body.landmine_risks,
+    )
+    return {"snapshot_id": snapshot_id}
+
+
+@app.get("/api/me/trajectory")
+def me_trajectory(token: str = "", limit: int = 50):
+    """Return trajectory snapshots for a user token, oldest first."""
+    if not token.strip():
+        from fastapi import HTTPException
+        raise HTTPException(status_code=422, detail="token query parameter is required")
+    from server.db import get_trajectory
+    return get_trajectory(token.strip(), limit=min(limit, 200))

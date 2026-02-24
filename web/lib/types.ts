@@ -195,3 +195,20 @@ export interface DrugSubstitutionResponse {
   by_drug: DrugSubstitutionItem[];
   disclaimer: string;
 }
+
+/** Longitudinal tracking: a single position snapshot. */
+export interface Snapshot {
+  recorded_at: string;
+  age: number | null;
+  conditions: string[];
+  symptoms: string[];
+  position_x: number | null;
+  position_y: number | null;
+  zone: string | null;
+  landmine_risks: Record<string, string>;
+}
+
+/** Trajectory: ordered list of snapshots for a user token. */
+export interface Trajectory {
+  snapshots: Snapshot[];
+}

@@ -88,18 +88,21 @@ def _rel_to_evidence(rel: dict) -> Evidence:
 # ── Query helpers ─────────────────────────────────────────────────────────────
 
 def _run_layer1(targets: list[str], limit: int) -> list[dict]:
-    """Layer 1 — 1-hop: Food/Nutrient -[PREVENTS|TREATS|ALLEVIATES|REDUCES_RISK_OF]-> Disease/Symptom."""
+    """Layer 1 — 1-hop: Food/Nutrient -[PREVENTS|TREATS|ALLEVIATES|REDUCES_RISK_OF]-> Disease/Symptom.
+    Filters out contested relationships; marks debated ones."""
     q = """
     MATCH (f)-[r]->(t)
     WHERE (f:Food OR f:Nutrient)
       AND type(r) IN ['PREVENTS', 'TREATS', 'ALLEVIATES', 'REDUCES_RISK_OF']
       AND (t:Disease OR t:Symptom)
       AND r.source_id IS NOT NULL AND r.source_id <> ''
+      AND NOT coalesce(r.contested, false)
       AND (size($targets) = 0 OR t.name IN $targets)
     RETURN f.name AS food, type(r) AS predicate, t.name AS target,
            null AS via_nutrient,
            r.context AS context, r.source_id AS source_id, r.source_type AS source_type,
-           r.journal AS journal, r.pub_date AS pub_date
+           r.journal AS journal, r.pub_date AS pub_date,
+           coalesce(r.debated, false) AS debated
     LIMIT $query_limit
     """
     return run_query(q, {"targets": targets, "query_limit": limit * 10})
@@ -143,17 +146,20 @@ def _run_layer3(targets: list[str], limit: int) -> list[dict]:
 
 
 def _run_restricted(targets: list[str], limit: int) -> list[dict]:
-    """Restricted foods: Food/Nutrient -[AGGRAVATES|CAUSES]-> Disease/Symptom."""
+    """Restricted foods: Food/Nutrient -[AGGRAVATES|CAUSES]-> Disease/Symptom.
+    Filters out contested relationships; marks debated ones."""
     q = """
     MATCH (f)-[r]->(t)
     WHERE (f:Food OR f:Nutrient)
       AND type(r) IN ['AGGRAVATES', 'CAUSES']
       AND (t:Disease OR t:Symptom)
       AND r.source_id IS NOT NULL AND r.source_id <> ''
+      AND NOT coalesce(r.contested, false)
       AND (size($targets) = 0 OR t.name IN $targets)
     RETURN f.name AS food, type(r) AS predicate, t.name AS target,
            r.context AS context, r.source_id AS source_id, r.source_type AS source_type,
-           r.journal AS journal, r.pub_date AS pub_date
+           r.journal AS journal, r.pub_date AS pub_date,
+           coalesce(r.debated, false) AS debated
     LIMIT $query_limit
     """
     return run_query(q, {"targets": targets, "query_limit": limit * 10})
@@ -170,6 +176,9 @@ def _make_reason(row: dict, profile_note: str = "") -> str:
         reason = f"Contains {via} which {pred} {target}"
     else:
         reason = f"Associated with {pred} of {target}"
+
+    if row.get("debated"):
+        reason += " [debated — conflicting evidence exists]"
 
     if profile_note:
         reason = f"{profile_note} — {reason}"

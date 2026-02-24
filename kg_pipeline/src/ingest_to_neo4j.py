@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 
 from config_loader import get_paths_config
-from ontology import normalize_entity_type, normalize_predicate
+from ontology import normalize_entity_type, normalize_predicate, normalize_entity_name_for_merge, normalize_entity_name
 from artifacts import AGENT_EXTRACT, AGENT_INGEST, get_run_id, read_manifest, write_manifest
 
 load_dotenv()
@@ -62,11 +62,20 @@ class KnowledgeGraphIngestor:
         rel_type = predicate.replace("-", "_").replace(" ", "_")
         source_id = triple.get("source_id", "")
 
-        # Fix: include source_id in MERGE so each (subject, predicate, object, source) gets its own
-        # relationship — prior evidence from other papers is never overwritten.
+        # MERGE on lowercased name to prevent case-sensitive duplicates;
+        # display_name preserves the canonical casing for UI/API use.
+        subject_merge = normalize_entity_name_for_merge(subject_name)
+        object_merge = normalize_entity_name_for_merge(object_name)
+        subject_display = normalize_entity_name(subject_name)
+        object_display = normalize_entity_name(object_name)
+
         query = f"""
-        MERGE (s:{subject_label} {{name: $subject_name}})
-        MERGE (o:{object_label} {{name: $object_name}})
+        MERGE (s:{subject_label} {{name: $subject_merge}})
+        SET s.display_name = $subject_display
+        WITH s
+        MERGE (o:{object_label} {{name: $object_merge}})
+        SET o.display_name = $object_display
+        WITH s, o
         MERGE (s)-[r:{rel_type} {{source_id: $source_id}}]->(o)
         SET r.context = $context,
             r.source_type = $source_type,
@@ -76,8 +85,10 @@ class KnowledgeGraphIngestor:
             r.evidence_strength = $evidence_strength
         """
         tx.run(query,
-               subject_name=subject_name,
-               object_name=object_name,
+               subject_merge=subject_merge,
+               object_merge=object_merge,
+               subject_display=subject_display,
+               object_display=object_display,
                context=triple.get("context", ""),
                source_id=source_id,
                source_type=triple.get("source_type", "PMC"),

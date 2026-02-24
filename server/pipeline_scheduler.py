@@ -43,7 +43,7 @@ class PipelineScheduler:
         self.next_run: datetime | None = None
         self.interval: int = _BASE_INTERVAL
         self.last_result: dict = {}
-        self.history: list[dict] = []     # last 10 run summaries
+        self.run_count: int = 0           # total runs since startup
 
         self._thread: threading.Thread | None = None
         self._stop = threading.Event()
@@ -66,11 +66,14 @@ class PipelineScheduler:
 
     def _run_pipeline(self) -> dict:
         """Execute smart-fetch → extract → ingest. Returns run summary."""
+        from server.db import log_run_start, log_run_end
         started = datetime.now()
-        summary: dict = {"started": started.isoformat(), "steps": {}}
+        db_run_id = log_run_start()
+        summary: dict = {"started": started.isoformat(), "steps": {}, "db_run_id": db_run_id}
 
         if not _VENV_PYTHON.exists():
             summary["error"] = f"venv not found at {_VENV_PYTHON}"
+            log_run_end(db_run_id, error=summary["error"])
             return summary
 
         # Step 1: smart-fetch
@@ -93,6 +96,9 @@ class PipelineScheduler:
         if code != 0 or new_papers == 0:
             summary["skipped_extract"] = True
             summary["elapsed_s"] = int((datetime.now() - started).total_seconds())
+            log_run_end(db_run_id, new_papers=new_papers,
+                        elapsed_s=summary["elapsed_s"],
+                        error="smart_fetch failed" if code != 0 else None)
             return summary
 
         # Step 2: extract
@@ -116,7 +122,43 @@ class PipelineScheduler:
             _KG_PIPELINE_DIR, timeout=120,
         )
         summary["steps"]["ingest"] = {"code": code, "output": out[-400:]}
+
+        # Step 4: entity resolution (merge duplicate nodes)
+        code, out = self._run(
+            [str(_VENV_PYTHON), "src/entity_resolver.py"],
+            _KG_PIPELINE_DIR, timeout=120,
+        )
+        summary["steps"]["entity_resolver"] = {"code": code, "output": out[-400:]}
+
+        # Step 5: contradiction detection
+        try:
+            from server.services.contradiction_detector import detect_contradictions
+            contradictions = detect_contradictions()
+            summary["contradictions_found"] = len(contradictions)
+        except Exception as e:
+            summary["steps"]["contradiction_detector"] = {"error": str(e)}
+
+        # Step 6: quality re-extraction (every 10th run)
+        if self.run_count > 0 and self.run_count % 10 == 0:
+            code, out = self._run(
+                [str(_VENV_PYTHON), "src/reextract.py", "--limit", "5"],
+                _KG_PIPELINE_DIR, timeout=600,
+            )
+            summary["steps"]["reextract"] = {"code": code, "output": out[-400:]}
+            # Re-ingest if re-extraction improved papers
+            if code == 0 and "improved" in out:
+                code2, out2 = self._run(
+                    [str(_VENV_PYTHON), "src/ingest_to_neo4j.py"],
+                    _KG_PIPELINE_DIR, timeout=120,
+                )
+                summary["steps"]["reingest"] = {"code": code2, "output": out2[-400:]}
+
         summary["elapsed_s"] = int((datetime.now() - started).total_seconds())
+        log_run_end(db_run_id,
+                    new_papers=new_papers,
+                    valid_triples=summary.get("valid_triples"),
+                    elapsed_s=summary["elapsed_s"])
+        self.run_count += 1
         return summary
 
     # ── Scheduler loop ────────────────────────────────────────────────────────
@@ -138,7 +180,6 @@ class PipelineScheduler:
             with self._lock:
                 self.last_run = datetime.now()
                 self.last_result = result
-                self.history = ([result] + self.history)[:10]
 
                 new_papers = result.get("new_papers", 0)
                 if result.get("error"):
@@ -192,7 +233,7 @@ class PipelineScheduler:
                 "last_new_papers": self.last_result.get("new_papers"),
                 "last_valid_triples": self.last_result.get("valid_triples"),
                 "last_elapsed_s": self.last_result.get("elapsed_s"),
-                "runs_completed": len(self.history),
+                "runs_completed": self.run_count,
                 "kg_pipeline_dir": str(_KG_PIPELINE_DIR),
                 "venv_found": _VENV_PYTHON.exists(),
             }

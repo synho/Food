@@ -6,12 +6,13 @@ import {
   fetchPosition, fetchSafestPath, fetchEarlySignals, fetchFoodChain,
   fetchContextFromText, fetchInterrogation, fetchLandmines,
   fetchPipelineStatus, triggerPipeline,
+  saveSnapshot, fetchTrajectory,
 } from "@/lib/api";
 import type { FoodChainResponse, PipelineStatus } from "@/lib/api";
 import type {
   UserContext, PositionResponse, SafestPathResponse,
   EarlySignalGuidanceResponse, NearbyRisk, PathStep, InterrogationResult,
-  LandmineDisease, LandmineResult,
+  LandmineDisease, LandmineResult, Snapshot,
 } from "@/lib/types";
 
 // ─── Map canvas ───────────────────────────────────────────────────────────────
@@ -1053,7 +1054,31 @@ export default function HealthMapPage() {
   const [chainLoading, setChainLoading]   = useState(false);
   const [chainData, setChainData]         = useState<FoodChainResponse | null>(null);
 
+  // ── Trajectory tracking ────────────────────────────────────────────────
+  const [trajectory, setTrajectory]       = useState<Snapshot[]>([]);
+  const userTokenRef = useRef<string>("");
+
   const autoSubmitted = useRef(false);
+
+  // Generate stable user token from context hash
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("health_user_token");
+      if (stored) {
+        userTokenRef.current = stored;
+      } else {
+        const token = "u_" + Math.random().toString(36).slice(2, 14) + Date.now().toString(36);
+        localStorage.setItem("health_user_token", token);
+        userTokenRef.current = token;
+      }
+      // Load existing trajectory
+      if (userTokenRef.current) {
+        fetchTrajectory(userTokenRef.current)
+          .then(setTrajectory)
+          .catch(() => {});
+      }
+    } catch { /* SSR or localStorage unavailable */ }
+  }, []);
 
   // ── Core submit function (takes full UserContext) ─────────────────────────
   const submitContext = useCallback(async (ctx: UserContext) => {
@@ -1076,6 +1101,16 @@ export default function HealthMapPage() {
         userX: ageToX(ctx.age),
         userY: conditionsToY(ctx.conditions ?? [], ctx.symptoms ?? [], ctx.age),
       });
+      // Async: save snapshot for trajectory tracking
+      const ux = ageToX(ctx.age);
+      const uy = conditionsToY(ctx.conditions ?? [], ctx.symptoms ?? [], ctx.age);
+      const zone = getZoneAt(uy).name;
+      if (userTokenRef.current) {
+        saveSnapshot(userTokenRef.current, ctx, ux, uy, zone)
+          .then(() => fetchTrajectory(userTokenRef.current))
+          .then(setTrajectory)
+          .catch(() => {});
+      }
       // Async: run interrogation agent after map loads
       setInterrogating(true);
       fetchInterrogation(ctx, answeredIds)
@@ -1084,7 +1119,15 @@ export default function HealthMapPage() {
         .finally(() => setInterrogating(false));
       // Async: landmine detection (non-blocking)
       fetchLandmines(ctx)
-        .then(setLandmineData)
+        .then((data) => {
+          setLandmineData(data);
+          // Update snapshot with landmine risk data
+          if (userTokenRef.current && data?.landmines) {
+            const risks: Record<string, string> = {};
+            data.landmines.forEach(l => { risks[l.name] = l.risk_level; });
+            saveSnapshot(userTokenRef.current, ctx, ux, uy, zone, risks).catch(() => {});
+          }
+        })
         .catch(() => {/* silent — landmine detection is enhancement only */});
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Request failed";
@@ -1523,6 +1566,25 @@ export default function HealthMapPage() {
                       onClick={() => setSelectedRisk(selectedRisk?.name === risk.name ? null : risk)} />
                   );
                 })}
+
+                {/* Trajectory: past positions as faded dots connected by a line */}
+                {trajectory.length > 1 && (() => {
+                  const pts = trajectory
+                    .filter(s => s.position_x != null && s.position_y != null)
+                    .map(s => ({ x: s.position_x!, y: s.position_y! }));
+                  if (pts.length < 2) return null;
+                  const polyline = pts.map(p => `${p.x},${p.y}`).join(" ");
+                  return (
+                    <g opacity="0.6">
+                      <polyline points={polyline} fill="none" stroke="#6366f1"
+                        strokeWidth="1.5" strokeDasharray="4,3" strokeLinecap="round" />
+                      {pts.slice(0, -1).map((p, i) => (
+                        <circle key={i} cx={p.x} cy={p.y} r={3}
+                          fill="#6366f1" opacity={0.3 + (i / pts.length) * 0.5} />
+                      ))}
+                    </g>
+                  );
+                })()}
 
                 <UserMarker x={userX} y={userY} label={markerLabel || "You"} />
                 <LifeRuler userX={userX} />

@@ -26,6 +26,52 @@ from artifacts import get_run_id, write_manifest
 from fetch_workers import parallel_search, parallel_fetch_articles
 from kg_gap_analyzer import analyze_kg_gaps
 
+
+def _load_low_yield_queries() -> set[str]:
+    """Load query labels that consistently produce low yield from SQLite."""
+    try:
+        import sqlite3
+        db_path = Path(__file__).resolve().parent.parent.parent / "data" / "health_map.db"
+        if not db_path.exists():
+            return set()
+        conn = sqlite3.connect(str(db_path))
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute(
+            """SELECT query_label, COUNT(*) AS runs,
+                      SUM(triples_produced) AS total_triples,
+                      SUM(papers_new) AS total_papers
+               FROM fetch_yield
+               GROUP BY query_label
+               HAVING runs >= 3 AND total_papers > 0
+                      AND CAST(total_triples AS REAL) / total_papers < 0.5"""
+        ).fetchall()
+        conn.close()
+        return {r["query_label"] for r in rows}
+    except Exception:
+        return set()
+
+
+def _log_yield_for_query(query_label: str, run_id: str | None,
+                          papers_returned: int, papers_new: int) -> None:
+    """Log per-query yield to SQLite."""
+    try:
+        import sqlite3
+        db_path = Path(__file__).resolve().parent.parent.parent / "data" / "health_map.db"
+        if not db_path.exists():
+            return
+        conn = sqlite3.connect(str(db_path))
+        conn.execute(
+            """INSERT INTO fetch_yield
+               (query_label, run_id, papers_returned, papers_new,
+                triples_produced, avg_evidence_strength)
+               VALUES (?, ?, ?, ?, 0, NULL)""",
+            (query_label, run_id, papers_returned, papers_new),
+        )
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass
+
 # ── Topic cluster definitions ─────────────────────────────────────────────────
 
 TOPIC_CLUSTERS: dict[str, dict] = {
@@ -311,6 +357,14 @@ def run_smart_fetch(
             simple_gaps = None
 
         active = select_active_clusters(simple_gaps, requested_clusters)
+
+        # Skip clusters that historically produce low yield
+        low_yield = _load_low_yield_queries()
+        deprioritized = [c for c in active if f"cluster:{c}" in low_yield]
+        if deprioritized:
+            print(f"\n  Deprioritized (low yield over 3+ runs): {deprioritized}")
+            active = [c for c in active if f"cluster:{c}" not in low_yield]
+
         print(f"\n  Active clusters: {active}")
         for cluster_name in active:
             defn = TOPIC_CLUSTERS[cluster_name]
@@ -337,15 +391,20 @@ def run_smart_fetch(
     phase1_pmcids: list[str] = []
     phase2_pmcids: list[str] = []
     seen_pmcids: set[str] = set(already_fetched)
+    run_id = get_run_id()
 
     for label, pmcids in search_results.items():
+        new_for_query = 0
         for p in pmcids:
             if p not in seen_pmcids:
                 seen_pmcids.add(p)
+                new_for_query += 1
                 if query_phases.get(label) == "phase1":
                     phase1_pmcids.append(p)
                 else:
                     phase2_pmcids.append(p)
+        # Log per-query yield
+        _log_yield_for_query(label, run_id, len(pmcids), new_for_query)
 
     all_new = phase1_pmcids + phase2_pmcids
     print(f"  Total unique new PMCIDs: {len(all_new)} "
@@ -353,7 +412,6 @@ def run_smart_fetch(
 
     if not all_new:
         print("  No new papers found across all queries.")
-        run_id = get_run_id()
         write_manifest("smart_fetch", run_id, {
             "phase1_pmcids": [], "phase2_pmcids": [],
             "pmcids_fetched": [], "total_fetched": 0,
@@ -364,7 +422,6 @@ def run_smart_fetch(
     print(f"\n=== Stage 3: Parallel download ({len(all_new)} papers) ===")
     fetched = parallel_fetch_articles(all_new, raw_dir, already_fetched=already_fetched)
 
-    run_id = get_run_id()
     payload = {
         "phase1_pmcids": [f"PMC{p}" for p in phase1_pmcids],
         "phase2_pmcids": [f"PMC{p}" for p in phase2_pmcids],

@@ -205,3 +205,40 @@ export async function fetchFoodChain(food: string): Promise<FoodChainResponse> {
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
+
+/** Save a context snapshot after map render. */
+export async function saveSnapshot(
+  userToken: string,
+  context: import("./types").UserContext,
+  positionX: number | null,
+  positionY: number | null,
+  zone: string | null,
+  landmineRisks?: Record<string, string>,
+): Promise<{ snapshot_id: number }> {
+  const res = await fetch(`${API}/api/me/snapshot`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_token: userToken,
+      context,
+      position_x: positionX,
+      position_y: positionY,
+      zone,
+      landmine_risks: landmineRisks ?? {},
+    }),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+/** Fetch trajectory (ordered snapshots) for a user token. */
+export async function fetchTrajectory(
+  token: string,
+  limit: number = 50,
+): Promise<import("./types").Snapshot[]> {
+  const res = await fetch(
+    `${API}/api/me/trajectory?token=${encodeURIComponent(token.trim())}&limit=${limit}`
+  );
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}

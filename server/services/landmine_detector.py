@@ -340,6 +340,83 @@ def _get_kg_evidence(disease_name: str, aliases: list[str] | None = None) -> lis
         return []
 
 
+# ── KG-driven profile enrichment ──────────────────────────────────────────────
+
+def _enrich_profile_from_kg(profile: dict) -> dict:
+    """
+    Augment a hardcoded landmine profile with dynamic data from the KG.
+
+    Queries Neo4j for:
+      - Dynamic risk factors (conditions that INCREASES_RISK_OF this disease)
+      - Dynamic early warnings (symptoms that are EARLY_SIGNAL_OF)
+      - Dynamic escape routes (foods/nutrients that PREVENTS/REDUCES_RISK_OF)
+
+    Returns a new dict with enriched data merged with hardcoded fallbacks.
+    """
+    aliases = [a.lower() for a in profile.get("kg_aliases", [])]
+    enriched = dict(profile)  # shallow copy
+
+    try:
+        # Dynamic risk factors
+        risk_rows = run_query("""
+            MATCH (c:Disease)-[r:INCREASES_RISK_OF|CAUSES]->(d:Disease)
+            WHERE toLower(d.name) IN $aliases AND r.source_id IS NOT NULL
+            RETURN c.name AS risk_factor, count(r) AS evidence
+            ORDER BY evidence DESC LIMIT 10
+        """, {"aliases": aliases})
+        kg_risk_factors = [r["risk_factor"] for r in risk_rows if r.get("risk_factor")]
+        # Append KG-discovered risk factors, deduped
+        existing_rf = {rf.lower() for rf in profile["risk_factors"]}
+        for rf in kg_risk_factors:
+            if rf.lower() not in existing_rf:
+                enriched["risk_factors"] = enriched["risk_factors"] + [rf]
+                existing_rf.add(rf.lower())
+    except Exception:
+        pass
+
+    try:
+        # Dynamic early warnings
+        warning_rows = run_query("""
+            MATCH (s:Symptom)-[r:EARLY_SIGNAL_OF]->(d:Disease)
+            WHERE toLower(d.name) IN $aliases AND r.source_id IS NOT NULL
+            RETURN s.name AS symptom, count(r) AS evidence
+            ORDER BY evidence DESC LIMIT 10
+        """, {"aliases": aliases})
+        kg_warnings = [r["symptom"] for r in warning_rows if r.get("symptom")]
+        # Supplement the static list
+        existing_ew = {w.lower() for w in profile["early_warning_signs"]}
+        for w in kg_warnings:
+            if w.lower() not in existing_ew:
+                enriched["early_warning_signs"] = enriched["early_warning_signs"] + [w]
+                existing_ew.add(w.lower())
+    except Exception:
+        pass
+
+    try:
+        # Dynamic escape routes
+        escape_rows = run_query("""
+            MATCH (f)-[r:PREVENTS|TREATS|ALLEVIATES|REDUCES_RISK_OF]->(d:Disease)
+            WHERE toLower(d.name) IN $aliases AND (f:Food OR f:Nutrient OR f:LifestyleFactor)
+              AND r.source_id IS NOT NULL
+            RETURN f.name AS food, type(r) AS predicate, count(r) AS evidence
+            ORDER BY evidence DESC LIMIT 10
+        """, {"aliases": aliases})
+        kg_escapes = [
+            f"{r['food']} — {r['predicate'].replace('_', ' ').lower()} ({r['evidence']} studies)"
+            for r in escape_rows if r.get("food")
+        ]
+        # Replace hardcoded escape routes when KG has sufficient evidence
+        if len(kg_escapes) >= 2:
+            enriched["escape_routes"] = kg_escapes
+        elif kg_escapes:
+            # Supplement hardcoded with KG
+            enriched["escape_routes"] = enriched["escape_routes"] + kg_escapes
+    except Exception:
+        pass
+
+    return enriched
+
+
 # ── Main function ─────────────────────────────────────────────────────────────
 
 def get_landmines(ctx: UserContext) -> dict:
@@ -351,6 +428,8 @@ def get_landmines(ctx: UserContext) -> dict:
     results = []
 
     for profile in LANDMINE_PROFILES:
+        # Enrich hardcoded profile with dynamic KG data
+        profile = _enrich_profile_from_kg(profile)
         risk_level, present, missing = _score_risk(profile, ctx)
         kg_evidence = _get_kg_evidence(profile["name"], profile.get("kg_aliases"))
 

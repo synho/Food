@@ -183,8 +183,14 @@ def _journal_clause(journals: list[str]) -> str:
     return "(" + " OR ".join(f'"{j}"[Journal]' for j in journals) + ")"
 
 
-def _build_queries(report: GapReport, days_back: int = 730, max_per_type: int = 5) -> list[GapQuery]:
+def _build_queries(
+    report: GapReport,
+    days_back: int = 730,
+    max_per_type: int = 5,
+    demand_boost: set[str] | None = None,
+) -> list[GapQuery]:
     queries: list[GapQuery] = []
+    _demand = demand_boost or set()
     date = _date_range_str(days_back)
     base_filters = f'{date} AND open access[filter] AND "humans"[MeSH Terms]'
 
@@ -192,16 +198,18 @@ def _build_queries(report: GapReport, days_back: int = 730, max_per_type: int = 
     med_j = _journal_clause(_MEDICAL_JOURNALS)
     food_j = _journal_clause(_FOOD_CHEM_JOURNALS)
 
-    # Priority 1 — Conditions with no food recommendations (most impactful)
+    # Priority 1 (0 if demand-boosted) — Conditions with no food recommendations (most impactful)
     for name, count in report.conditions_no_food_recs[:max_per_type]:
         q = (
             f'("{name}"[Title/Abstract] OR "{name}"[MeSH Terms]) '
             f'AND (diet OR food OR nutrition OR nutrient OR dietary) '
             f'AND {nutr_j} AND {base_filters}'
         )
+        priority = 0 if name in _demand else 1
         queries.append(GapQuery(
-            entity=name, gap_type="no_food_recs", query=q, priority=1,
-            hint=f"{name} has {count} food recs — find more food/nutrient evidence",
+            entity=name, gap_type="no_food_recs", query=q, priority=priority,
+            hint=f"{name} has {count} food recs — find more food/nutrient evidence"
+                 + (" [HIGH DEMAND]" if name in _demand else ""),
         ))
 
     # Priority 1 — Key conditions with no avoidance data
@@ -219,10 +227,16 @@ def _build_queries(report: GapReport, days_back: int = 730, max_per_type: int = 
             f'AND (avoid OR worsen OR "risk factor" OR aggravate OR harmful OR "foods to limit") '
             f'AND (diet OR food OR nutrition) AND {nutr_j} AND {base_filters}'
         )
-        priority = 1 if name in _avoidance_priority else 2
+        if name in _demand:
+            priority = 0
+        elif name in _avoidance_priority:
+            priority = 1
+        else:
+            priority = 2
         queries.append(GapQuery(
             entity=name, gap_type="no_avoidance", query=q, priority=priority,
-            hint=f"No AGGRAVATES/CAUSES data for {name} — find foods to avoid",
+            hint=f"No AGGRAVATES/CAUSES data for {name} — find foods to avoid"
+                 + (" [HIGH DEMAND]" if name in _demand else ""),
         ))
 
     # Priority 2 — Foods with no nutrient links
@@ -279,6 +293,26 @@ def _build_queries(report: GapReport, days_back: int = 730, max_per_type: int = 
 
 # ── Main entry point ──────────────────────────────────────────────────────────
 
+def _load_demand_boost() -> set[str]:
+    """Load top-demand entities from SQLite to boost their gap priority."""
+    try:
+        import sqlite3
+        from pathlib import Path
+        db_path = Path(__file__).resolve().parent.parent.parent / "data" / "health_map.db"
+        if not db_path.exists():
+            return set()
+        conn = sqlite3.connect(str(db_path))
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute(
+            """SELECT entity_name FROM query_demand
+               GROUP BY entity_name ORDER BY SUM(count) DESC LIMIT 20"""
+        ).fetchall()
+        conn.close()
+        return {r["entity_name"] for r in rows}
+    except Exception:
+        return set()
+
+
 def analyze_kg_gaps(
     uri: str = "bolt://localhost:7687",
     user: str = "foodnot4self",
@@ -290,12 +324,17 @@ def analyze_kg_gaps(
     """
     Full KG gap analysis: query Neo4j → generate targeted PubMed queries.
     Returns GapReport; generated_queries contains ready-to-use PubMed query strings.
+    Demand-boosted: entities frequently queried by users get priority 0.
     """
     report = _run_gap_queries(uri, user, pw, min_food_recs)
     if report is None:
         return GapReport(as_of=datetime.now().strftime("%Y-%m-%d %H:%M"))
 
-    report.generated_queries = _build_queries(report, days_back=days_back, max_per_type=max_per_type)
+    demand_boost = _load_demand_boost()
+    report.generated_queries = _build_queries(
+        report, days_back=days_back, max_per_type=max_per_type,
+        demand_boost=demand_boost,
+    )
     return report
 
 

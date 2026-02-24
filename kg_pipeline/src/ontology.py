@@ -138,6 +138,13 @@ def normalize_entity_name(name: str, _entity_type: str = "") -> str:
     return CANONICAL_ENTITY_NAMES.get(key) or name.strip()
 
 
+def normalize_entity_name_for_merge(name: str) -> str:
+    """Return lowercased name for MERGE key to prevent case-sensitive duplicates.
+    Always lowercases; the display_name property preserves the original casing."""
+    canonical = normalize_entity_name(name)
+    return canonical.lower() if canonical else ""
+
+
 def normalize_entity_type(raw: str) -> str:
     """Map extraction output to canonical entity label (Neo4j node label)."""
     if not raw or not isinstance(raw, str):
