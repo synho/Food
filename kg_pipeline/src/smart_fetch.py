@@ -86,6 +86,55 @@ TOPIC_CLUSTERS: dict[str, dict] = {
                      "pancreatic cancer diet", "exocrine pancreas nutrition"],
         "mesh": ["Pancreatic Neoplasms", "Pancreas"],
     },
+    # Additional disease clusters
+    "hypertension": {
+        "entities": ["Hypertension"],
+        "keywords": ["hypertension", "blood pressure diet", "DASH diet", "sodium reduction",
+                     "potassium food", "hypertension prevention"],
+        "mesh": ["Hypertension", "Blood Pressure"],
+    },
+    "metabolic_syndrome": {
+        "entities": ["Metabolic syndrome", "Prediabetes", "Insulin resistance"],
+        "keywords": ["metabolic syndrome", "insulin resistance diet", "prediabetes nutrition",
+                     "glycemic index", "low carb diet metabolic"],
+        "mesh": ["Metabolic Syndrome", "Insulin Resistance"],
+    },
+    "obesity": {
+        "entities": ["Obesity"],
+        "keywords": ["obesity diet", "weight loss nutrition", "adiposity food",
+                     "satiety foods", "anti-obesity diet"],
+        "mesh": ["Obesity", "Weight Loss"],
+    },
+    "longevity": {
+        "entities": ["Longevity", "Healthy aging"],
+        "keywords": ["longevity diet", "healthy aging nutrition", "blue zone diet",
+                     "centenarian diet", "anti-aging food", "lifespan nutrition"],
+        "mesh": ["Longevity", "Aging"],
+    },
+    "liver_disease": {
+        "entities": ["Liver disease", "NAFLD", "Fatty liver"],
+        "keywords": ["fatty liver diet", "NAFLD nutrition", "liver disease food",
+                     "hepatic steatosis diet", "liver protective food"],
+        "mesh": ["Non-alcoholic Fatty Liver Disease", "Liver Diseases"],
+    },
+    "immune_health": {
+        "entities": ["Immune dysfunction", "Autoimmune disease"],
+        "keywords": ["immune diet", "immunonutrition", "autoimmune diet",
+                     "anti-inflammatory foods immunity", "gut immune axis"],
+        "mesh": ["Immunity", "Autoimmune Diseases"],
+    },
+    "bone_density": {
+        "entities": ["Osteoporosis", "Fracture risk"],
+        "keywords": ["osteoporosis diet", "bone density nutrition", "calcium food",
+                     "vitamin D bone", "fracture prevention diet"],
+        "mesh": ["Osteoporosis", "Bone Density", "Calcium, Dietary"],
+    },
+    "cancer_prevention": {
+        "entities": ["Cancer", "Colorectal cancer", "Breast cancer"],
+        "keywords": ["cancer prevention diet", "anticancer food", "colorectal cancer nutrition",
+                     "breast cancer diet", "phytochemicals cancer"],
+        "mesh": ["Neoplasms", "Colorectal Neoplasms", "Diet"],
+    },
     # Always-active clusters (no KG entities to check — always run)
     "inflammation": {
         "entities": [],

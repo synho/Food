@@ -32,15 +32,29 @@ _NUTRITION_JOURNALS = [
     "Nutrients", "Br J Nutr", "J Nutr", "Eur J Nutr",
     "Am J Clin Nutr", "Nutr Rev", "Clin Nutr", "Front Nutr",
     "Int J Environ Res Public Health", "J Acad Nutr Diet",
+    "Public Health Nutr", "Int J Food Sci Nutr", "Food Funct",
+    "Nutr Metab Cardiovasc Dis", "Nutr Cancer",
 ]
 _MEDICAL_JOURNALS = [
     "Nat Med", "Lancet", "N Engl J Med", "JAMA", "BMJ",
     "Ann Intern Med", "Am J Clin Nutr",
-    # Specialty journals for landmine diseases
+    # Neurology / dementia / stroke
     "JAMA Neurol", "Lancet Neurol", "Alzheimers Dement", "Neurology",
-    "Kidney Int", "J Am Soc Nephrol",
-    "Lancet Oncol", "Gut",
-    "JAMA Psychiatry", "Mol Psychiatry",
+    "J Alzheimers Dis", "Brain", "Ann Neurol",
+    # Kidney
+    "Kidney Int", "J Am Soc Nephrol", "Clin J Am Soc Nephrol",
+    "Nephrol Dial Transplant",
+    # Oncology
+    "Lancet Oncol", "J Natl Cancer Inst", "Gut",
+    "Cancer Epidemiol Biomarkers Prev",
+    # Psychiatry
+    "JAMA Psychiatry", "Mol Psychiatry", "J Affect Disord",
+    # Cardiovascular
+    "Eur Heart J", "Circulation", "J Am Coll Cardiol",
+    # Diabetes / metabolic
+    "Diabetes Care", "Diabetologia",
+    # Aging
+    "Age Ageing", "J Gerontol A Biol Sci Med Sci",
 ]
 _FOOD_CHEM_JOURNALS = [
     "Food Chem", "J Food Compos Anal", "LWT", "Food Res Int",

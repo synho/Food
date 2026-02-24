@@ -23,10 +23,10 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 # ── Constants ─────────────────────────────────────────────────────────────────
-_MIN_INTERVAL  = 30 * 60    # 30 minutes
-_BASE_INTERVAL = 60 * 60    # 1 hour
-_MAX_INTERVAL  = 6 * 60 * 60  # 6 hours
-_CHECK_EVERY   = 60         # poll loop cadence in seconds
+_MIN_INTERVAL  = 60          # 1 minute — fire again as soon as previous run finishes
+_BASE_INTERVAL = 60          # start at 1 minute
+_MAX_INTERVAL  = 30 * 60     # back off to 30 min max when corpus is saturated
+_CHECK_EVERY   = 10          # poll every 10 seconds for faster response
 
 _KG_PIPELINE_DIR = Path(
     os.getenv("KG_PIPELINE_DIR", Path(__file__).resolve().parent.parent / "kg_pipeline")
@@ -142,11 +142,9 @@ class PipelineScheduler:
 
                 new_papers = result.get("new_papers", 0)
                 if result.get("error"):
-                    self.interval = _MIN_INTERVAL              # retry quickly on error
-                elif new_papers > 10:
-                    self.interval = _MIN_INTERVAL              # hot — keep filling
+                    self.interval = _MIN_INTERVAL              # retry immediately on error
                 elif new_papers > 0:
-                    self.interval = _BASE_INTERVAL             # warm — normal pace
+                    self.interval = _MIN_INTERVAL              # found papers — keep firing
                 else:
                     self.interval = min(self.interval * 2, _MAX_INTERVAL)  # saturated — back off
 

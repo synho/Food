@@ -61,31 +61,68 @@ smart_fetch:
     - "Br J Nutr"
     - "J Nutr"
     - "Eur J Nutr"
+    - "Am J Clin Nutr"
     - "Nutr Rev"
     - "Clin Nutr"
     - "Front Nutr"
     - "Int J Environ Res Public Health"
-  gap_threshold: 3             # entities with < N relationships = underrepresented
-  max_per_cluster: 15          # papers per topic cluster per run
-  days_back: 1825              # 5-year window for maximum coverage
+    - "Public Health Nutr"
+    - "Food Funct"
+    - "Int J Food Sci Nutr"
+    - "Nutr Metab Cardiovasc Dis"
+    - "Nutr Cancer"
+    - "J Acad Nutr Diet"
+  gap_threshold: 5             # entities with < N relationships = underrepresented
+  max_per_cluster: 25          # papers per topic cluster per run
+  days_back: 2555              # 7-year window for maximum coverage
   use_mesh: true
 
   # Phase 1: KG-targeted gap query settings
-  max_gap_queries: 20          # total entity-targeted queries per smart-fetch
-  max_gap_queries_per_type: 5  # max queries per gap type
+  max_gap_queries: 30          # total entity-targeted queries per smart-fetch
+  max_gap_queries_per_type: 8  # max queries per gap type
 
-  # Specialty journals added for landmine disease coverage
+  # Specialty journals — broad disease + nutrition coverage
   specialty_journals:
-    - "JAMA Neurol"            # JAMA Neurology — Alzheimer's, stroke, dementia
-    - "Lancet Neurol"          # Lancet Neurology
-    - "Alzheimers Dement"      # Alzheimer's & Dementia
-    - "Neurology"              # American Academy of Neurology
-    - "Kidney Int"             # Kidney International — CKD
-    - "J Am Soc Nephrol"       # JASN — CKD
-    - "Lancet Oncol"           # Lancet Oncology — pancreatic cancer
-    - "Gut"                    # Gut — GI / pancreatic
-    - "JAMA Psychiatry"        # JAMA Psychiatry — depression
-    - "Mol Psychiatry"         # Molecular Psychiatry — MDD
+    # Neurology / Alzheimer's / Dementia
+    - "JAMA Neurol"
+    - "Lancet Neurol"
+    - "Alzheimers Dement"
+    - "Neurology"
+    - "J Alzheimers Dis"
+    - "Brain"
+    - "Ann Neurol"
+    # Kidney
+    - "Kidney Int"
+    - "J Am Soc Nephrol"
+    - "Clin J Am Soc Nephrol"
+    - "Nephrol Dial Transplant"
+    # Oncology / Pancreatic
+    - "Lancet Oncol"
+    - "J Natl Cancer Inst"
+    - "Cancer Epidemiol Biomarkers Prev"
+    - "Gut"
+    # Psychiatry / Depression
+    - "JAMA Psychiatry"
+    - "Mol Psychiatry"
+    - "J Affect Disord"
+    - "Psychosom Med"
+    # Cardiovascular
+    - "Eur Heart J"
+    - "Circulation"
+    - "J Am Coll Cardiol"
+    - "JACC"
+    # Diabetes / Metabolic
+    - "Diabetes Care"
+    - "Diabetologia"
+    - "J Clin Endocrinol Metab"
+    # Aging / Longevity
+    - "Aging Cell"
+    - "J Gerontol A Biol Sci Med Sci"
+    - "Age Ageing"
+    # Broad nutrition
+    - "Public Health Nutr"
+    - "Int J Food Sci Nutr"
+    - "Food Funct"
 
   # Parallel worker settings (auto-tuned by NCBI_API_KEY env var)
   # Without key: 3 workers, 2.5 req/s  |  With key: 5 workers, 7 req/s
