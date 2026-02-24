@@ -29,6 +29,8 @@ LANDMINE_PROFILES = [
         "map_x": 720,
         "map_y": 62,
         "territory": "Longevity Coast",
+        "kg_aliases": ["alzheimer's disease", "dementia", "alzheimer disease",
+                       "cognitive decline", "cognitive impairment", "ad"],
         "risk_factors": [
             "Type 2 diabetes",
             "Hypertension",
@@ -61,6 +63,8 @@ LANDMINE_PROFILES = [
         "map_x": 610,
         "map_y": 195,
         "territory": "Recovery Valley",
+        "kg_aliases": ["stroke", "cerebrovascular disease", "brain ischemia",
+                       "ischemic stroke", "hemorrhagic stroke", "cerebral infarction"],
         "risk_factors": [
             "Hypertension",
             "Atrial fibrillation",
@@ -94,6 +98,8 @@ LANDMINE_PROFILES = [
         "map_x": 420,
         "map_y": 300,
         "territory": "Risk Territory",
+        "kg_aliases": ["pancreatic cancer", "pancreatic neoplasm",
+                       "pancreatic ductal adenocarcinoma", "pdac"],
         "risk_factors": [
             "Type 2 diabetes",
             "Chronic pancreatitis",
@@ -125,6 +131,8 @@ LANDMINE_PROFILES = [
         "map_x": 280,
         "map_y": 200,
         "territory": "Metabolic Crossroads",
+        "kg_aliases": ["chronic kidney disease", "ckd", "renal disease",
+                       "kidney disease", "renal failure", "nephropathy"],
         "risk_factors": [
             "Type 2 diabetes",
             "Hypertension",
@@ -157,6 +165,8 @@ LANDMINE_PROFILES = [
         "map_x": 530,
         "map_y": 340,
         "territory": "Cardiometabolic Ridge",
+        "kg_aliases": ["cardiovascular disease", "heart disease", "coronary artery disease",
+                       "coronary heart disease", "cvd", "cardiac disease"],
         "risk_factors": [
             "Hypertension",
             "Type 2 diabetes",
@@ -190,6 +200,8 @@ LANDMINE_PROFILES = [
         "map_x": 155,
         "map_y": 348,
         "territory": "Inflammatory Plains",
+        "kg_aliases": ["major depressive disorder", "depression", "mdd",
+                       "depressive disorder", "clinical depression"],
         "risk_factors": [
             "Chronic pain",
             "Cardiovascular disease",
@@ -292,14 +304,15 @@ def _score_risk(profile: dict, ctx: UserContext) -> tuple[str, list[str], list[s
 
 # ── KG enrichment ─────────────────────────────────────────────────────────────
 
-def _get_kg_evidence(disease_name: str) -> list[dict]:
-    """Query Neo4j for food/nutrient nodes that PREVENTS/TREATS/ALLEVIATES/REDUCES_RISK_OF the disease.
-    Uses case-insensitive name matching to catch variant capitalizations."""
+def _get_kg_evidence(disease_name: str, aliases: list[str] | None = None) -> list[dict]:
+    """Query Neo4j for food/nutrient/lifestyle nodes that reduce risk of a landmine disease.
+    Matches against the canonical name plus any known KG aliases (all case-insensitive)."""
+    all_names = list({disease_name.lower()} | {a.lower() for a in (aliases or [])})
     try:
         rows = run_query(
             """
             MATCH (f)-[r:PREVENTS|TREATS|ALLEVIATES|REDUCES_RISK_OF]->(d:Disease)
-            WHERE toLower(d.name) = toLower($disease)
+            WHERE toLower(d.name) IN $names
               AND (f:Food OR f:Nutrient OR f:LifestyleFactor)
               AND r.source_id IS NOT NULL
             RETURN f.name AS food, labels(f)[0] AS food_type, type(r) AS predicate,
@@ -308,7 +321,7 @@ def _get_kg_evidence(disease_name: str) -> list[dict]:
             ORDER BY r.source_id DESC
             LIMIT 8
             """,
-            {"disease": disease_name},
+            {"names": all_names},
         )
         return [
             {
@@ -339,7 +352,7 @@ def get_landmines(ctx: UserContext) -> dict:
 
     for profile in LANDMINE_PROFILES:
         risk_level, present, missing = _score_risk(profile, ctx)
-        kg_evidence = _get_kg_evidence(profile["name"])
+        kg_evidence = _get_kg_evidence(profile["name"], profile.get("kg_aliases"))
 
         results.append({
             "name": profile["name"],
