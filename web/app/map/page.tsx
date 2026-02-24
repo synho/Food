@@ -992,27 +992,28 @@ function HealthPersonaCard({ persona, zone, complexity, momentum, score, conditi
         <span className="text-sm font-bold text-slate-800">{persona.name}</span>
       </div>
       <div className="flex gap-1.5">
-        {([
+        {[
           { label: dimLabel("zone", zone) },
           { label: dimLabel("complexity", complexity) },
           { label: dimLabel("momentum", momentum) },
-        ] as const).map(({ label }) => (
+        ].map(({ label }) => (
           <span key={label} className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-600">
             {label}
           </span>
         ))}
       </div>
-      <p className="text-xs text-slate-600 leading-relaxed italic">&ldquo;{desc}&rdquo;</p>
+      <p className="text-xs text-slate-600 leading-relaxed italic">{"\u201C"}{desc}{"\u201D"}</p>
     </div>
   );
 }
 
 // ─── Bot Panel ───────────────────────────────────────────────────────────────
+const BOT_ROLE_COLORS: Record<string, string> = { better: "#16a34a", parallel: "#6366f1", warning: "#dc2626" };
+
 function BotPanel({ bots, showBots, onToggle, trajectory }: {
   bots: SyntheticBot[]; showBots: boolean; onToggle: () => void; trajectory: Snapshot[];
 }) {
   if (bots.length === 0) return null;
-  const roleIcons: Record<string, string> = { better: "\u{1F7E2}", parallel: "\u{1F7E3}", warning: "\u{1F534}" };
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
@@ -1027,7 +1028,8 @@ function BotPanel({ bots, showBots, onToggle, trajectory }: {
         const botPersona = derivePersona(bot.currentY, bot.conditions, trajectory);
         return (
           <div key={bot.id} className="flex items-start gap-2.5">
-            <span style={{ fontSize: "12px" }}>{roleIcons[bot.role]}</span>
+            <span className="mt-1 inline-block h-2.5 w-2.5 rounded-full flex-shrink-0"
+              style={{ backgroundColor: BOT_ROLE_COLORS[bot.role] ?? "#94a3b8" }} />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-xs font-bold text-slate-800">{bot.name}</span>
@@ -1038,7 +1040,7 @@ function BotPanel({ bots, showBots, onToggle, trajectory }: {
                 </span>
                 <span className="text-xs text-slate-500">Score {bot.score}</span>
               </div>
-              <p className="text-xs text-slate-500 italic mt-0.5">&ldquo;{bot.description}&rdquo;</p>
+              <p className="text-xs text-slate-500 italic mt-0.5">{"\u201C"}{bot.description}{"\u201D"}</p>
             </div>
           </div>
         );
