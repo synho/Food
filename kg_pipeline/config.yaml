@@ -66,13 +66,13 @@ smart_fetch:
     - "Front Nutr"
     - "Int J Environ Res Public Health"
   gap_threshold: 3             # entities with < N relationships = underrepresented
-  max_per_cluster: 5           # papers per topic cluster per run (Phase 2)
-  days_back: 730               # 2-year window for gap queries (wider = more relevant papers)
+  max_per_cluster: 15          # papers per topic cluster per run (bumped for broader coverage)
+  days_back: 1095              # 3-year window — more papers for underrepresented diseases
   use_mesh: true
 
   # Phase 1: KG-targeted gap query settings
-  max_gap_queries: 12          # total entity-targeted queries per smart-fetch (more = more coverage)
-  max_gap_queries_per_type: 4  # max queries per gap type
+  max_gap_queries: 20          # total entity-targeted queries per smart-fetch (more = more coverage)
+  max_gap_queries_per_type: 5  # max queries per gap type
 
   # Parallel worker settings (auto-tuned by NCBI_API_KEY env var)
   # Without key: 3 workers, 2.5 req/s  |  With key: 5 workers, 7 req/s
