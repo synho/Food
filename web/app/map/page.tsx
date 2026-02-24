@@ -69,6 +69,193 @@ function conditionsToY(
   return Math.min(Math.max(50 + ageBase + condRisk + sympRisk, 50), 455);
 }
 
+// ─── Health Journey math ─────────────────────────────────────────────────────
+function computeHealthScore(y: number): number {
+  return Math.round(100 * (1 - (y - 50) / (455 - 50)));
+}
+
+function scoreColor(score: number): string {
+  if (score >= 75) return "#16a34a";
+  if (score >= 45) return "#b45309";
+  if (score >= 20) return "#dc2626";
+  return "#7f1d1d";
+}
+
+interface SnapshotDiff {
+  addedConditions: string[];
+  removedConditions: string[];
+  addedSymptoms: string[];
+  removedSymptoms: string[];
+}
+
+function diffSnapshots(a: Snapshot, b: Snapshot): SnapshotDiff {
+  return {
+    addedConditions: b.conditions.filter(c => !a.conditions.includes(c)),
+    removedConditions: a.conditions.filter(c => !b.conditions.includes(c)),
+    addedSymptoms: b.symptoms.filter(s => !a.symptoms.includes(s)),
+    removedSymptoms: a.symptoms.filter(s => !b.symptoms.includes(s)),
+  };
+}
+
+// ─── Health Persona Types (MBTI-style, 12 archetypes) ────────────────────────
+type PersonaZone = "V" | "G";
+type PersonaComplexity = "S" | "C";
+type PersonaMomentum = "A" | "S" | "D";
+type PersonaCode = `${PersonaZone}${PersonaComplexity}${PersonaMomentum}`;
+
+interface PersonaType {
+  code: PersonaCode;
+  name: string;
+  color: string;
+  descTemplate: string;
+}
+
+const PERSONA_CATALOG: Record<PersonaCode, PersonaType> = {
+  VSA: { code: "VSA", name: "The Rising Star",        color: "#16a34a", descTemplate: "Score {score} with a clean health slate and upward momentum. You're building strong foundations." },
+  VSS: { code: "VSS", name: "The Steady Beacon",      color: "#22c55e", descTemplate: "Score {score} in the vital zone — stable and simple. A solid baseline to build on." },
+  VSD: { code: "VSD", name: "The Drifting Sail",       color: "#84cc16", descTemplate: "Score {score} but trending down. Few conditions, but something is shifting — worth paying attention." },
+  VCA: { code: "VCA", name: "The Resilient Juggler",   color: "#0ea5e9", descTemplate: "Score {score} while managing {conditionCount} conditions and still climbing. Impressive resilience." },
+  VCS: { code: "VCS", name: "The Balanced Navigator",  color: "#0284c7", descTemplate: "Score {score} holding steady with {conditionCount} conditions. You've found a working balance." },
+  VCD: { code: "VCD", name: "The Watchful Guardian",   color: "#7c3aed", descTemplate: "Score {score} with {conditionCount} conditions and a downward drift. Time to reassess your strategy." },
+  GSA: { code: "GSA", name: "The Climbing Scout",      color: "#f59e0b", descTemplate: "Score {score} in guarded territory, but you're climbing. Each step up matters." },
+  GSS: { code: "GSS", name: "The Patient Walker",      color: "#d97706", descTemplate: "Score {score} — guarded zone, few conditions, holding position. Small changes can tip you upward." },
+  GSD: { code: "GSD", name: "The Fading Ember",        color: "#ea580c", descTemplate: "Score {score} sliding down with {conditionCount} condition(s). This is your wake-up signal." },
+  GCA: { code: "GCA", name: "The Phoenix Fighter",     color: "#dc2626", descTemplate: "Score {score} with {conditionCount} conditions, but you're fighting back. The hardest climbs earn the best views." },
+  GCS: { code: "GCS", name: "The Storm Weatherer",     color: "#b91c1c", descTemplate: "Score {score} managing {conditionCount} conditions in guarded territory. Stability here is strength." },
+  GCD: { code: "GCD", name: "The Critical Crossroads", color: "#7f1d1d", descTemplate: "Score {score} with {conditionCount} conditions and declining. This is the moment decisions matter most." },
+};
+
+function derivePersona(
+  y: number, conditions: string[], snapshots: Snapshot[],
+): { persona: PersonaType; zone: PersonaZone; complexity: PersonaComplexity; momentum: PersonaMomentum; score: number } {
+  const score = computeHealthScore(y);
+  const zone: PersonaZone = score >= 60 ? "V" : "G";
+  const complexity: PersonaComplexity = conditions.length <= 1 ? "S" : "C";
+  let momentum: PersonaMomentum = "S";
+  const valid = snapshots.filter(s => s.position_y != null);
+  if (valid.length >= 2) {
+    const prev = computeHealthScore(valid[valid.length - 2].position_y!);
+    const curr = computeHealthScore(valid[valid.length - 1].position_y!);
+    const delta = curr - prev;
+    if (delta > 2) momentum = "A";
+    else if (delta < -2) momentum = "D";
+  }
+  const code = `${zone}${complexity}${momentum}` as PersonaCode;
+  return { persona: PERSONA_CATALOG[code], zone, complexity, momentum, score };
+}
+
+// ─── Synthetic Health Bots ("People Like You") ──────────────────────────────
+const BOT_NAMES = [
+  "Alex", "Morgan", "Jordan", "Casey", "Riley", "Quinn",
+  "Avery", "Taylor", "Sage", "River", "Rowan", "Parker",
+];
+
+const ESCALATION_MAP: Record<string, string> = {
+  "Type 2 diabetes": "Chronic kidney disease",
+  "Hypertension": "Cardiovascular disease",
+  "High cholesterol": "Coronary artery disease",
+  "Obesity": "Type 2 diabetes",
+  "Chronic kidney disease": "End-stage renal disease",
+  "Cardiovascular disease": "Heart failure",
+  "Asthma": "COPD",
+  "Depression": "Major depressive disorder",
+  "Anxiety": "Panic disorder",
+  "Sleep apnea": "Hypertension",
+};
+
+function profileHash(age: number | null | undefined, conditions: string[]): number {
+  const str = `${age ?? 35}:${conditions.slice().sort().join(",")}`;
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash + str.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
+interface SyntheticBot {
+  id: string;
+  name: string;
+  age: number;
+  conditions: string[];
+  symptoms: string[];
+  role: "better" | "parallel" | "warning";
+  color: string;
+  trajectory: { x: number; y: number }[];
+  currentX: number;
+  currentY: number;
+  score: number;
+  description: string;
+}
+
+function generateBots(
+  userAge: number | null | undefined,
+  userConditions: string[],
+  userSymptoms: string[],
+): SyntheticBot[] {
+  const age = userAge ?? 35;
+  const hash = profileHash(age, userConditions);
+
+  // Better Path bot
+  const betterConds = userConditions.length > 0 ? userConditions.slice(0, -1) : [];
+  const betterAge = Math.max(18, age - 2);
+  const betterName = BOT_NAMES[hash % 12];
+  const betterTrajectory: { x: number; y: number }[] = [];
+  for (let step = 0; step < 5; step++) {
+    const stepAge = betterAge - 4 + step;
+    const stepConds = step < 2 ? [...betterConds, "Fatigue"] : betterConds;
+    const stepSymps = step < 1 ? ["Fatigue"] : [];
+    betterTrajectory.push({ x: ageToX(stepAge), y: conditionsToY(stepConds, stepSymps, stepAge) });
+  }
+  const betterCurrent = betterTrajectory[betterTrajectory.length - 1];
+
+  // Parallel bot
+  const parallelAge = age + (hash % 3 === 0 ? -1 : 1);
+  const parallelName = BOT_NAMES[(hash + 4) % 12];
+  const parallelTrajectory: { x: number; y: number }[] = [];
+  for (let step = 0; step < 5; step++) {
+    const stepAge = parallelAge - 4 + step;
+    const wobbleConds = step === 2 ? [...userConditions, "Fatigue"] : userConditions;
+    parallelTrajectory.push({ x: ageToX(stepAge), y: conditionsToY(wobbleConds, userSymptoms, stepAge) });
+  }
+  const parallelCurrent = parallelTrajectory[parallelTrajectory.length - 1];
+
+  // Warning bot
+  const warningAge = age + 2;
+  const warningName = BOT_NAMES[(hash + 8) % 12];
+  const lastCond = userConditions[userConditions.length - 1] ?? "";
+  const escalated = ESCALATION_MAP[lastCond] ?? "Chronic fatigue";
+  const warningConds = [...userConditions, escalated];
+  const warningTrajectory: { x: number; y: number }[] = [];
+  for (let step = 0; step < 5; step++) {
+    const stepAge = warningAge - 4 + step;
+    const stepConds = step < 2 ? userConditions : warningConds;
+    const stepSymps = step >= 3 ? [...userSymptoms, "Fatigue"] : userSymptoms;
+    warningTrajectory.push({ x: ageToX(stepAge), y: conditionsToY(stepConds, stepSymps, stepAge) });
+  }
+  const warningCurrent = warningTrajectory[warningTrajectory.length - 1];
+
+  return [
+    {
+      id: "bot-better", name: betterName, age: betterAge,
+      conditions: betterConds, symptoms: [], role: "better", color: "#16a34a",
+      trajectory: betterTrajectory, currentX: betterCurrent.x, currentY: betterCurrent.y,
+      score: computeHealthScore(betterCurrent.y), description: "Fewer conditions, improving",
+    },
+    {
+      id: "bot-parallel", name: parallelName, age: parallelAge,
+      conditions: userConditions, symptoms: userSymptoms, role: "parallel", color: "#6366f1",
+      trajectory: parallelTrajectory, currentX: parallelCurrent.x, currentY: parallelCurrent.y,
+      score: computeHealthScore(parallelCurrent.y), description: "Same landscape, holding steady",
+    },
+    {
+      id: "bot-warning", name: warningName, age: warningAge,
+      conditions: warningConds, symptoms: userSymptoms, role: "warning", color: "#dc2626",
+      trajectory: warningTrajectory, currentX: warningCurrent.x, currentY: warningCurrent.y,
+      score: computeHealthScore(warningCurrent.y), description: `Added ${escalated.toLowerCase()}, declining`,
+    },
+  ];
+}
+
 function destinationXY(userX: number, userY: number) {
   return { dx: Math.min(userX + 140, W - 55), dy: Math.max(userY - 138, 68) };
 }
@@ -229,6 +416,10 @@ function MapBackground() {
         <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
           <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#94a3b8" strokeWidth="0.3" strokeOpacity="0.35" />
         </pattern>
+        <linearGradient id="g-trajectory" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#6366f1" stopOpacity="0.15" />
+          <stop offset="100%" stopColor="#6366f1" stopOpacity="0.85" />
+        </linearGradient>
         <filter id="glow">
           <feGaussianBlur stdDeviation="3" result="coloredBlur" />
           <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
@@ -352,6 +543,32 @@ function UserMarker({ x, y, label }: { x: number; y: number; label: string }) {
   );
 }
 
+function BotGhostMarker({ x, y, color, name, personaCode }: {
+  x: number; y: number; color: string; name: string; personaCode: string;
+}) {
+  return (
+    <g opacity="0.45">
+      <circle cx={x} cy={y} r={6} fill={color} stroke="white" strokeWidth="1.5" />
+      <circle cx={x} cy={y} r={2} fill="white" />
+      <text x={x} y={y + 14} textAnchor="middle"
+        style={{ fontSize: "6.5px", fill: color, fontWeight: "600", userSelect: "none" }}>
+        {name} · {personaCode}
+      </text>
+    </g>
+  );
+}
+
+function BotTrajectoryTrail({ points, color }: {
+  points: { x: number; y: number }[]; color: string;
+}) {
+  if (points.length < 2) return null;
+  const d = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x},${p.y}`).join(" ");
+  return (
+    <path d={d} fill="none" stroke={color} strokeWidth="1.5" strokeOpacity="0.35"
+      strokeDasharray="4,4" strokeLinecap="round" strokeLinejoin="round" />
+  );
+}
+
 function RiskPin({
   x, y, sev, label, selected, onClick,
 }: {
@@ -425,6 +642,473 @@ function MapLegend() {
         </g>
       ))}
     </g>
+  );
+}
+
+// ─── Health Journey components ───────────────────────────────────────────────
+
+function HealthScoreGauge({ score }: { score: number }) {
+  const [displayScore, setDisplayScore] = useState(0);
+  useEffect(() => {
+    const target = score;
+    const duration = 1200;
+    const startTime = performance.now();
+    let raf: number;
+    function tick(now: number) {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplayScore(Math.round(eased * target));
+      if (progress < 1) raf = requestAnimationFrame(tick);
+    }
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [score]);
+
+  const R = 40, cx = 50, cy = 50;
+  const circumference = 2 * Math.PI * R;
+  const arcLen = (270 / 360) * circumference;
+  const fillLen = arcLen * (Math.max(0, Math.min(100, score)) / 100);
+  const color = scoreColor(score);
+
+  return (
+    <svg viewBox="0 0 100 100" className="w-28 h-28 mx-auto">
+      <circle cx={cx} cy={cy} r={R} fill="none" stroke="#e2e8f0" strokeWidth="7"
+        strokeDasharray={`${arcLen} ${circumference}`}
+        strokeLinecap="round" transform={`rotate(135 ${cx} ${cy})`} />
+      <circle cx={cx} cy={cy} r={R} fill="none" stroke={color} strokeWidth="7"
+        strokeDasharray={`${arcLen} ${circumference}`}
+        strokeDashoffset={arcLen - fillLen}
+        strokeLinecap="round" transform={`rotate(135 ${cx} ${cy})`}>
+        <animate attributeName="stroke-dashoffset" from={String(arcLen)} to={String(arcLen - fillLen)}
+          dur="1.2s" fill="freeze" />
+      </circle>
+      <text x={cx} y={cy - 2} textAnchor="middle" dominantBaseline="central"
+        style={{ fontSize: "20px", fontWeight: 800, fill: color }}>{displayScore}</text>
+      <text x={cx} y={cy + 14} textAnchor="middle"
+        style={{ fontSize: "7px", fill: "#64748b", fontWeight: 600 }}>Health Score</text>
+    </svg>
+  );
+}
+
+function TrajectorySparkline({ snapshots }: { snapshots: Snapshot[] }) {
+  const pts = snapshots
+    .filter(s => s.position_y != null && s.recorded_at)
+    .map(s => ({ score: computeHealthScore(s.position_y!), time: new Date(s.recorded_at).getTime() }));
+  if (pts.length < 2) return null;
+
+  const SW = 260, SH = 80, PAD = 12;
+  const plotW = SW - PAD * 2, plotH = SH - PAD * 2;
+  const minT = pts[0].time, maxT = pts[pts.length - 1].time;
+  const tRange = maxT - minT || 1;
+  const points = pts.map(p => ({
+    x: PAD + ((p.time - minT) / tRange) * plotW,
+    y: PAD + plotH - (Math.max(0, Math.min(100, p.score)) / 100) * plotH,
+    score: p.score,
+  }));
+
+  let pathD = `M ${points[0].x},${points[0].y}`;
+  for (let i = 1; i < points.length; i++) {
+    const cpx = (points[i - 1].x + points[i].x) / 2;
+    pathD += ` Q ${cpx},${points[i - 1].y} ${points[i].x},${points[i].y}`;
+  }
+  const areaD = pathD + ` L ${points[points.length - 1].x},${PAD + plotH} L ${points[0].x},${PAD + plotH} Z`;
+  const color = scoreColor(pts[pts.length - 1].score);
+  const fmtDate = (ts: number) => new Date(ts).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+  const bands = [
+    { y1: 0, y2: 20, color: "#7f1d1d" },
+    { y1: 20, y2: 45, color: "#dc2626" },
+    { y1: 45, y2: 75, color: "#b45309" },
+    { y1: 75, y2: 100, color: "#16a34a" },
+  ];
+
+  return (
+    <svg viewBox={`0 0 ${SW} ${SH}`} className="w-full">
+      <defs>
+        <linearGradient id="spark-area" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.2" />
+          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {bands.map((b, i) => (
+        <rect key={i} x={PAD} y={PAD + plotH - (b.y2 / 100) * plotH}
+          width={plotW} height={((b.y2 - b.y1) / 100) * plotH}
+          fill={b.color} opacity="0.08" />
+      ))}
+      <path d={areaD} fill="url(#spark-area)" />
+      <path d={pathD} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      {points.map((p, i) => (
+        <g key={i}>
+          {i === points.length - 1 && (
+            <circle cx={p.x} cy={p.y} r={4} fill={scoreColor(p.score)} fillOpacity="0">
+              <animate attributeName="r" from="3" to="8" dur="1.5s" repeatCount="indefinite" />
+              <animate attributeName="fill-opacity" from="0.4" to="0" dur="1.5s" repeatCount="indefinite" />
+            </circle>
+          )}
+          <circle cx={p.x} cy={p.y} r={i === points.length - 1 ? 3.5 : 2.5}
+            fill={scoreColor(p.score)} stroke="white" strokeWidth="1" />
+        </g>
+      ))}
+      <text x={points[0].x} y={SH - 1} textAnchor="start"
+        style={{ fontSize: "7px", fill: "#94a3b8" }}>{fmtDate(minT)}</text>
+      <text x={points[points.length - 1].x} y={SH - 1} textAnchor="end"
+        style={{ fontSize: "7px", fill: "#94a3b8" }}>{fmtDate(maxT)}</text>
+    </svg>
+  );
+}
+
+function TrajectoryPath({ snapshots }: { snapshots: Snapshot[] }) {
+  const pts = snapshots
+    .filter(s => s.position_x != null && s.position_y != null)
+    .map(s => ({ x: s.position_x!, y: s.position_y!, zone: s.zone, recorded_at: s.recorded_at }));
+  if (pts.length < 2) return null;
+
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x},${p.y}`).join(" ");
+  const totalLen = pts.reduce((sum, p, i) => {
+    if (i === 0) return 0;
+    return sum + Math.sqrt((p.x - pts[i - 1].x) ** 2 + (p.y - pts[i - 1].y) ** 2);
+  }, 0);
+  const fmtDate = (d: string) => new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+  return (
+    <g>
+      <path d={pathD} fill="none" stroke="#6366f1" strokeWidth="4" strokeOpacity="0.15"
+        strokeLinecap="round" strokeLinejoin="round" />
+      <path d={pathD} fill="none" stroke="url(#g-trajectory)" strokeWidth="2"
+        strokeLinecap="round" strokeLinejoin="round"
+        strokeDasharray={totalLen} strokeDashoffset={totalLen}>
+        <animate attributeName="stroke-dashoffset" from={String(totalLen)} to="0"
+          dur="2s" fill="freeze" />
+      </path>
+      {pts.map((p, i) => {
+        const isTransition = i > 0 && p.zone !== pts[i - 1].zone;
+        if (i === pts.length - 1) return null;
+        return isTransition ? (
+          <g key={i} transform={`translate(${p.x},${p.y})`}>
+            <polygon points="0,-5 5,0 0,5 -5,0" fill="#6366f1" stroke="white" strokeWidth="1.5" />
+          </g>
+        ) : (
+          <circle key={i} cx={p.x} cy={p.y} r={2.5}
+            fill="#6366f1" opacity={0.3 + (i / pts.length) * 0.5}
+            stroke="white" strokeWidth="0.5" />
+        );
+      })}
+      <text x={pts[0].x} y={pts[0].y + 14} textAnchor="middle"
+        style={{ fontSize: "6.5px", fill: "#6366f1", opacity: 0.7 }}>{fmtDate(pts[0].recorded_at)}</text>
+      <text x={pts[pts.length - 1].x} y={pts[pts.length - 1].y + 14} textAnchor="middle"
+        style={{ fontSize: "6.5px", fill: "#6366f1", opacity: 0.7 }}>{fmtDate(pts[pts.length - 1].recorded_at)}</text>
+    </g>
+  );
+}
+
+function DriftIndicator({ snapshots }: { snapshots: Snapshot[] }) {
+  const valid = snapshots.filter(s => s.position_y != null);
+  if (valid.length < 2) return null;
+
+  const prev = valid[valid.length - 2];
+  const curr = valid[valid.length - 1];
+  const prevScore = computeHealthScore(prev.position_y!);
+  const currScore = computeHealthScore(curr.position_y!);
+  const delta = currScore - prevScore;
+
+  const prevZone = prev.zone ?? getZoneAt(prev.position_y!).name;
+  const currZone = curr.zone ?? getZoneAt(curr.position_y!).name;
+  const zoneChanged = prevZone !== currZone;
+
+  const direction = delta > 2 ? "improving" : delta < -2 ? "worsening" : "steady";
+  const arrow = direction === "improving" ? "\u25B2" : direction === "worsening" ? "\u25BC" : "\u25B6";
+  const arrowColor = direction === "improving" ? "#16a34a" : direction === "worsening" ? "#dc2626" : "#94a3b8";
+  const deltaStr = delta > 0 ? `+${delta}` : String(delta);
+  const fmtDate = (s: Snapshot) => new Date(s.recorded_at).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const shortZone = (z: string) => {
+    if (z.includes("Thriving")) return "Thriving";
+    if (z.includes("Navigation")) return "Navigation";
+    if (z.includes("Risk")) return "Risk";
+    return "Critical";
+  };
+
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center gap-2">
+        <span className="text-lg font-bold" style={{ color: arrowColor }}>{arrow}</span>
+        <span className="text-sm font-bold" style={{ color: arrowColor }}>{deltaStr}</span>
+        <span className="text-xs text-slate-500">
+          {direction === "improving" ? "Improving" : direction === "worsening" ? "Worsening" : "Steady"}
+          {" \u00B7 since "}{fmtDate(prev)}
+        </span>
+      </div>
+      {zoneChanged && (
+        <div className="flex items-center gap-1.5 text-xs">
+          <span className="rounded-full px-2 py-0.5 font-semibold text-white"
+            style={{ backgroundColor: scoreColor(prevScore) }}>{shortZone(prevZone)}</span>
+          <span className="text-slate-400">{"\u2192"}</span>
+          <span className="rounded-full px-2 py-0.5 font-semibold text-white"
+            style={{ backgroundColor: scoreColor(currScore) }}>{shortZone(currZone)}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ZoneTransitionBadges({ snapshots }: { snapshots: Snapshot[] }) {
+  const valid = snapshots.filter(s => s.position_y != null && s.zone);
+  if (valid.length < 2) return null;
+
+  const transitions: { zone: string; date: string; score: number }[] = [
+    { zone: valid[0].zone!, date: valid[0].recorded_at, score: computeHealthScore(valid[0].position_y!) },
+  ];
+  for (let i = 1; i < valid.length; i++) {
+    if (valid[i].zone !== valid[i - 1].zone) {
+      transitions.push({ zone: valid[i].zone!, date: valid[i].recorded_at, score: computeHealthScore(valid[i].position_y!) });
+    }
+  }
+  const last = valid[valid.length - 1];
+  if (transitions[transitions.length - 1].date !== last.recorded_at) {
+    transitions.push({ zone: last.zone!, date: last.recorded_at, score: computeHealthScore(last.position_y!) });
+  }
+  if (transitions.length < 2) return null;
+
+  const abbrev = (z: string) => {
+    if (z.includes("Thriving")) return "THR";
+    if (z.includes("Navigation")) return "NAV";
+    if (z.includes("Risk")) return "RISK";
+    return "CRIT";
+  };
+  const zoneHex = (z: string) => {
+    if (z.includes("Thriving")) return "#16a34a";
+    if (z.includes("Navigation")) return "#b45309";
+    if (z.includes("Risk")) return "#dc2626";
+    return "#7f1d1d";
+  };
+  const fmtDate = (d: string) => new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+  return (
+    <div className="flex items-center gap-0 overflow-x-auto">
+      {transitions.map((t, i) => (
+        <div key={i} className="flex items-center">
+          {i > 0 && <div className="w-4 h-0.5" style={{ backgroundColor: zoneHex(transitions[i - 1].zone), opacity: 0.4 }} />}
+          <div className="flex flex-col items-center">
+            <span className="rounded-full px-2 py-0.5 text-xs font-bold text-white"
+              style={{ backgroundColor: zoneHex(t.zone) }}>{abbrev(t.zone)}</span>
+            <span className="text-slate-400 mt-0.5" style={{ fontSize: "7px" }}>{fmtDate(t.date)}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ConditionDiff({ snapshots }: { snapshots: Snapshot[] }) {
+  const valid = snapshots.filter(s => s.position_y != null);
+  if (valid.length < 2) return <p className="text-xs text-slate-400 italic">No prior visits to compare</p>;
+
+  const diff = diffSnapshots(valid[valid.length - 2], valid[valid.length - 1]);
+  const hasChanges = diff.addedConditions.length + diff.removedConditions.length +
+                     diff.addedSymptoms.length + diff.removedSymptoms.length > 0;
+  if (!hasChanges) return <p className="text-xs text-slate-400 italic">No changes since last visit</p>;
+
+  return (
+    <div className="space-y-1">
+      {diff.addedConditions.map(c => (
+        <div key={`+c:${c}`} className="flex items-center gap-1.5 text-xs">
+          <span className="rounded-full bg-red-100 text-red-700 px-1.5 py-0.5 font-bold">+</span>
+          <span className="text-slate-700">{c}</span>
+        </div>
+      ))}
+      {diff.removedConditions.map(c => (
+        <div key={`-c:${c}`} className="flex items-center gap-1.5 text-xs">
+          <span className="rounded-full bg-green-100 text-green-700 px-1.5 py-0.5 font-bold">{"\u2212"}</span>
+          <span className="text-slate-500 line-through">{c}</span>
+        </div>
+      ))}
+      {diff.addedSymptoms.map(s => (
+        <div key={`+s:${s}`} className="flex items-center gap-1.5 text-xs">
+          <span className="rounded-full bg-orange-100 text-orange-700 px-1.5 py-0.5 font-bold">+</span>
+          <span className="text-slate-600">{s}</span>
+        </div>
+      ))}
+      {diff.removedSymptoms.map(s => (
+        <div key={`-s:${s}`} className="flex items-center gap-1.5 text-xs">
+          <span className="rounded-full bg-slate-100 text-slate-500 px-1.5 py-0.5 font-bold">{"\u2212"}</span>
+          <span className="text-slate-400 line-through">{s}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function JourneyPanel({ trajectory, currentY }: { trajectory: Snapshot[]; currentY: number }) {
+  if (trajectory.length === 0) return null;
+  const score = computeHealthScore(currentY);
+
+  if (trajectory.length === 1) {
+    return (
+      <div className="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-4 shadow-sm space-y-3">
+        <h3 className="text-xs font-bold uppercase tracking-wide text-indigo-700">Your Health Journey</h3>
+        <HealthScoreGauge score={score} />
+        <p className="text-xs text-center text-slate-500 italic">Come back to track your journey</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-4 shadow-sm space-y-3">
+      <h3 className="text-xs font-bold uppercase tracking-wide text-indigo-700">Your Health Journey</h3>
+      <HealthScoreGauge score={score} />
+      <DriftIndicator snapshots={trajectory} />
+      <TrajectorySparkline snapshots={trajectory} />
+      <ZoneTransitionBadges snapshots={trajectory} />
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1.5">What Changed</p>
+        <ConditionDiff snapshots={trajectory} />
+      </div>
+    </div>
+  );
+}
+
+// ─── Health Persona Card ─────────────────────────────────────────────────────
+function HealthPersonaCard({ persona, zone, complexity, momentum, score, conditionCount }: {
+  persona: PersonaType; zone: PersonaZone; complexity: PersonaComplexity;
+  momentum: PersonaMomentum; score: number; conditionCount: number;
+}) {
+  const desc = persona.descTemplate
+    .replace("{score}", String(score))
+    .replace("{conditionCount}", String(conditionCount))
+    .replace("{zone}", zone === "V" ? "vital zone" : "guarded zone");
+
+  const dimLabel = (dim: string, val: string) => {
+    if (dim === "zone") return val === "V" ? "Vital" : "Guarded";
+    if (dim === "complexity") return val === "S" ? "Simple" : "Complex";
+    return val === "A" ? "Ascending" : val === "D" ? "Declining" : "Steady";
+  };
+
+  return (
+    <div className="rounded-2xl border bg-white p-4 shadow-sm space-y-2.5"
+      style={{ borderColor: persona.color + "60" }}>
+      <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Your Health Persona</p>
+      <div className="flex items-center gap-3">
+        <span className="rounded-lg px-2.5 py-1.5 text-sm font-black text-white"
+          style={{ backgroundColor: persona.color }}>{persona.code}</span>
+        <span className="text-sm font-bold text-slate-800">{persona.name}</span>
+      </div>
+      <div className="flex gap-1.5">
+        {([
+          { label: dimLabel("zone", zone) },
+          { label: dimLabel("complexity", complexity) },
+          { label: dimLabel("momentum", momentum) },
+        ] as const).map(({ label }) => (
+          <span key={label} className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-600">
+            {label}
+          </span>
+        ))}
+      </div>
+      <p className="text-xs text-slate-600 leading-relaxed italic">&ldquo;{desc}&rdquo;</p>
+    </div>
+  );
+}
+
+// ─── Bot Panel ───────────────────────────────────────────────────────────────
+function BotPanel({ bots, showBots, onToggle, trajectory }: {
+  bots: SyntheticBot[]; showBots: boolean; onToggle: () => void; trajectory: Snapshot[];
+}) {
+  if (bots.length === 0) return null;
+  const roleIcons: Record<string, string> = { better: "\u{1F7E2}", parallel: "\u{1F7E3}", warning: "\u{1F534}" };
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-bold uppercase tracking-wide text-slate-400">People Like You</p>
+        <button type="button" onClick={onToggle}
+          className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs text-slate-500 hover:border-blue-300 hover:text-blue-600 transition-colors">
+          {showBots ? "Hide" : "Show on map"}
+        </button>
+      </div>
+      {bots.map((bot) => {
+        const botPersona = derivePersona(bot.currentY, bot.conditions, trajectory);
+        return (
+          <div key={bot.id} className="flex items-start gap-2.5">
+            <span style={{ fontSize: "12px" }}>{roleIcons[bot.role]}</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-bold text-slate-800">{bot.name}</span>
+                <span className="text-xs text-slate-500">({bot.age})</span>
+                <span className="rounded-full px-1.5 py-0.5 font-bold text-white"
+                  style={{ backgroundColor: botPersona.persona.color, fontSize: "9px" }}>
+                  {botPersona.persona.code}
+                </span>
+                <span className="text-xs text-slate-500">Score {bot.score}</span>
+              </div>
+              <p className="text-xs text-slate-500 italic mt-0.5">&ldquo;{bot.description}&rdquo;</p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Health ID Badge ─────────────────────────────────────────────────────────
+function HealthIdBadge({ token, onRestore }: {
+  token: string; onRestore: (newToken: string) => void;
+}) {
+  const [copied, setCopied] = useState(false);
+  const [showRestore, setShowRestore] = useState(false);
+  const [restoreInput, setRestoreInput] = useState("");
+
+  const shortId = token.slice(-8);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(token);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* clipboard API may fail in some contexts */ }
+  };
+
+  const handleRestore = () => {
+    const trimmed = restoreInput.trim();
+    if (trimmed) {
+      onRestore(trimmed);
+      setRestoreInput("");
+      setShowRestore(false);
+    }
+  };
+
+  if (!token) return null;
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2">
+      <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Your Health ID</p>
+      <div className="flex items-center gap-2">
+        <span className="rounded-md bg-white border border-slate-200 px-2.5 py-1 text-xs font-mono font-bold text-slate-700 tracking-wider">
+          {shortId}
+        </span>
+        <button type="button" onClick={handleCopy}
+          className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-500 hover:border-blue-300 hover:text-blue-600 transition-colors">
+          {copied ? "Copied!" : "Copy"}
+        </button>
+      </div>
+      <p className="text-xs text-slate-400 leading-snug">
+        Saved anonymously on this device. Copy ID to restore elsewhere.
+      </p>
+      <button type="button" onClick={() => setShowRestore(v => !v)}
+        className="text-xs text-slate-500 hover:text-blue-600 transition-colors">
+        {showRestore ? "\u25BE Hide restore" : "\u25B8 Restore from another device"}
+      </button>
+      {showRestore && (
+        <div className="flex gap-2">
+          <input type="text" value={restoreInput} onChange={e => setRestoreInput(e.target.value)}
+            placeholder="Paste your Health ID"
+            onKeyDown={e => { if (e.key === "Enter") handleRestore(); }}
+            className="flex-1 rounded-md border border-slate-200 px-2 py-1 text-xs font-mono focus:border-blue-400 focus:outline-none" />
+          <button type="button" onClick={handleRestore}
+            disabled={!restoreInput.trim()}
+            className="rounded-md bg-blue-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50 transition-colors">
+            Restore
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -1057,6 +1741,8 @@ export default function HealthMapPage() {
   // ── Trajectory tracking ────────────────────────────────────────────────
   const [trajectory, setTrajectory]       = useState<Snapshot[]>([]);
   const userTokenRef = useRef<string>("");
+  const [showBots, setShowBots]           = useState(false);
+  const [currentToken, setCurrentToken]   = useState("");
 
   const autoSubmitted = useRef(false);
 
@@ -1066,10 +1752,12 @@ export default function HealthMapPage() {
       const stored = localStorage.getItem("health_user_token");
       if (stored) {
         userTokenRef.current = stored;
+        setCurrentToken(stored);
       } else {
         const token = "u_" + Math.random().toString(36).slice(2, 14) + Date.now().toString(36);
         localStorage.setItem("health_user_token", token);
         userTokenRef.current = token;
+        setCurrentToken(token);
       }
       // Load existing trajectory
       if (userTokenRef.current) {
@@ -1307,6 +1995,30 @@ export default function HealthMapPage() {
 
   const hasCtx = loadedCtx !== null;
 
+  // ── Persona derivation ──────────────────────────────────────────────────
+  const personaData = useMemo(
+    () => derivePersona(userY, activeConditions, trajectory),
+    [userY, activeConditions, trajectory],
+  );
+
+  // ── Synthetic bots ──────────────────────────────────────────────────────
+  const bots = useMemo(
+    () => generateBots(ctx.age, activeConditions, activeSymptoms),
+    [ctx.age, activeConditions, activeSymptoms],
+  );
+
+  // ── Health ID restore handler ───────────────────────────────────────────
+  const handleRestoreToken = useCallback((newToken: string) => {
+    try {
+      localStorage.setItem("health_user_token", newToken);
+    } catch { /* ignore */ }
+    userTokenRef.current = newToken;
+    setCurrentToken(newToken);
+    fetchTrajectory(newToken)
+      .then(setTrajectory)
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* ── Header ───────────────────────────────────────────────────────── */}
@@ -1433,6 +2145,33 @@ export default function HealthMapPage() {
               </div>
             )}
 
+            {/* ── Health Persona Card ───────────────────────────────────── */}
+            {(hasCtx || hasSubmitted) && (
+              <HealthPersonaCard
+                persona={personaData.persona}
+                zone={personaData.zone}
+                complexity={personaData.complexity}
+                momentum={personaData.momentum}
+                score={personaData.score}
+                conditionCount={activeConditions.length}
+              />
+            )}
+
+            {/* ── People Like You (Synthetic Bots) ────────────────────────── */}
+            {(hasCtx || hasSubmitted) && bots.length > 0 && (
+              <BotPanel
+                bots={bots}
+                showBots={showBots}
+                onToggle={() => setShowBots(v => !v)}
+                trajectory={trajectory}
+              />
+            )}
+
+            {/* ── Health Journey Dashboard ────────────────────────────────── */}
+            {(hasCtx || hasSubmitted) && trajectory.length > 0 && (
+              <JourneyPanel trajectory={trajectory} currentY={userY} />
+            )}
+
             {/* ── Interrogation agent panel ───────────────────────────────── */}
             {(interrogation || interrogating) && (
               <div>
@@ -1510,6 +2249,9 @@ export default function HealthMapPage() {
 
             {/* ── Pipeline status widget ──────────────────────────────────── */}
             <PipelineWidget />
+
+            {/* ── Health ID Badge ──────────────────────────────────────────── */}
+            <HealthIdBadge token={currentToken} onRestore={handleRestoreToken} />
           </div>
 
           {/* ── RIGHT: Map ───────────────────────────────────────────────── */}
@@ -1567,24 +2309,23 @@ export default function HealthMapPage() {
                   );
                 })}
 
-                {/* Trajectory: past positions as faded dots connected by a line */}
-                {trajectory.length > 1 && (() => {
-                  const pts = trajectory
-                    .filter(s => s.position_x != null && s.position_y != null)
-                    .map(s => ({ x: s.position_x!, y: s.position_y! }));
-                  if (pts.length < 2) return null;
-                  const polyline = pts.map(p => `${p.x},${p.y}`).join(" ");
+                {/* Trajectory: animated gradient path with zone-transition diamonds */}
+                {trajectory.length > 1 && <TrajectoryPath snapshots={trajectory} />}
+
+                {/* Synthetic bot ghost markers + trajectory trails */}
+                {showBots && bots.map((bot) => {
+                  const bp = derivePersona(bot.currentY, bot.conditions, trajectory);
                   return (
-                    <g opacity="0.6">
-                      <polyline points={polyline} fill="none" stroke="#6366f1"
-                        strokeWidth="1.5" strokeDasharray="4,3" strokeLinecap="round" />
-                      {pts.slice(0, -1).map((p, i) => (
-                        <circle key={i} cx={p.x} cy={p.y} r={3}
-                          fill="#6366f1" opacity={0.3 + (i / pts.length) * 0.5} />
-                      ))}
+                    <g key={bot.id}>
+                      <BotTrajectoryTrail points={bot.trajectory} color={bot.color} />
+                      <BotGhostMarker
+                        x={bot.currentX} y={bot.currentY}
+                        color={bot.color} name={bot.name}
+                        personaCode={bp.persona.code}
+                      />
                     </g>
                   );
-                })()}
+                })}
 
                 <UserMarker x={userX} y={userY} label={markerLabel || "You"} />
                 <LifeRuler userX={userX} />
