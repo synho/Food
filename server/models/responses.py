@@ -109,3 +109,87 @@ class DrugSubstitutionResponse(BaseModel):
     disclaimer: str = Field(
         default="This is not medical advice. Consult your doctor or pharmacist before changing medication or diet."
     )
+
+
+# ── Medical KG layer response models ────────────────────────────────────────
+
+class BiomarkerEvidence(BaseModel):
+    source_id: str = Field(default="")
+    context: str = Field(default="")
+    journal: str = Field(default="")
+    pub_date: str = Field(default="")
+
+
+class BiomarkerFoodRec(BaseModel):
+    food: str = Field(..., description="Food or nutrient name")
+    direction: str = Field(..., description="increases | decreases")
+    context: str = Field(default="")
+    evidence: BiomarkerEvidence = Field(default_factory=BiomarkerEvidence)
+
+
+class BiomarkerItem(BaseModel):
+    biomarker: str = Field(..., description="Biomarker name (e.g. HbA1c)")
+    disease: str = Field(..., description="Disease it is a biomarker for")
+    evidence: BiomarkerEvidence = Field(default_factory=BiomarkerEvidence)
+    food_recommendations: list[BiomarkerFoodRec] = Field(default_factory=list)
+
+
+class BiomarkerResponse(BaseModel):
+    biomarkers: list[BiomarkerItem] = Field(default_factory=list)
+    disclaimer: str = Field(default="Biomarker information is for educational purposes. Consult your healthcare provider.")
+
+
+class MechanismEvidence(BaseModel):
+    source_id: str = Field(default="")
+    source_type: str = Field(default="PMC")
+    journal: str = Field(default="")
+    pub_date: str = Field(default="")
+
+
+class MechanismHop(BaseModel):
+    context: str = Field(default="")
+    evidence: MechanismEvidence = Field(default_factory=MechanismEvidence)
+
+
+class MechanismChain(BaseModel):
+    food: str = Field(..., description="Food or nutrient")
+    food_type: str = Field(default="Food")
+    mechanism: str = Field(..., description="Biological mechanism")
+    mechanism_relationship: str = Field(default="CAUSES", description="CAUSES | INCREASES_RISK_OF")
+    disease: str = Field(...)
+    food_to_mechanism: MechanismHop = Field(default_factory=MechanismHop)
+    mechanism_to_disease: MechanismHop = Field(default_factory=MechanismHop)
+
+
+class MechanismResponse(BaseModel):
+    disease: str = Field(default="")
+    mechanism_chains: list[MechanismChain] = Field(default_factory=list)
+    disclaimer: str = Field(default="Mechanism information is for educational purposes.")
+
+
+class DrugInteractionEvidence(BaseModel):
+    source_id: str = Field(default="")
+    source_type: str = Field(default="PMC")
+    journal: str = Field(default="")
+    pub_date: str = Field(default="")
+
+
+class DrugInteractionItem(BaseModel):
+    nutrient: str = Field(...)
+    nutrient_type: str = Field(default="Nutrient")
+    context: str = Field(default="")
+    evidence: DrugInteractionEvidence = Field(default_factory=DrugInteractionEvidence)
+
+
+class DrugInteractionByDrug(BaseModel):
+    drug: str = Field(...)
+    contraindications: list[DrugInteractionItem] = Field(default_factory=list)
+    complements: list[DrugInteractionItem] = Field(default_factory=list)
+
+
+class DrugInteractionResponse(BaseModel):
+    interactions: list[DrugInteractionByDrug] = Field(default_factory=list)
+    disclaimer: str = Field(
+        default="Drug interaction information is for educational purposes only. "
+        "Do NOT change medication or diet without consulting your doctor or pharmacist."
+    )

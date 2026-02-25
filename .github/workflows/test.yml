@@ -1,0 +1,46 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      neo4j:
+        image: neo4j:latest
+        env:
+          NEO4J_AUTH: foodnot4self/foodnot4self
+        ports:
+          - 7474:7474
+          - 7687:7687
+        options: >-
+          --health-cmd "curl -f http://localhost:7474/ || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --health-start-period 30s
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install pipeline dependencies
+        run: pip install -r kg_pipeline/requirements.txt
+
+      - name: Run pipeline tests
+        run: cd kg_pipeline && python -m pytest tests/ -v
+
+      - name: Install server dependencies
+        run: pip install -r server/requirements.txt
+
+      - name: Run server tests
+        run: python -m pytest server/tests/ -v

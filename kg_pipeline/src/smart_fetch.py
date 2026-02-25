@@ -199,6 +199,32 @@ TOPIC_CLUSTERS: dict[str, dict] = {
         "keywords": ["nutraceutical", "supplement vs drug"],
         "mesh": ["Dietary Supplements"],
     },
+    # ── Medical KG clusters (biomarkers, mechanisms, trials, drug interactions) ──
+    "biomarker_nutrition": {
+        "entities": [],
+        "keywords": ["biomarker", "HbA1c", "LDL cholesterol", "dietary intervention", "CRP diet",
+                     "triglycerides nutrition", "fasting glucose diet", "eGFR nutrition"],
+        "mesh": ["Biomarkers", "Glycated Hemoglobin", "Cholesterol, LDL", "C-Reactive Protein"],
+    },
+    "mechanism_pathways": {
+        "entities": [],
+        "keywords": ["insulin signaling", "oxidative stress", "anti-inflammatory mechanism",
+                     "gut-brain axis", "neuroinflammation diet", "endothelial dysfunction nutrition",
+                     "AMPK activation food", "sirtuin diet", "autophagy nutrition"],
+        "mesh": ["Signal Transduction", "Oxidative Stress", "Insulin Resistance"],
+    },
+    "clinical_trials_diet": {
+        "entities": [],
+        "keywords": ["randomized controlled trial", "dietary intervention", "clinical trial nutrition",
+                     "PREDIMED", "DASH trial", "Mediterranean diet trial"],
+        "mesh": ["Randomized Controlled Trials as Topic", "Diet Therapy"],
+    },
+    "drug_nutrient_interaction": {
+        "entities": [],
+        "keywords": ["drug-nutrient interaction", "contraindication", "warfarin vitamin K",
+                     "metformin B12", "statin coenzyme Q10", "food drug interaction"],
+        "mesh": ["Drug Interactions", "Food-Drug Interactions"],
+    },
     # ── General health clusters (always-active, essential for bootstrapping) ──
     "general_nutrition": {
         "entities": [],

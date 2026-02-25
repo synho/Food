@@ -27,6 +27,9 @@ class KnowledgeGraphIngestor:
             "Food", "Disease", "Symptom", "Nutrient", "Drug",
             "LifestyleFactor", "BodySystem", "AgeRelatedChange", "LifeStage",
             "Study",  # Reserved for future evidence graph; no Study nodes ingested yet
+            # Medical KG layer
+            "Biomarker", "ClinicalTrial", "Mechanism", "BiochemicalPathway",
+            "PopulationGroup",
         ]
         with self.driver.session() as session:
             for label in labels:

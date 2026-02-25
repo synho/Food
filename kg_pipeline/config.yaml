@@ -127,13 +127,33 @@ smart_fetch:
     - "Int J Food Sci Nutr"
     - "Food Funct"
 
+  # ── Medical KG clusters (biomarkers, mechanisms, trials, drug interactions) ──
+  medical_clusters:
+    biomarker_nutrition:
+      keywords: ["biomarker", "HbA1c", "LDL cholesterol", "dietary intervention", "CRP diet",
+                 "triglycerides nutrition", "fasting glucose diet", "eGFR nutrition"]
+      mesh: ["Biomarkers", "Glycated Hemoglobin", "Cholesterol, LDL", "C-Reactive Protein"]
+    mechanism_pathways:
+      keywords: ["insulin signaling", "oxidative stress", "anti-inflammatory mechanism",
+                 "gut-brain axis", "neuroinflammation diet", "endothelial dysfunction nutrition",
+                 "AMPK activation food", "sirtuin diet", "autophagy nutrition"]
+      mesh: ["Signal Transduction", "Oxidative Stress", "Insulin Resistance"]
+    clinical_trials_diet:
+      keywords: ["randomized controlled trial", "dietary intervention", "clinical trial nutrition",
+                 "PREDIMED", "DASH trial", "Mediterranean diet trial"]
+      mesh: ["Randomized Controlled Trials as Topic", "Diet Therapy"]
+    drug_nutrient_interaction:
+      keywords: ["drug-nutrient interaction", "contraindication", "warfarin vitamin K",
+                 "metformin B12", "statin coenzyme Q10", "food drug interaction"]
+      mesh: ["Drug Interactions", "Food-Drug Interactions"]
+
   # Parallel worker settings (auto-tuned by NCBI_API_KEY env var)
   # Without key: 3 workers, 2.5 req/s  |  With key: 5 workers, 7 req/s
   # Set NCBI_API_KEY in kg_pipeline/.env for higher throughput (free at ncbi.nlm.nih.gov)
 
 continuous_build:
-  papers_per_run: 3       # extract this many new papers per invocation
-  extract_delay_sec: 45   # pause between Gemini calls
+  papers_per_run: 5       # extract this many new papers per invocation (cloud: higher throughput)
+  extract_delay_sec: 2    # pause between extraction calls (Bedrock: much faster than Gemini)
   max_retries: 3
   use_api_retry_after: true   # parse retryDelay from Gemini error JSON
   max_wait_sec: 120       # if retryDelay > this, skip the paper

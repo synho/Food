@@ -1,0 +1,53 @@
+# Production overlay — use with base docker-compose.yml:
+#   docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml up -d
+#
+# Adds: restart policy, resource limits, health checks, pipeline volume,
+#       web on port 80, production-safe Neo4j settings.
+
+services:
+  neo4j:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+    environment:
+      NEO4J_AUTH: foodnot4self/foodnot4self
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_server_memory_heap_initial__size: 256m
+      NEO4J_server_memory_heap_max__size: 512m
+      NEO4J_server_memory_pagecache_size: 128m
+
+  server:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    volumes:
+      - ../kg_pipeline:/app/kg_pipeline:ro
+      - ../data:/app/data
+    environment:
+      CORS_ORIGINS: "*"
+      MASTER_GRAPH_PATH: /app/data/extracted_triples/master_graph.json
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  web:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    ports:
+      - "80:3000"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s

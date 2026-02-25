@@ -42,6 +42,12 @@ _LANDMINE_KEYWORDS = {
     "alzheimer", "dementia", "cognitive decline", "stroke", "cerebrovascular",
     "pancreatic cancer", "pancreas", "chronic kidney disease", "ckd", "renal",
     "cardiovascular", "heart disease", "depression", "depressive",
+    # Medical KG — biomarker and mechanism terms
+    "hba1c", "ldl cholesterol", "hdl cholesterol", "c-reactive protein", "crp",
+    "triglycerides", "fasting glucose", "egfr", "biomarker",
+    "insulin resistance", "oxidative stress", "inflammation",
+    "endothelial dysfunction", "neuroinflammation", "gut-brain axis",
+    "drug interaction", "contraindication", "warfarin", "vitamin k interaction",
 }
 
 

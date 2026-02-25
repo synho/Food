@@ -78,6 +78,10 @@ class GapReport:
     foods_no_nutrients: list[str] = field(default_factory=list)
     nutrients_no_food: list[str] = field(default_factory=list)
     symptoms_no_early_signal: list[str] = field(default_factory=list)
+    # Medical KG layer gaps
+    biomarkers_no_food_link: list[str] = field(default_factory=list)
+    diseases_no_biomarker: list[str] = field(default_factory=list)
+    mechanisms_no_food: list[str] = field(default_factory=list)
     generated_queries: list[GapQuery] = field(default_factory=list)
     as_of: str = ""
 
@@ -89,6 +93,9 @@ class GapReport:
             f"  Foods with no nutrient links:   {len(self.foods_no_nutrients)}",
             f"  Nutrients with no food source:  {len(self.nutrients_no_food)}",
             f"  Symptoms with no early signal:  {len(self.symptoms_no_early_signal)}",
+            f"  Biomarkers w/o food link:       {len(self.biomarkers_no_food_link)}",
+            f"  Diseases w/o biomarker:         {len(self.diseases_no_biomarker)}",
+            f"  Mechanisms w/o food link:        {len(self.mechanisms_no_food)}",
             f"  Generated targeted queries:     {len(self.generated_queries)}",
         ]
         return "\n".join(lines)
@@ -159,6 +166,34 @@ def _run_gap_queries(uri: str, user: str, pw: str, min_food_recs: int = 3) -> Op
                 RETURN s.name AS name ORDER BY name
             """)
             report.symptoms_no_early_signal = [r["name"] for r in rows if r["name"]]
+
+            # 6. Biomarkers with no incoming INCREASES_BIOMARKER/DECREASES_BIOMARKER from Food/Nutrient
+            rows = s.run("""
+                MATCH (b:Biomarker)
+                WHERE NOT (:Food|Nutrient)-[:INCREASES_BIOMARKER|DECREASES_BIOMARKER]->(b)
+                RETURN b.name AS name ORDER BY name
+            """)
+            report.biomarkers_no_food_link = [r["name"] for r in rows if r["name"]]
+
+            # 7. Diseases with no incoming BIOMARKER_FOR
+            rows = s.run("""
+                MATCH (d:Disease)
+                WHERE COUNT { (d)--() } > 0
+                AND NOT (:Biomarker)-[:BIOMARKER_FOR]->(d)
+                RETURN d.name AS name ORDER BY name
+            """)
+            report.diseases_no_biomarker = [
+                r["name"] for r in rows
+                if r["name"] and r["name"].lower() not in _SKIP_CONDITIONS
+            ]
+
+            # 8. Mechanisms with no incoming TARGETS_MECHANISM from Food/Nutrient
+            rows = s.run("""
+                MATCH (m:Mechanism)
+                WHERE NOT (:Food|Nutrient)-[:TARGETS_MECHANISM]->(m)
+                RETURN m.name AS name ORDER BY name
+            """)
+            report.mechanisms_no_food = [r["name"] for r in rows if r["name"]]
 
     except Exception as e:
         print(f"Warning: gap query failed: {e}")
@@ -286,6 +321,44 @@ def _build_queries(
             hint=f"{name} has no EARLY_SIGNAL_OF link — find disease associations",
         ))
 
+    # Priority 2 — Biomarkers with no food link
+    for name in report.biomarkers_no_food_link[:max_per_type]:
+        q = (
+            f'("{name}"[Title/Abstract] OR "{name}"[MeSH Terms]) '
+            f'AND (diet OR food OR nutrition OR nutrient OR dietary) '
+            f'AND (increase OR decrease OR reduce OR improve OR worsen) '
+            f'AND {nutr_j} AND {base_filters}'
+        )
+        queries.append(GapQuery(
+            entity=name, gap_type="biomarker_no_food", query=q, priority=2,
+            hint=f"Biomarker {name} has no food link — find foods that affect it",
+        ))
+
+    # Priority 2 — Diseases with no biomarker
+    for name in report.diseases_no_biomarker[:max_per_type]:
+        q = (
+            f'("{name}"[Title/Abstract] OR "{name}"[MeSH Terms]) '
+            f'AND (biomarker OR "clinical marker" OR indicator OR HbA1c OR LDL OR CRP) '
+            f'AND {med_j} AND {base_filters}'
+        )
+        queries.append(GapQuery(
+            entity=name, gap_type="disease_no_biomarker", query=q, priority=2,
+            hint=f"{name} has no biomarker links — find relevant biomarkers",
+        ))
+
+    # Priority 2 — Mechanisms with no food link
+    for name in report.mechanisms_no_food[:max_per_type]:
+        q = (
+            f'("{name}"[Title/Abstract] OR "{name}"[MeSH Terms]) '
+            f'AND (diet OR food OR nutrient OR dietary OR phytochemical) '
+            f'AND (target OR modulate OR inhibit OR activate) '
+            f'AND {nutr_j} AND {base_filters}'
+        )
+        queries.append(GapQuery(
+            entity=name, gap_type="mechanism_no_food", query=q, priority=2,
+            hint=f"Mechanism {name} has no food targeting — find dietary modulators",
+        ))
+
     # Sort: priority ascending, then by entity name
     queries.sort(key=lambda q: (q.priority, q.entity))
     return queries
@@ -361,6 +434,9 @@ def main():
             "foods_no_nutrients": report.foods_no_nutrients,
             "nutrients_no_food": report.nutrients_no_food,
             "symptoms_no_early_signal": report.symptoms_no_early_signal,
+            "biomarkers_no_food_link": report.biomarkers_no_food_link,
+            "diseases_no_biomarker": report.diseases_no_biomarker,
+            "mechanisms_no_food": report.mechanisms_no_food,
             "generated_queries": [
                 {"entity": q.entity, "gap_type": q.gap_type, "priority": q.priority,
                  "hint": q.hint, "query": q.query}

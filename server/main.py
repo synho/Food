@@ -24,6 +24,9 @@ from server.models.responses import (
     EarlySignalGuidanceResponse,
     GeneralGuidanceResponse,
     DrugSubstitutionResponse,
+    BiomarkerResponse,
+    MechanismResponse,
+    DrugInteractionResponse,
 )
 from server.services.recommendations import get_recommendations
 from server.services.position import get_position
@@ -339,6 +342,48 @@ def drug_substitution_post(body: DrugSubstitutionRequest):
     Not medical advice; consult doctor/pharmacist.
     """
     return get_drug_substitution(drugs=body.drugs or [])
+
+
+# ----- Medical KG layer: biomarkers, mechanisms, drug interactions -----
+
+class ClinicalBiomarkerRequest(BaseModel):
+    conditions: list[str] = Field(default_factory=list, description="Conditions to find biomarkers for")
+
+
+@app.post("/api/clinical/biomarkers", response_model=BiomarkerResponse)
+def clinical_biomarkers(body: ClinicalBiomarkerRequest):
+    """
+    Given conditions, find relevant biomarkers and foods that improve them.
+    Uses medical KG: Biomarker -BIOMARKER_FOR-> Disease,
+    Food/Nutrient -INCREASES/DECREASES_BIOMARKER-> Biomarker.
+    """
+    from server.services.biomarkers import get_biomarkers
+    return get_biomarkers(conditions=body.conditions or [])
+
+
+@app.get("/api/clinical/mechanisms/{disease}", response_model=MechanismResponse)
+def clinical_mechanisms(disease: str):
+    """
+    Mechanism graph for a disease: Food/Nutrient -> Mechanism -> Disease with evidence.
+    Multi-hop chain showing *why* a food helps or harms through biological mechanism.
+    """
+    from server.services.mechanisms import get_mechanisms
+    return get_mechanisms(disease=disease)
+
+
+class ClinicalDrugInteractionRequest(BaseModel):
+    medications: list[str] = Field(default_factory=list, description="Medications to check interactions for")
+
+
+@app.post("/api/clinical/drug-interactions", response_model=DrugInteractionResponse)
+def clinical_drug_interactions(body: ClinicalDrugInteractionRequest):
+    """
+    Given medications, find food contraindications and complements from the medical KG.
+    Nutrient -CONTRAINDICATED_WITH-> Drug, Food/Nutrient -COMPLEMENTS_DRUG-> Drug.
+    Not medical advice — consult doctor/pharmacist.
+    """
+    from server.services.mechanisms import get_drug_interactions
+    return get_drug_interactions(medications=body.medications or [])
 
 
 # ----- Encrypted context save/restore (optional; requires CONTEXT_ENCRYPTION_KEY) -----

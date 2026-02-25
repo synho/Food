@@ -212,3 +212,84 @@ export interface Snapshot {
 export interface Trajectory {
   snapshots: Snapshot[];
 }
+
+// ── Medical KG layer types ──────────────────────────────────────────────────
+
+export interface BiomarkerEvidence {
+  source_id: string;
+  context: string;
+  journal: string;
+  pub_date: string;
+}
+
+export interface BiomarkerFoodRec {
+  food: string;
+  direction: "increases" | "decreases";
+  context: string;
+  evidence: BiomarkerEvidence;
+}
+
+export interface BiomarkerItem {
+  biomarker: string;
+  disease: string;
+  evidence: BiomarkerEvidence;
+  food_recommendations: BiomarkerFoodRec[];
+}
+
+export interface BiomarkerResponse {
+  biomarkers: BiomarkerItem[];
+  disclaimer: string;
+}
+
+export interface MechanismEvidence {
+  source_id: string;
+  source_type: string;
+  journal: string;
+  pub_date: string;
+}
+
+export interface MechanismHop {
+  context: string;
+  evidence: MechanismEvidence;
+}
+
+export interface MechanismChain {
+  food: string;
+  food_type: string;
+  mechanism: string;
+  mechanism_relationship: string;
+  disease: string;
+  food_to_mechanism: MechanismHop;
+  mechanism_to_disease: MechanismHop;
+}
+
+export interface MechanismResponse {
+  disease: string;
+  mechanism_chains: MechanismChain[];
+  disclaimer: string;
+}
+
+export interface DrugInteractionEvidence {
+  source_id: string;
+  source_type: string;
+  journal: string;
+  pub_date: string;
+}
+
+export interface DrugInteractionItem {
+  nutrient: string;
+  nutrient_type: string;
+  context: string;
+  evidence: DrugInteractionEvidence;
+}
+
+export interface DrugInteractionByDrug {
+  drug: string;
+  contraindications: DrugInteractionItem[];
+  complements: DrugInteractionItem[];
+}
+
+export interface DrugInteractionResponse {
+  interactions: DrugInteractionByDrug[];
+  disclaimer: string;
+}

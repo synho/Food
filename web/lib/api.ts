@@ -12,6 +12,9 @@ import type {
   EarlySignalGuidanceResponse,
   GeneralGuidanceResponse,
   DrugSubstitutionResponse,
+  BiomarkerResponse,
+  MechanismResponse,
+  DrugInteractionResponse,
 } from "./types";
 
 const BASE =
@@ -226,6 +229,37 @@ export async function saveSnapshot(
       zone,
       landmine_risks: landmineRisks ?? {},
     }),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+// ── Medical KG layer API functions ──────────────────────────────────────────
+
+/** Clinical biomarkers: given conditions, find relevant biomarkers + foods that improve them. */
+export async function fetchBiomarkers(conditions: string[]): Promise<BiomarkerResponse> {
+  const res = await fetch(`${API}/api/clinical/biomarkers`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ conditions }),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+/** Mechanism graph: Food -> Mechanism -> Disease with evidence chains. */
+export async function fetchMechanisms(disease: string): Promise<MechanismResponse> {
+  const res = await fetch(`${API}/api/clinical/mechanisms/${encodeURIComponent(disease.trim())}`);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+/** Drug interactions: given medications, find food contraindications and complements. */
+export async function fetchDrugInteractions(medications: string[]): Promise<DrugInteractionResponse> {
+  const res = await fetch(`${API}/api/clinical/drug-interactions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ medications }),
   });
   if (!res.ok) throw new Error(await res.text());
   return res.json();

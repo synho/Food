@@ -17,6 +17,12 @@ ENTITY_TYPES = [
     "LifeStage",
     # Evidence graph (schema reserved; Study nodes not yet ingested from pipeline)
     "Study",
+    # Medical KG layer
+    "Biomarker",
+    "ClinicalTrial",
+    "Mechanism",
+    "BiochemicalPathway",
+    "PopulationGroup",
 ]
 
 # Human-readable names that map to entity types (for extraction prompt and normalization)
@@ -39,6 +45,23 @@ ENTITY_TYPE_ALIASES = {
     "life stage": "LifeStage",
     "life_stage": "LifeStage",
     "lifestage": "LifeStage",
+    # Medical KG layer aliases
+    "biomarker": "Biomarker",
+    "clinical trial": "ClinicalTrial",
+    "clinical_trial": "ClinicalTrial",
+    "clinicaltrial": "ClinicalTrial",
+    "trial": "ClinicalTrial",
+    "mechanism": "Mechanism",
+    "biological mechanism": "Mechanism",
+    "biochemical pathway": "BiochemicalPathway",
+    "biochemical_pathway": "BiochemicalPathway",
+    "biochemicalpathway": "BiochemicalPathway",
+    "pathway": "BiochemicalPathway",
+    "population group": "PopulationGroup",
+    "population_group": "PopulationGroup",
+    "populationgroup": "PopulationGroup",
+    "population": "PopulationGroup",
+    "study population": "PopulationGroup",
 }
 
 # Allowed relationship types (predicates) for core + drug substitution
@@ -65,7 +88,17 @@ PREDICATES_AGING = [
     "EXPLAINS_WHY",
 ]
 
-ALL_PREDICATES = PREDICATES + PREDICATES_AGING
+# Medical KG layer predicates
+PREDICATES_MEDICAL = [
+    "BIOMARKER_FOR",           # Biomarker → Disease
+    "INCREASES_BIOMARKER",     # Food/Nutrient → Biomarker
+    "DECREASES_BIOMARKER",     # Food/Nutrient → Biomarker
+    "CONTRAINDICATED_WITH",    # Nutrient → Drug
+    "TARGETS_MECHANISM",       # Food/Nutrient → Mechanism
+    "STUDIED_IN",              # ClinicalTrial → PopulationGroup
+]
+
+ALL_PREDICATES = PREDICATES + PREDICATES_AGING + PREDICATES_MEDICAL
 
 # Canonical entity names for normalization (variant -> canonical).
 # SYNC: keep in sync with server/canonical.py CANONICAL_ENTITY_NAMES.
@@ -241,6 +274,136 @@ CANONICAL_ENTITY_NAMES = {
     "fatty liver": "Non-alcoholic fatty liver disease",
     "chronic inflammation": "Chronic inflammation",
     "oxidative stress": "Oxidative stress",
+    # ── Biomarkers ───────────────────────────────────────────────────────────
+    "hba1c": "HbA1c",
+    "hemoglobin a1c": "HbA1c",
+    "glycated hemoglobin": "HbA1c",
+    "glycated haemoglobin": "HbA1c",
+    "a1c": "HbA1c",
+    "ldl": "LDL cholesterol",
+    "ldl cholesterol": "LDL cholesterol",
+    "ldl-c": "LDL cholesterol",
+    "low-density lipoprotein": "LDL cholesterol",
+    "hdl": "HDL cholesterol",
+    "hdl cholesterol": "HDL cholesterol",
+    "hdl-c": "HDL cholesterol",
+    "high-density lipoprotein": "HDL cholesterol",
+    "crp": "C-reactive protein",
+    "c-reactive protein": "C-reactive protein",
+    "c reactive protein": "C-reactive protein",
+    "hs-crp": "C-reactive protein",
+    "high-sensitivity crp": "C-reactive protein",
+    "egfr": "eGFR",
+    "estimated glomerular filtration rate": "eGFR",
+    "glomerular filtration rate": "eGFR",
+    "triglycerides": "Triglycerides",
+    "triglyceride": "Triglycerides",
+    "tg": "Triglycerides",
+    "fasting glucose": "Fasting glucose",
+    "fasting blood glucose": "Fasting glucose",
+    "fbg": "Fasting glucose",
+    "fasting plasma glucose": "Fasting glucose",
+    "blood pressure": "Blood pressure",
+    "systolic blood pressure": "Systolic blood pressure",
+    "sbp": "Systolic blood pressure",
+    "diastolic blood pressure": "Diastolic blood pressure",
+    "dbp": "Diastolic blood pressure",
+    "bmi": "BMI",
+    "body mass index": "BMI",
+    "waist circumference": "Waist circumference",
+    "homocysteine": "Homocysteine",
+    "uric acid": "Uric acid",
+    "ferritin": "Ferritin",
+    "serum ferritin": "Ferritin",
+    "vitamin d level": "Vitamin D level",
+    "25-hydroxyvitamin d": "Vitamin D level",
+    "25(oh)d": "Vitamin D level",
+    "total cholesterol": "Total cholesterol",
+    "insulin": "Fasting insulin",
+    "fasting insulin": "Fasting insulin",
+    "homa-ir": "HOMA-IR",
+    "homa ir": "HOMA-IR",
+    "hemoglobin": "Hemoglobin",
+    "haemoglobin": "Hemoglobin",
+    "albumin": "Albumin",
+    "serum albumin": "Albumin",
+    # ── Mechanisms ───────────────────────────────────────────────────────────
+    "insulin resistance": "Insulin resistance",
+    "insulin signaling": "Insulin signaling",
+    "glucose metabolism": "Glucose metabolism",
+    "lipid metabolism": "Lipid metabolism",
+    "lipid peroxidation": "Lipid peroxidation",
+    "endothelial dysfunction": "Endothelial dysfunction",
+    "gut-brain axis": "Gut-brain axis",
+    "gut brain axis": "Gut-brain axis",
+    "neuroinflammation": "Neuroinflammation",
+    "beta-amyloid accumulation": "Beta-amyloid accumulation",
+    "amyloid": "Beta-amyloid accumulation",
+    "tau phosphorylation": "Tau phosphorylation",
+    "mitochondrial dysfunction": "Mitochondrial dysfunction",
+    "autophagy": "Autophagy",
+    "telomere shortening": "Telomere shortening",
+    "dna methylation": "DNA methylation",
+    "epigenetic modification": "Epigenetic modification",
+    "gut microbiome modulation": "Gut microbiome modulation",
+    "microbiome": "Gut microbiome modulation",
+    "nf-kb signaling": "NF-kB signaling",
+    "nf-kb": "NF-kB signaling",
+    "ampk activation": "AMPK activation",
+    "ampk": "AMPK activation",
+    "sirtuin activation": "Sirtuin activation",
+    "sirt1": "Sirtuin activation",
+    "mtor signaling": "mTOR signaling",
+    "mtor": "mTOR signaling",
+    "glycemic control": "Glycemic control",
+    "blood glucose regulation": "Glycemic control",
+    "platelet aggregation": "Platelet aggregation",
+    "angiogenesis": "Angiogenesis",
+    "apoptosis": "Apoptosis",
+    "immune modulation": "Immune modulation",
+    "immunomodulation": "Immune modulation",
+    # ── Clinical Trials ──────────────────────────────────────────────────────
+    "predimed": "PREDIMED trial",
+    "predimed trial": "PREDIMED trial",
+    "dash": "DASH trial",
+    "dash trial": "DASH trial",
+    "dash-sodium": "DASH-Sodium trial",
+    "lyon diet heart study": "Lyon Diet Heart Study",
+    "nurses' health study": "Nurses' Health Study",
+    "health professionals follow-up study": "Health Professionals Follow-up Study",
+    "epic study": "EPIC study",
+    "epic": "EPIC study",
+    "framingham heart study": "Framingham Heart Study",
+    "framingham": "Framingham Heart Study",
+    "women's health initiative": "Women's Health Initiative",
+    "whi": "Women's Health Initiative",
+    "interheart": "INTERHEART study",
+    "interheart study": "INTERHEART study",
+    # ── Population Groups ────────────────────────────────────────────────────
+    "postmenopausal women": "Postmenopausal women",
+    "elderly adults": "Elderly adults",
+    "older adults": "Elderly adults",
+    "south asian adults": "South Asian adults",
+    "mediterranean adults": "Mediterranean adults",
+    "pregnant women": "Pregnant women",
+    "children": "Children",
+    "adolescents": "Adolescents",
+    # ── Biochemical Pathways ─────────────────────────────────────────────────
+    "glycolysis": "Glycolysis",
+    "gluconeogenesis": "Gluconeogenesis",
+    "fatty acid oxidation": "Fatty acid oxidation",
+    "beta oxidation": "Fatty acid oxidation",
+    "citric acid cycle": "Citric acid cycle",
+    "krebs cycle": "Citric acid cycle",
+    "tca cycle": "Citric acid cycle",
+    "pentose phosphate pathway": "Pentose phosphate pathway",
+    "cholesterol biosynthesis": "Cholesterol biosynthesis",
+    "mevalonate pathway": "Cholesterol biosynthesis",
+    "tryptophan metabolism": "Tryptophan metabolism",
+    "folate metabolism": "Folate metabolism",
+    "one-carbon metabolism": "One-carbon metabolism",
+    "arachidonic acid pathway": "Arachidonic acid pathway",
+    "prostaglandin synthesis": "Prostaglandin synthesis",
 }
 
 
@@ -278,6 +441,7 @@ def normalize_predicate(raw: str) -> str:
 def get_ontology_prompt_section(include_aging: bool = True) -> str:
     """Return the ontology section for the extraction prompt (entity types + relationship types).
     When include_aging=True, BodySystem, AgeRelatedChange, LifeStage and aging predicates are included (docs/AGING_AND_HUMAN_BIOLOGY.md).
+    Always includes medical KG layer types (Biomarker, Mechanism, ClinicalTrial, etc.).
     """
     entity_list = "\n".join(f"- {t}" for t in (ENTITY_TYPES if include_aging else ENTITY_TYPES[:6]))
     preds = ALL_PREDICATES if include_aging else PREDICATES
@@ -292,4 +456,18 @@ Target Relationship Types (use exactly these; one per triple):
 Return ONLY triples whose subject_type and object_type are from the Entity Types list and whose predicate is from the Relationship Types list.
 If the text discusses aging, life stage, body systems, or modifiable risk, use types like AgeRelatedChange, LifeStage, BodySystem and predicates like PART_OF, OCCURS_AT, INCREASES_RISK_OF, MODIFIABLE_BY, EXPLAINS_WHY where supported.
 For early signals: use Symptom -EARLY_SIGNAL_OF-> Disease when the text describes early signs/symptoms of a disease; use ALLEVIATES (food/nutrient reduces symptom) and AGGRAVATES (food/nutrient worsens symptom) so we can recommend "foods that reduce" vs "foods to avoid".
+
+Medical KG extraction rules:
+- When the text discusses biomarkers (HbA1c, LDL, CRP, eGFR, triglycerides, fasting glucose):
+  Extract: Food/Nutrient -INCREASES_BIOMARKER/DECREASES_BIOMARKER-> Biomarker
+  Extract: Biomarker -BIOMARKER_FOR-> Disease
+- When the text discusses biological mechanisms (inflammation, oxidative stress, insulin resistance):
+  Extract: Food/Nutrient -TARGETS_MECHANISM-> Mechanism
+  Extract: Mechanism -CAUSES/INCREASES_RISK_OF-> Disease
+- When the text discusses drug-nutrient interactions or contraindications:
+  Extract: Nutrient -CONTRAINDICATED_WITH-> Drug (with context explaining why)
+- When the text references a specific named clinical trial (e.g. PREDIMED, DASH):
+  Extract: ClinicalTrial -STUDIED_IN-> PopulationGroup
+- When the text discusses biochemical pathways (glucose metabolism, lipid metabolism):
+  Extract: Food/Nutrient -TARGETS_MECHANISM-> BiochemicalPathway
 """
