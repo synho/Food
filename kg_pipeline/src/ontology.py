@@ -25,6 +25,9 @@ ENTITY_TYPES = [
     "PopulationGroup",
 ]
 
+# Fast lookup set for normalize_entity_type (avoids .capitalize() destroying PascalCase)
+_ENTITY_TYPES_SET = set(ENTITY_TYPES)
+
 # Human-readable names that map to entity types (for extraction prompt and normalization)
 ENTITY_TYPE_ALIASES = {
     "disease": "Disease",
@@ -42,9 +45,11 @@ ENTITY_TYPE_ALIASES = {
     "bodysystem": "BodySystem",
     "age related change": "AgeRelatedChange",
     "age_related_change": "AgeRelatedChange",
+    "agerelatedchange": "AgeRelatedChange",
     "life stage": "LifeStage",
     "life_stage": "LifeStage",
     "lifestage": "LifeStage",
+    "study": "Study",
     # Medical KG layer aliases
     "biomarker": "Biomarker",
     "clinical trial": "ClinicalTrial",
@@ -62,6 +67,78 @@ ENTITY_TYPE_ALIASES = {
     "populationgroup": "PopulationGroup",
     "population": "PopulationGroup",
     "study population": "PopulationGroup",
+    # Common LLM noise types → correct mappings
+    "condition": "Disease",
+    "medical condition": "Disease",
+    "medical_condition": "Disease",
+    "health condition": "Disease",
+    "health_condition": "Disease",
+    "health outcome": "Disease",
+    "health_outcome": "Disease",
+    "healthoutcome": "Disease",
+    "outcome": "Disease",
+    "protein": "Nutrient",
+    "amino acid": "Nutrient",
+    "amino_acid": "Nutrient",
+    "mineral": "Nutrient",
+    "vitamin": "Nutrient",
+    "supplement": "Nutrient",
+    "dietary supplement": "Nutrient",
+    "dietary_supplement": "Nutrient",
+    "nutraceutical": "Nutrient",
+    "phytochemical": "Nutrient",
+    "therapy": "Drug",
+    "medication": "Drug",
+    "pharmaceutical": "Drug",
+    "dietary pattern": "Food",
+    "dietary_pattern": "Food",
+    "dietarypattern": "Food",
+    "diet pattern": "Food",
+    "diet_pattern": "Food",
+    "diet": "Food",
+    "meal": "Food",
+    "beverage": "Food",
+    "health metric": "Biomarker",
+    "health_metric": "Biomarker",
+    "healthmetric": "Biomarker",
+    "clinical marker": "Biomarker",
+    "clinical_marker": "Biomarker",
+    "lab test": "Biomarker",
+    "lab_test": "Biomarker",
+    "lab value": "Biomarker",
+    "lab_value": "Biomarker",
+    "biological marker": "Biomarker",
+    "biological_marker": "Biomarker",
+    "patient group": "PopulationGroup",
+    "patient_group": "PopulationGroup",
+    "patientgroup": "PopulationGroup",
+    "study group": "PopulationGroup",
+    "study_group": "PopulationGroup",
+    "demographic": "PopulationGroup",
+    "biological process": "Mechanism",
+    "biological_process": "Mechanism",
+    "biologicalprocess": "Mechanism",
+    "process": "Mechanism",
+    "molecular mechanism": "Mechanism",
+    "molecular_mechanism": "Mechanism",
+    "signaling pathway": "BiochemicalPathway",
+    "signaling_pathway": "BiochemicalPathway",
+    "metabolic pathway": "BiochemicalPathway",
+    "metabolic_pathway": "BiochemicalPathway",
+    "biological pathway": "BiochemicalPathway",
+    "biological_pathway": "BiochemicalPathway",
+    "gene": "Biomarker",
+    "genetic factor": "Biomarker",
+    "genetic_factor": "Biomarker",
+    "geneticfactor": "Biomarker",
+    "exercise": "LifestyleFactor",
+    "physical activity": "LifestyleFactor",
+    "physical_activity": "LifestyleFactor",
+    "behavior": "LifestyleFactor",
+    "behaviour": "LifestyleFactor",
+    "organ": "BodySystem",
+    "organ system": "BodySystem",
+    "organ_system": "BodySystem",
 }
 
 # Allowed relationship types (predicates) for core + drug substitution
@@ -426,8 +503,16 @@ def normalize_entity_type(raw: str) -> str:
     """Map extraction output to canonical entity label (Neo4j node label)."""
     if not raw or not isinstance(raw, str):
         return "Thing"
-    key = raw.strip().replace(" ", "_").replace("-", "_").lower()  # Fix: was replace("-","") → "agerelated_change"
-    return ENTITY_TYPE_ALIASES.get(key) or raw.replace(" ", "_").replace("/", "_").capitalize()
+    trimmed = raw.strip()
+    # If already a valid entity type (e.g. LLM returned "AgeRelatedChange"), use it directly
+    if trimmed in _ENTITY_TYPES_SET:
+        return trimmed
+    key = trimmed.replace(" ", "_").replace("-", "_").lower()
+    if key in ENTITY_TYPE_ALIASES:
+        return ENTITY_TYPE_ALIASES[key]
+    # Fallback: capitalize first letter (preserves PascalCase unlike .capitalize())
+    cleaned = trimmed.replace(" ", "_").replace("/", "_")
+    return cleaned[0].upper() + cleaned[1:] if cleaned else "Thing"
 
 
 def normalize_predicate(raw: str) -> str:

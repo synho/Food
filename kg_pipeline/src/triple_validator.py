@@ -19,6 +19,11 @@ Usage:
 """
 from __future__ import annotations
 
+from ontology import ENTITY_TYPES
+
+# Set of valid entity types for fast lookup
+_VALID_ENTITY_TYPES = set(ENTITY_TYPES)
+
 # ── Vague entity names to reject ─────────────────────────────────────────────
 _VAGUE = {
     "patients", "patient", "humans", "human", "adults", "adult", "children",
@@ -127,7 +132,17 @@ def validate_and_score(
             _reject(t, f"low-value predicate: {predicate}")
             continue
 
-        # 6. Assign evidence strength
+        # 6. Entity type validation — reject types not in ontology
+        subject_type = (t.get("subject_type") or "").strip()
+        object_type = (t.get("object_type") or "").strip()
+        if subject_type and subject_type not in _VALID_ENTITY_TYPES:
+            _reject(t, f"unknown subject_type: {subject_type}")
+            continue
+        if object_type and object_type not in _VALID_ENTITY_TYPES:
+            _reject(t, f"unknown object_type: {object_type}")
+            continue
+
+        # 7. Assign evidence strength
         t["evidence_strength"] = _evidence_strength(t.get("evidence_type", ""))
         valid.append(t)
 

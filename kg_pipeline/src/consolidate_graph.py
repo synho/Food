@@ -3,13 +3,16 @@ import glob
 import os
 
 from config_loader import get_paths_config
+from ontology import normalize_entity_type, normalize_entity_name, normalize_predicate
+from triple_validator import validate_and_score, report as validator_report
 
 
 def consolidate_graph() -> str:
     """
-    Read all *_triples.json files and write master_graph.json.
+    Read all *_triples.json files, re-normalize and validate, then write master_graph.json.
     This is the single authoritative writer of master_graph — extract_triples delegates here
     so incremental runs accumulate all prior batches.
+    Only valid triples (ontology-compliant, with evidence) make it to the master graph.
     Returns the output file path.
     """
     paths = get_paths_config()
@@ -25,12 +28,25 @@ def consolidate_graph() -> str:
         with open(file_path, "r") as f:
             data = json.load(f)
             if isinstance(data, list):
+                # Re-normalize through current ontology
+                for t in data:
+                    t["subject_type"] = normalize_entity_type(t.get("subject_type", ""))
+                    t["object_type"] = normalize_entity_type(t.get("object_type", ""))
+                    t["predicate"] = normalize_predicate(t.get("predicate", ""))
+                    t["subject"] = normalize_entity_name(t.get("subject", ""), t.get("subject_type", ""))
+                    t["object"] = normalize_entity_name(t.get("object", ""), t.get("object_type", ""))
                 all_triples.extend(data)
 
-    with open(output_file, "w") as f:
-        json.dump(all_triples, f, indent=4)
+    # Validate: only ontology-compliant triples with evidence make it to master graph
+    valid, rejected, stats = validate_and_score(all_triples)
+    print(validator_report(stats))
+    if rejected:
+        print(f"  Filtered out {len(rejected)} low-quality triples from master graph.")
 
-    print(f"Consolidated {len(all_triples)} triples from {len(triple_files)} files into {output_file}")
+    with open(output_file, "w") as f:
+        json.dump(valid, f, indent=2)
+
+    print(f"Consolidated {len(valid)} valid triples from {len(triple_files)} files into {output_file}")
     return output_file
 
 if __name__ == "__main__":

@@ -21,14 +21,17 @@ class TestConsolidateGraph:
         """All triples from separate *_triples.json files are combined."""
         with tempfile.TemporaryDirectory() as tmpdir:
             _write_triples(tmpdir, "paper1_triples.json", [
-                {"subject": "Salmon", "predicate": "PREVENTS", "object": "Cardiovascular disease",
-                 "source_id": "PMC001", "pub_date": "2024-01"}
+                {"subject": "Salmon", "subject_type": "Food", "predicate": "PREVENTS",
+                 "object": "Cardiovascular disease", "object_type": "Disease",
+                 "source_id": "PMC001", "pub_date": "2024-01", "context": "Salmon prevents CVD."}
             ])
             _write_triples(tmpdir, "paper2_triples.json", [
-                {"subject": "Broccoli", "predicate": "REDUCES_RISK_OF", "object": "Type 2 diabetes",
-                 "source_id": "PMC002", "pub_date": "2024-02"},
-                {"subject": "Vitamin D", "predicate": "TREATS", "object": "Osteoporosis",
-                 "source_id": "PMC002", "pub_date": "2024-02"},
+                {"subject": "Broccoli", "subject_type": "Food", "predicate": "REDUCES_RISK_OF",
+                 "object": "Type 2 diabetes", "object_type": "Disease",
+                 "source_id": "PMC002", "pub_date": "2024-02", "context": "Broccoli reduces T2D risk."},
+                {"subject": "Vitamin D", "subject_type": "Nutrient", "predicate": "TREATS",
+                 "object": "Osteoporosis", "object_type": "Disease",
+                 "source_id": "PMC002", "pub_date": "2024-02", "context": "Vitamin D treats osteoporosis."},
             ])
             output_file = os.path.join(tmpdir, "master_graph.json")
 
@@ -63,12 +66,14 @@ class TestConsolidateGraph:
         with tempfile.TemporaryDirectory() as tmpdir:
             # Pre-existing master_graph.json (from a previous run)
             _write_triples(tmpdir, "master_graph.json", [
-                {"subject": "old", "predicate": "CAUSES", "object": "noise",
-                 "source_id": "OLD", "pub_date": "2023-01"}
+                {"subject": "old noise", "subject_type": "Food", "predicate": "CAUSES",
+                 "object": "noise disease", "object_type": "Disease",
+                 "source_id": "OLD", "pub_date": "2023-01", "context": "Old noise data."}
             ])
             _write_triples(tmpdir, "new_triples.json", [
-                {"subject": "Salmon", "predicate": "PREVENTS", "object": "Hypertension",
-                 "source_id": "PMC003", "pub_date": "2024-03"}
+                {"subject": "Salmon", "subject_type": "Food", "predicate": "PREVENTS",
+                 "object": "Hypertension", "object_type": "Disease",
+                 "source_id": "PMC003", "pub_date": "2024-03", "context": "Salmon prevents hypertension."}
             ])
             output_file = os.path.join(tmpdir, "master_graph.json")
             paths_cfg = {"extracted_triples": tmpdir, "master_graph": output_file}
