@@ -99,11 +99,11 @@ check:
 	python3 scripts/monitor.py
 
 kg-status:
-	@if [ -f .venv/bin/python3 ]; then .venv/bin/python3 scripts/kg_status.py; else python3 scripts/kg_status.py --no-neo4j; fi
+	@if [ -f kg_pipeline/venv/bin/python ]; then kg_pipeline/venv/bin/python scripts/kg_status.py; else python3 scripts/kg_status.py --no-neo4j; fi
 
-# Uses .venv Python when present (neo4j driver). May need a few seconds after starting Neo4j.
+# Uses kg_pipeline venv Python when present (neo4j driver). May need a few seconds after starting Neo4j.
 debug-neo4j:
-	@if [ -f .venv/bin/python3 ]; then .venv/bin/python3 scripts/debug_neo4j.py; else python3 scripts/debug_neo4j.py; fi
+	@if [ -f kg_pipeline/venv/bin/python ]; then kg_pipeline/venv/bin/python scripts/debug_neo4j.py; else python3 scripts/debug_neo4j.py; fi
 
 # 다른 앱이 3000/8000 포트를 쓰는 경우: 제외하고 확인
 # 예: make check-skip-web (Web 제외), make check-skip-server-web (Server·Web 제외)
@@ -116,10 +116,10 @@ ports:
 	@python3 scripts/ports_check.py
 
 server:
-	uvicorn server.main:app --reload --host 0.0.0.0
+	@if [ -x kg_pipeline/venv/bin/uvicorn ]; then kg_pipeline/venv/bin/uvicorn server.main:app --reload --host 0.0.0.0; else uvicorn server.main:app --reload --host 0.0.0.0; fi
 
 server-8001:
-	uvicorn server.main:app --reload --host 0.0.0.0 --port 8001
+	@if [ -x kg_pipeline/venv/bin/uvicorn ]; then kg_pipeline/venv/bin/uvicorn server.main:app --reload --host 0.0.0.0 --port 8001; else uvicorn server.main:app --reload --host 0.0.0.0 --port 8001; fi
 
 web:
 	cd web && npm run dev
@@ -136,4 +136,4 @@ check-sync:
 
 test:
 	cd kg_pipeline && (venv/bin/python -m pytest tests/ -v || ( . venv/bin/activate && python -m pytest tests/ -v ))
-	python3 -m pytest server/tests/ -v
+	@if [ -f kg_pipeline/venv/bin/python ]; then kg_pipeline/venv/bin/python -m pytest server/tests/ -v; else python3 -m pytest server/tests/ -v; fi

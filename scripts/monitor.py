@@ -25,20 +25,20 @@ MASTER_GRAPH = KG / "data" / "extracted_triples" / "master_graph.json"
 SKIP_ENV = os.environ.get("SKIP_CHECKS", "")
 SKIP = set(s.strip().lower() for s in SKIP_ENV.split(",") if s.strip())
 
-# 포트 충돌 회피: env로 URL 지정 가능. 기본 8001은 web/.env.local 및 run.sh start와 맞춤.
+# 포트 충돌 회피: env로 URL 지정 가능. 기본 8000은 web/.env.local 및 start_local.sh와 맞춤.
 NEO4J_HTTP_URL = os.environ.get("NEO4J_HTTP_URL", "http://localhost:7474")
 def _detect_server_url() -> str:
-    """Try 8001 first (web/.env.local default), fall back to 8000."""
+    """Try 8000 first (default), fall back to 8001."""
     forced = os.environ.get("SERVER_URL", "")
     if forced:
         return forced
-    for port in (8001, 8000):
+    for port in (8000, 8001):
         try:
             urlopen(f"http://127.0.0.1:{port}/health", timeout=1)
             return f"http://127.0.0.1:{port}"
         except Exception:
             pass
-    return "http://127.0.0.1:8001"
+    return "http://127.0.0.1:8000"
 
 SERVER_URL = _detect_server_url()
 WEB_URL = os.environ.get("WEB_URL", "http://127.0.0.1:3000")

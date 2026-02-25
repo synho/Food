@@ -19,6 +19,19 @@ done
 
 run_stop() { [ -z "$ONLY_STEP" ] || [ "$ONLY_STEP" = "$1" ]; }
 
+# Kill a process and its children (uvicorn workers, node child processes)
+stop_pid() {
+  local PID="$1" NAME="$2"
+  if kill -0 "$PID" 2>/dev/null; then
+    # Kill children first to prevent reparenting to PID 1
+    pkill -P "$PID" 2>/dev/null || true
+    kill "$PID" 2>/dev/null || true
+    echo "  $NAME stopped (PID $PID)."
+  else
+    echo "  $NAME not running (stale PID $PID)."
+  fi
+}
+
 echo "=== Health Navigation — Stop (local) ==="
 echo ""
 
@@ -27,12 +40,7 @@ if run_stop 1; then
 echo "[Step 1/3] Stopping web..."
 if [ -f "$WEB_PID" ]; then
   PID=$(cat "$WEB_PID")
-  if kill -0 "$PID" 2>/dev/null; then
-    kill "$PID" 2>/dev/null || true
-    echo "  Web stopped (PID $PID)."
-  else
-    echo "  Web not running (stale PID $PID)."
-  fi
+  stop_pid "$PID" "Web"
   rm -f "$WEB_PID"
 else
   echo "  No web PID file (.run/web.pid)."
@@ -45,12 +53,7 @@ if run_stop 2; then
 echo "[Step 2/3] Stopping API server..."
 if [ -f "$SERVER_PID" ]; then
   PID=$(cat "$SERVER_PID")
-  if kill -0 "$PID" 2>/dev/null; then
-    kill "$PID" 2>/dev/null || true
-    echo "  Server stopped (PID $PID)."
-  else
-    echo "  Server not running (stale PID $PID)."
-  fi
+  stop_pid "$PID" "Server"
   rm -f "$SERVER_PID"
 else
   echo "  No server PID file (.run/server.pid)."

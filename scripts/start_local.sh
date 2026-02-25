@@ -18,8 +18,8 @@ for arg in "$@"; do
   fi
 done
 
-# Default ports: 8001 matches web/.env.local (NEXT_PUBLIC_API_URL). Override with env if needed.
-SERVER_PORT="${SERVER_PORT:-8001}"
+# Default ports: 8000 matches web/.env.local (NEXT_PUBLIC_API_URL). Override with env if needed.
+SERVER_PORT="${SERVER_PORT:-8000}"
 WEB_PORT="${WEB_PORT:-3000}"
 NEO4J_HTTP="${NEO4J_HTTP_URL:-http://localhost:7474}"
 
@@ -49,7 +49,7 @@ fi
 if run_step 2; then
 echo "[Step 2/4] Starting Neo4j..."
 if command -v docker &>/dev/null; then
-  (cd kg_pipeline && docker-compose up -d 2>/dev/null) || (docker compose up -d neo4j 2>/dev/null) || true
+  (cd kg_pipeline && docker compose up -d 2>/dev/null) || true
 fi
 if ! curl -sf "${NEO4J_HTTP}" >/dev/null 2>&1; then
   if brew services list 2>/dev/null | grep -q neo4j; then
@@ -89,8 +89,17 @@ if [ ! -f "$SERVER_PID" ] || ! kill -0 "$(cat "$SERVER_PID")" 2>/dev/null; then
     echo "  Port $SERVER_PORT already in use. Skip start (or stop other process and retry)."
   else
     UVC=""
-    if [ -x "$REPO_ROOT/.venv/bin/uvicorn" ]; then UVC="$REPO_ROOT/.venv/bin/uvicorn server.main:app"; elif command -v uvicorn &>/dev/null; then UVC="uvicorn server.main:app"; else UVC="python3 -m uvicorn server.main:app"; fi
-    (cd "$REPO_ROOT" && $UVC --host 0.0.0.0 --port "$SERVER_PORT" </dev/null >> "$RUN_DIR/server.log" 2>&1 & echo $! > "$SERVER_PID")
+    if [ -x "$REPO_ROOT/kg_pipeline/venv/bin/uvicorn" ]; then
+      UVC="$REPO_ROOT/kg_pipeline/venv/bin/uvicorn server.main:app"
+    elif [ -x "$REPO_ROOT/.venv/bin/uvicorn" ]; then
+      UVC="$REPO_ROOT/.venv/bin/uvicorn server.main:app"
+    elif command -v uvicorn &>/dev/null; then
+      UVC="uvicorn server.main:app"
+    else
+      UVC="python3 -m uvicorn server.main:app"
+    fi
+    $UVC --host 0.0.0.0 --port "$SERVER_PORT" </dev/null >> "$RUN_DIR/server.log" 2>&1 &
+    echo $! > "$SERVER_PID"
     echo "  Server started (PID $(cat "$SERVER_PID")). Log: .run/server.log"
     sleep 2
     if ! curl -sf "http://127.0.0.1:${SERVER_PORT}/health" >/dev/null 2>&1; then
@@ -116,7 +125,8 @@ if [ ! -f "$WEB_PID" ] || ! kill -0 "$(cat "$WEB_PID")" 2>/dev/null; then
   if port_in_use "$WEB_PORT"; then
     echo "  Port $WEB_PORT already in use. Skip start (or stop other process and retry)."
   else
-    (cd web && PORT="$WEB_PORT" npm run dev </dev/null >> "$RUN_DIR/web.log" 2>&1 & echo $! > "$WEB_PID")
+    (cd web && PORT="$WEB_PORT" exec npm run dev) </dev/null >> "$RUN_DIR/web.log" 2>&1 &
+    echo $! > "$WEB_PID"
     echo "  Web started (PID $(cat "$WEB_PID")). Log: .run/web.log"
     sleep 2
   fi
