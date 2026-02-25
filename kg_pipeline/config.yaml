@@ -13,8 +13,8 @@
 
 fetch:
   # Phase 4 expansion: use days_back: 90, max_results: 50 (or 100) for broader KG (docs/PIPELINE_STRATEGY.md)
-  days_back: 30          # Search papers from last N days (30 = conservative; 90 = Phase 4 expansion)
-  max_results: 15       # Max papers per run (50–100 for Phase 4 expansion)
+  days_back: 90          # Search papers from last N days (expanded for broader KG coverage)
+  max_results: 50       # Max papers per run (expanded for broader KG coverage)
   request_delay_sec: 1   # Delay between NCBI requests (be polite)
   skip_existing: true    # Skip PMCIDs that already have a file in raw_papers (incremental fetch)
   humans_only: true      # Restrict to human studies only (no animal models); uses "humans"[MeSH Terms]
@@ -36,6 +36,9 @@ fetch:
     - "Nature"
     - "Ann Intern Med"
     - "Am J Clin Nutr"    # American Journal of Clinical Nutrition
+    - "Nutrients"          # MDPI Nutrients — broad nutrition research
+    - "Adv Nutr"           # Advances in Nutrition — review articles
+    - "J Nutr"             # Journal of Nutrition
 
 paths:
   raw_papers: "data/raw_papers"

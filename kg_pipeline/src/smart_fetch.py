@@ -189,13 +189,76 @@ TOPIC_CLUSTERS: dict[str, dict] = {
     },
     "gut_health": {
         "entities": [],
-        "keywords": ["gut microbiome", "probiotic", "fermented"],
-        "mesh": ["Gastrointestinal Microbiome"],
+        "keywords": ["gut microbiome", "probiotic", "fermented", "prebiotic food",
+                     "fiber microbiome", "gut health nutrition", "microbiota diet",
+                     "fermented food health"],
+        "mesh": ["Gastrointestinal Microbiome", "Prebiotics", "Fermented Foods"],
     },
     "drug_substitution": {
         "entities": [],
         "keywords": ["nutraceutical", "supplement vs drug"],
         "mesh": ["Dietary Supplements"],
+    },
+    # ── General health clusters (always-active, essential for bootstrapping) ──
+    "general_nutrition": {
+        "entities": [],
+        "keywords": ["dietary guidelines", "healthy eating", "balanced diet",
+                     "recommended dietary allowance", "nutrition recommendations"],
+        "mesh": ["Diet, Healthy", "Recommended Dietary Allowances"],
+    },
+    "dietary_patterns": {
+        "entities": [],
+        "keywords": ["Mediterranean diet", "DASH diet", "plant-based diet",
+                     "vegetarian diet", "dietary pattern health"],
+        "mesh": ["Diet, Mediterranean", "Diet, Vegetarian"],
+    },
+    "food_nutrient_composition": {
+        "entities": [],
+        "keywords": ["food composition", "nutrient content", "bioavailability",
+                     "vitamin content", "mineral content food"],
+        "mesh": ["Food Analysis", "Nutritive Value", "Biological Availability"],
+    },
+    "micronutrient_health": {
+        "entities": [],
+        "keywords": ["vitamin deficiency", "mineral deficiency", "iron deficiency",
+                     "B12 deficiency", "micronutrient supplementation"],
+        "mesh": ["Micronutrients", "Avitaminosis"],
+    },
+    "anti_inflammatory_diet": {
+        "entities": [],
+        "keywords": ["anti-inflammatory diet", "polyphenols", "antioxidant food",
+                     "flavonoid", "curcumin", "anti-inflammatory nutrition"],
+        "mesh": ["Anti-Inflammatory Agents", "Polyphenols", "Antioxidants"],
+    },
+    "exercise_nutrition": {
+        "entities": [],
+        "keywords": ["exercise nutrition", "protein intake exercise",
+                     "muscle recovery diet", "sports nutrition", "physical activity diet"],
+        "mesh": ["Sports Nutritional Sciences", "Exercise"],
+    },
+    "sleep_nutrition": {
+        "entities": [],
+        "keywords": ["sleep quality diet", "melatonin food", "tryptophan food",
+                     "magnesium sleep", "sleep nutrition"],
+        "mesh": ["Sleep", "Sleep Quality"],
+    },
+    "hydration": {
+        "entities": [],
+        "keywords": ["hydration health", "water intake", "electrolyte balance",
+                     "fluid intake", "hydration nutrition"],
+        "mesh": ["Drinking", "Water-Electrolyte Balance"],
+    },
+    "healthy_aging_nutrition": {
+        "entities": [],
+        "keywords": ["healthy aging diet", "nutrition elderly", "geriatric nutrition",
+                     "cognitive health diet", "aging nutrition"],
+        "mesh": ["Aging", "Diet, Food, and Nutrition"],
+    },
+    "weight_management_diet": {
+        "entities": [],
+        "keywords": ["weight management", "portion control", "caloric restriction",
+                     "satiety food", "weight management nutrition"],
+        "mesh": ["Body Weight Maintenance", "Caloric Restriction"],
     },
 }
 

@@ -1,0 +1,108 @@
+# Bootstrap config: aggressive one-time fetch to populate an empty KG.
+# Usage: python run_pipeline.py --config config_bootstrap.yaml
+# After bootstrap, switch back to config.yaml for ongoing incremental runs.
+
+fetch:
+  days_back: 365          # 1-year window for broad initial coverage
+  max_results: 100        # generous per-query limit
+  request_delay_sec: 1
+  skip_existing: true
+  humans_only: true
+  topic_keywords: []
+  aging_keywords: ["aging", "sarcopenia", "bone health", "life course"]
+  journals:
+    # Original 10 high-impact journals
+    - "Nat Med"
+    - "Lancet"
+    - "N Engl J Med"
+    - "JAMA"
+    - "BMJ"
+    - "Cell"
+    - "Science"
+    - "Nature"
+    - "Ann Intern Med"
+    - "Am J Clin Nutr"
+    # 7 general nutrition journals for bootstrap
+    - "Nutrients"
+    - "Adv Nutr"
+    - "J Nutr"
+    - "Eur J Nutr"
+    - "Front Nutr"
+    - "Food Funct"
+    - "J Acad Nutr Diet"
+
+paths:
+  raw_papers: "data/raw_papers"
+  extracted_triples: "data/extracted_triples"
+  master_graph: "data/extracted_triples/master_graph.json"
+  manifests: "data/manifests"
+
+extract:
+  model: "bedrock/amazon.nova-micro-v1:0"
+
+smart_fetch:
+  nutrition_journals:
+    - "Nutrients"
+    - "Br J Nutr"
+    - "J Nutr"
+    - "Eur J Nutr"
+    - "Am J Clin Nutr"
+    - "Nutr Rev"
+    - "Clin Nutr"
+    - "Front Nutr"
+    - "Int J Environ Res Public Health"
+    - "Public Health Nutr"
+    - "Food Funct"
+    - "Int J Food Sci Nutr"
+    - "Nutr Metab Cardiovasc Dis"
+    - "Nutr Cancer"
+    - "J Acad Nutr Diet"
+    - "Adv Nutr"
+    - "Annu Rev Nutr"
+    - "Food Chem"
+  max_per_cluster: 40       # higher for bootstrap
+  days_back: 2555           # 7-year window for maximum coverage
+  use_mesh: true
+  gap_threshold: 5
+  max_gap_queries: 40
+  max_gap_queries_per_type: 10
+  specialty_journals:
+    - "JAMA Neurol"
+    - "Lancet Neurol"
+    - "Alzheimers Dement"
+    - "Neurology"
+    - "J Alzheimers Dis"
+    - "Brain"
+    - "Ann Neurol"
+    - "Kidney Int"
+    - "J Am Soc Nephrol"
+    - "Clin J Am Soc Nephrol"
+    - "Nephrol Dial Transplant"
+    - "Lancet Oncol"
+    - "J Natl Cancer Inst"
+    - "Cancer Epidemiol Biomarkers Prev"
+    - "Gut"
+    - "JAMA Psychiatry"
+    - "Mol Psychiatry"
+    - "J Affect Disord"
+    - "Psychosom Med"
+    - "Eur Heart J"
+    - "Circulation"
+    - "J Am Coll Cardiol"
+    - "JACC"
+    - "Diabetes Care"
+    - "Diabetologia"
+    - "J Clin Endocrinol Metab"
+    - "Aging Cell"
+    - "J Gerontol A Biol Sci Med Sci"
+    - "Age Ageing"
+    - "Public Health Nutr"
+    - "Int J Food Sci Nutr"
+    - "Food Funct"
+
+continuous_build:
+  papers_per_run: 10
+  extract_delay_sec: 1
+  max_retries: 3
+  use_api_retry_after: true
+  max_wait_sec: 120

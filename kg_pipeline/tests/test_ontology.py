@@ -48,6 +48,78 @@ class TestNormalizeEntityName:
         for variant in ("pre diabetes", "pre-diabetes", "pre diabetic", "pre diabetics"):
             assert normalize_entity_name(variant) == "Prediabetes", f"Failed for '{variant}'"
 
+    # ── Common foods ──────────────────────────────────────────────────────
+    def test_food_oatmeal_to_oats(self):
+        assert normalize_entity_name("oatmeal") == "Oats"
+
+    def test_food_yoghurt_to_yogurt(self):
+        assert normalize_entity_name("yoghurt") == "Yogurt"
+
+    def test_food_olive_oil_variants(self):
+        assert normalize_entity_name("olive oil") == "Olive oil"
+        assert normalize_entity_name("extra virgin olive oil") == "Olive oil"
+        assert normalize_entity_name("evoo") == "Olive oil"
+
+    def test_food_singular_plural(self):
+        assert normalize_entity_name("blueberry") == "Blueberries"
+        assert normalize_entity_name("walnut") == "Walnuts"
+        assert normalize_entity_name("lentil") == "Lentils"
+        assert normalize_entity_name("tomato") == "Tomatoes"
+
+    # ── Nutrients ─────────────────────────────────────────────────────────
+    def test_fiber_variants(self):
+        for variant in ("fiber", "fibre", "dietary fiber", "dietary fibre"):
+            assert normalize_entity_name(variant) == "Dietary fiber", f"Failed for '{variant}'"
+
+    def test_b12_variants(self):
+        assert normalize_entity_name("b12") == "Vitamin B12"
+        assert normalize_entity_name("vitamin b12") == "Vitamin B12"
+        assert normalize_entity_name("cobalamin") == "Vitamin B12"
+
+    def test_folate_variants(self):
+        assert normalize_entity_name("folic acid") == "Folate"
+        assert normalize_entity_name("folate") == "Folate"
+
+    def test_coq10_variants(self):
+        assert normalize_entity_name("coq10") == "Coenzyme Q10"
+        assert normalize_entity_name("coenzyme q10") == "Coenzyme Q10"
+
+    def test_omega6(self):
+        assert normalize_entity_name("omega-6") == "Omega-6"
+        assert normalize_entity_name("omega 6") == "Omega-6"
+
+    # ── Dietary patterns ──────────────────────────────────────────────────
+    def test_keto_variants(self):
+        assert normalize_entity_name("keto") == "Ketogenic diet"
+        assert normalize_entity_name("keto diet") == "Ketogenic diet"
+        assert normalize_entity_name("ketogenic diet") == "Ketogenic diet"
+
+    def test_dash_diet(self):
+        assert normalize_entity_name("dash diet") == "DASH diet"
+
+    def test_plant_based_diet(self):
+        assert normalize_entity_name("plant-based diet") == "Plant-based diet"
+        assert normalize_entity_name("plant based diet") == "Plant-based diet"
+
+    def test_vegan_shorthand(self):
+        assert normalize_entity_name("vegan") == "Vegan diet"
+
+    # ── General health conditions ─────────────────────────────────────────
+    def test_ibs(self):
+        assert normalize_entity_name("ibs") == "Irritable bowel syndrome"
+
+    def test_gerd_variants(self):
+        assert normalize_entity_name("gerd") == "Gastroesophageal reflux disease"
+        assert normalize_entity_name("acid reflux") == "Gastroesophageal reflux disease"
+
+    def test_nafld_variants(self):
+        assert normalize_entity_name("nafld") == "Non-alcoholic fatty liver disease"
+        assert normalize_entity_name("fatty liver") == "Non-alcoholic fatty liver disease"
+
+    def test_iron_deficiency_variants(self):
+        assert normalize_entity_name("iron deficiency anemia") == "Iron-deficiency anaemia"
+        assert normalize_entity_name("iron-deficiency anaemia") == "Iron-deficiency anaemia"
+
 
 # ── normalize_entity_type ─────────────────────────────────────────────────────
 
