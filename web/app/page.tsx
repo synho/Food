@@ -18,6 +18,7 @@ import { UserContextForm } from "@/components/UserContextForm";
 import { EvidenceBlock } from "@/components/EvidenceBlock";
 import { SelfIntroBlock } from "@/components/SelfIntroBlock";
 import { EditableContextSummary } from "@/components/EditableContextSummary";
+import { ClinicalInsights } from "@/components/ClinicalInsights";
 import { useLocale } from "@/contexts/LocaleContext";
 
 /** Derive which parts of context the user provided, for labels and ordering. */
@@ -400,6 +401,13 @@ export default function Home() {
         </section>
       )}
 
+      {results.recommendations && lastContext && (
+        <ClinicalInsights
+          conditions={lastContext.conditions ?? []}
+          medications={lastContext.medications ?? []}
+        />
+      )}
+
       {results.safestPath && results.safestPath.steps.length > 0 && (
         <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
           {summary.labels.safestPath && <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">{summary.labels.safestPath}</p>}
@@ -553,6 +561,10 @@ export default function Home() {
       <footer className="mt-10 border-t border-gray-200 pt-4 text-center text-sm text-gray-500">
         <Link href="/kg" className="text-blue-600 hover:underline">
           Knowledge Graph — Status
+        </Link>
+        {" · "}
+        <Link href="/clinical" className="text-blue-600 hover:underline">
+          Clinical Explorer
         </Link>
         {" · "}
         <Link href="/map" className="text-blue-600 hover:underline">

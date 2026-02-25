@@ -293,3 +293,16 @@ export interface DrugInteractionResponse {
   interactions: DrugInteractionByDrug[];
   disclaimer: string;
 }
+
+/** A single pipeline run record from /api/pipeline/history. */
+export interface PipelineRun {
+  id: number;
+  started_at: string;
+  finished_at: string | null;
+  state: "completed" | "error" | "running";
+  new_papers: number | null;
+  valid_triples: number | null;
+  total_triples: number | null;
+  elapsed_s: number | null;
+  error: string | null;
+}

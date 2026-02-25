@@ -15,6 +15,7 @@ import type {
   BiomarkerResponse,
   MechanismResponse,
   DrugInteractionResponse,
+  PipelineRun,
 } from "./types";
 
 const BASE =
@@ -168,12 +169,25 @@ export interface KgStats {
     with_source_id: number;
     unique_sources: number;
   };
+  trend?: Array<{
+    date: string;
+    nodes: number;
+    relationships: number;
+  }>;
 }
 
 export async function fetchKgStats(): Promise<KgStats> {
   const res = await fetch(`${API}/api/kg/stats`);
   if (!res.ok) throw new Error(await res.text());
   return res.json();
+}
+
+/** Pipeline run history. */
+export async function fetchPipelineHistory(limit: number = 5): Promise<PipelineRun[]> {
+  const res = await fetch(`${API}/api/pipeline/history?limit=${limit}`);
+  if (!res.ok) return [];
+  const data = await res.json();
+  return Array.isArray(data) ? data : data.runs ?? [];
 }
 
 /** Food-chain multi-hop result: Food → Nutrient → Disease/Symptom */
