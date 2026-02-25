@@ -43,7 +43,7 @@ export function ClinicalInsights({ conditions, medications }: ClinicalInsightsPr
     }
 
     Promise.all(promises).finally(() => setLoading(false));
-  }, [conditions, medications]);
+  }, [conditions.join(","), medications.join(",")]);
 
   // Don't render if no data to show
   if (conditions.length === 0 && medications.length === 0) return null;

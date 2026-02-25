@@ -48,9 +48,9 @@ export function MechanismChainSVG({ chain }: { chain: MechanismChain }) {
               x={(a.x1 + a.x2) / 2}
               y={midY - 8}
               textAnchor="middle"
-              style={{ fontSize: "8px", fill: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em" }}
+              style={{ fontSize: "8px", fill: "#94a3b8", letterSpacing: "0.05em" }}
             >
-              {a.label}
+              {(a.label ?? "").toUpperCase()}
             </text>
           </g>
         );
@@ -58,7 +58,7 @@ export function MechanismChainSVG({ chain }: { chain: MechanismChain }) {
 
       {/* Boxes */}
       {boxes.map((b) => (
-        <g key={b.label}>
+        <g key={b.x}>
           <rect
             x={b.x}
             y={Y}
@@ -75,7 +75,7 @@ export function MechanismChainSVG({ chain }: { chain: MechanismChain }) {
             textAnchor="middle"
             style={{ fontSize: "10px", fontWeight: "600", fill: "#0f172a" }}
           >
-            {b.label.length > 20 ? b.label.slice(0, 18) + "…" : b.label}
+            {(b.label ?? "").length > 20 ? (b.label ?? "").slice(0, 18) + "…" : (b.label ?? "")}
           </text>
           <text
             x={b.x + b.w / 2}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   fetchPipelineStatus,
   triggerPipeline,
@@ -14,6 +14,8 @@ export function PipelinePanel() {
   const [history, setHistory] = useState<PipelineRun[]>([]);
   const [triggering, setTriggering] = useState(false);
   const [triggered, setTriggered] = useState(false);
+  const mountedRef = useRef(true);
+  useEffect(() => { return () => { mountedRef.current = false; }; }, []);
 
   const load = useCallback(async () => {
     try {
@@ -42,7 +44,7 @@ export function PipelinePanel() {
       setTriggered(true);
       setTimeout(() => setTriggered(false), 3000);
       // Reload status after a short delay
-      setTimeout(load, 2000);
+      setTimeout(() => { if (mountedRef.current) load(); }, 2000);
     } catch {
       // ignore
     } finally {
