@@ -265,6 +265,14 @@ def reextract(limit: int = 20, dry_run: bool = False) -> dict:
             master_triples.extend(valid_new)
             improved += 1
             print(f"  Replaced with improved extraction.")
+            # Also write the individual _triples.json so consolidate_graph preserves this improvement
+            extracted_dir = paths["extracted_triples"]
+            indiv_path = os.path.join(extracted_dir, f"PMC{pmcid}_triples.json")
+            try:
+                with open(indiv_path, "w") as f:
+                    json.dump(valid_new, f, indent=2)
+            except Exception as e:
+                print(f"  Warning: could not write individual triples file: {e}")
         else:
             print(f"  No improvement — keeping original.")
 

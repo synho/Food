@@ -13,8 +13,8 @@
 
 fetch:
   # Phase 4 expansion: use days_back: 90, max_results: 50 (or 100) for broader KG (docs/PIPELINE_STRATEGY.md)
-  days_back: 90          # Search papers from last N days (expanded for broader KG coverage)
-  max_results: 50       # Max papers per run (expanded for broader KG coverage)
+  days_back: 1095        # Search papers from last N days (3 years for broader KG coverage)
+  max_results: 300      # Max papers per run (expanded for broader KG coverage)
   request_delay_sec: 1   # Delay between NCBI requests (be polite)
   skip_existing: true    # Skip PMCIDs that already have a file in raw_papers (incremental fetch)
   humans_only: true      # Restrict to human studies only (no animal models); uses "humans"[MeSH Terms]
@@ -39,6 +39,40 @@ fetch:
     - "Nutrients"          # MDPI Nutrients — broad nutrition research
     - "Adv Nutr"           # Advances in Nutrition — review articles
     - "J Nutr"             # Journal of Nutrition
+    - "Diabetes Care"      # Diabetes management & nutrition
+    - "Diabetologia"       # Diabetes research
+    - "Eur Heart J"        # Cardiovascular — diet & heart disease
+    - "Circulation"        # Cardiovascular nutrition
+    - "JAMA Neurol"        # Neurology — diet & brain health
+    - "Lancet Neurol"      # Neurology — dementia, diet
+    - "Aging Cell"         # Aging & longevity nutrition
+    - "Gut"                # Gut microbiome & diet
+    - "Gastroenterology"   # GI & dietary interventions
+    - "Eur J Clin Nutr"    # European clinical nutrition
+    - "PLoS Med"           # Broad open-access medicine
+    # Neurology / Dementia / Alzheimer's
+    - "Alzheimers Dement"  # Alzheimer's & dementia — diet & brain health
+    - "JAMA Psychiatry"    # Psychiatry — mood disorders & diet
+    - "Mol Psychiatry"     # Molecular psychiatry — gut-brain axis
+    # Nephrology / Kidney disease
+    - "Kidney Int"         # Chronic kidney disease — renal diet
+    - "J Am Soc Nephrol"   # Nephrology — protein/potassium/phosphate intake
+    # Oncology / Cancer prevention
+    - "Lancet Oncol"       # Cancer prevention — dietary risk factors
+    - "J Natl Cancer Inst" # Cancer epidemiology — diet & cancer
+    # Cardiology
+    - "J Am Coll Cardiol"  # Cardiology — dietary interventions
+    # Endocrinology / Metabolic
+    - "J Clin Endocrinol Metab"  # Hormones, metabolic disease, nutrition
+    # Specific nutrition
+    - "Br J Nutr"          # British Journal of Nutrition — broad nutrition
+    - "Nutr Rev"           # Nutrition Reviews — systematic reviews
+    - "Front Nutr"         # Frontiers in Nutrition — open access, high volume
+    - "Public Health Nutr" # Population-level dietary patterns
+    - "Food Funct"         # Food bioactivity & functional effects
+    # Aging / Longevity
+    - "Age Ageing"         # Geriatric nutrition & frailty
+    - "J Gerontol A Biol Sci Med Sci"  # Aging biology — dietary interventions
 
 paths:
   raw_papers: "data/raw_papers"
