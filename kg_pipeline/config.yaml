@@ -13,8 +13,8 @@
 
 fetch:
   # Phase 4 expansion: use days_back: 90, max_results: 50 (or 100) for broader KG (docs/PIPELINE_STRATEGY.md)
-  days_back: 1095        # Search papers from last N days (3 years for broader KG coverage)
-  max_results: 300      # Max papers per run (expanded for broader KG coverage)
+  days_back: 1825        # Search papers from last N days (5 years for maximum coverage)
+  max_results: 500      # Max papers per run (expanded for broader KG coverage)
   request_delay_sec: 1   # Delay between NCBI requests (be polite)
   skip_existing: true    # Skip PMCIDs that already have a file in raw_papers (incremental fetch)
   humans_only: true      # Restrict to human studies only (no animal models); uses "humans"[MeSH Terms]
@@ -22,7 +22,12 @@ fetch:
   # Optional: narrow search by topic; empty = no keyword filter (broadest, more results)
   topic_keywords: []
   # Optional: second query for aging/biology (merged with topic_keywords results). See docs/AGING_AND_HUMAN_BIOLOGY.md
-  aging_keywords: ["aging", "sarcopenia", "bone health", "life course"]
+  aging_keywords: ["aging", "sarcopenia", "bone health", "life course",
+                   "longevity", "healthspan", "lifespan", "centenarian",
+                   "telomere", "epigenetic aging", "biological age",
+                   "mitochondrial dysfunction", "cellular senescence",
+                   "inflammaging", "autophagy", "mTOR", "NAD+",
+                   "caloric restriction", "intermittent fasting"]
 
   # High-impact open access medical journals (PubMed journal names)
   journals:
@@ -70,9 +75,33 @@ fetch:
     - "Front Nutr"         # Frontiers in Nutrition — open access, high volume
     - "Public Health Nutr" # Population-level dietary patterns
     - "Food Funct"         # Food bioactivity & functional effects
-    # Aging / Longevity
-    - "Age Ageing"         # Geriatric nutrition & frailty
+    # Aging / Longevity / Healthspan
+    - "Age Ageing"                     # Geriatric nutrition & frailty
     - "J Gerontol A Biol Sci Med Sci"  # Aging biology — dietary interventions
+    - "GeroScience"                    # Geroscience — mechanisms of aging & diet
+    - "NPJ Aging"                      # Nature Partner — aging biology
+    - "Aging (Albany NY)"              # Aging journal — longevity interventions
+    - "Longev Healthspan"              # Longevity & healthspan research
+    - "Mech Ageing Dev"                # Mechanisms of aging & nutrition
+    # Longevity / Metabolism / Systems biology
+    - "Cell Metab"                     # Cell Metabolism — high-impact metabolic research
+    - "Nat Aging"                      # Nature Aging — top longevity journal
+    - "eLife"                          # Open-access — broad high-impact biology
+    - "PLOS ONE"                       # High-volume open-access — nutrition & health
+    - "Sci Rep"                        # Scientific Reports — broad health research
+    # Microbiome / Gut-Brain
+    - "Microbiome"                     # Gut microbiome & diet — health outcomes
+    - "Cell Host Microbe"              # Host-microbiome interactions
+    - "NPJ Biofilm Microbiomes"        # Microbiome & nutrition
+    # Immunology / Inflammation
+    - "J Neuroinflammation"            # Neuroinflammation & diet
+    - "Front Immunol"                  # Frontiers Immunology — diet & immune health
+    # Endocrinology / Hormones
+    - "Thyroid"                        # Thyroid & nutritional status
+    - "J Endocrinol"                   # Hormones & nutrition
+    # Sleep / Circadian
+    - "Sleep"                          # Sleep & nutrition interactions
+    - "J Sleep Res"                    # Sleep research & diet
 
 paths:
   raw_papers: "data/raw_papers"
