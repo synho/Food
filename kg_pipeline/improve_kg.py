@@ -215,23 +215,51 @@ def run_iteration(n: int, total: int, reextract_limit: int) -> dict:
     for line in tail_output(out, 2):
         print(f"    {line}")
 
-    # ── Step 5: Broad pipeline sweep ──────────────────────────────────────────
-    print(f"\n  [5/6] Broad sweep  (44 journals × 3 yr)…")
+    # ── Step 5a: Europe PMC fetch (new data source) ───────────────────────────
+    print(f"\n  [5a/6] Europe PMC fetch  (66 journals × 10 yr)…")
+    code, out = run(
+        [str(VENV_PYTHON), "src/fetch_europe_pmc.py"],
+        timeout=600, label="fetch_europe_pmc.py",
+    )
+    epmc_new = 0
+    for line in out.splitlines():
+        import re
+        m = re.search(r"\+(\d+)\s+new", line)
+        if m:
+            epmc_new = max(epmc_new, int(m.group(1)))
+    for line in tail_output(out, 2):
+        print(f"    {line}")
+
+    # ── Step 5b: FDA drug labels fetch (new data source) ──────────────────────
+    print(f"\n  [5b/6] FDA drug labels fetch  (food-drug interactions)…")
+    code, out = run(
+        [str(VENV_PYTHON), "src/fetch_fda_labels.py", "--max-labels", "200"],
+        timeout=300, label="fetch_fda_labels.py",
+    )
+    fda_new = 0
+    for line in out.splitlines():
+        m = re.search(r"\+(\d+)\s+new", line)
+        if m:
+            fda_new = max(fda_new, int(m.group(1)))
+    for line in tail_output(out, 1):
+        print(f"    {line}")
+
+    # ── Step 5c: Broad NCBI pipeline sweep ────────────────────────────────────
+    print(f"\n  [5c/6] Broad NCBI sweep  (66 journals × 10 yr)…")
     code, out = run(
         [str(VENV_PYTHON), "run_pipeline.py"],
         timeout=1800, label="run_pipeline.py",
     )
-    new_papers = 0
+    new_papers = epmc_new + fda_new
     new_triples = 0
     for line in out.splitlines():
-        import re
         m = re.search(r"fetching\s+(\d+)\s+new", line, re.I)
         if m:
-            new_papers = int(m.group(1))
+            new_papers += int(m.group(1))
         m = re.search(r"Consolidated\s+(\d+)\s+valid triples", line)
         if m:
             new_triples = int(m.group(1))
-    print(f"    +{new_papers} new papers  ·  {new_triples:,} valid triples now")
+    print(f"    +{new_papers} new total  ·  {new_triples:,} valid triples now")
 
     # ── Step 6: Entity resolve + ingest ──────────────────────────────────────
     print(f"\n  [6/6] Entity resolution + ingest…")

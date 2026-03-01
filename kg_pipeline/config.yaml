@@ -13,7 +13,7 @@
 
 fetch:
   # Phase 4 expansion: use days_back: 90, max_results: 50 (or 100) for broader KG (docs/PIPELINE_STRATEGY.md)
-  days_back: 1825        # Search papers from last N days (5 years for maximum coverage)
+  days_back: 3650        # Search papers from last N days (10 years for maximum coverage)
   max_results: 500      # Max papers per run (expanded for broader KG coverage)
   request_delay_sec: 1   # Delay between NCBI requests (be polite)
   skip_existing: true    # Skip PMCIDs that already have a file in raw_papers (incremental fetch)
