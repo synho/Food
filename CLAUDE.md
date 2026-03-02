@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Before Starting Any Task
 
-Read `.cursor/plans/roadmap.md` to identify the **current phase** and the **next unchecked item**. All work should advance the current phase and stay aligned with it. After any pipeline code change, run regression: `cd kg_pipeline && python src/validate_run.py --neo4j`.
+Read `.cursor/plans/roadmap.md` to identify the **current phase** and the **next unchecked item**, and read `kg_pipeline/config.yaml` to understand current pipeline settings. All work should advance the current phase and stay aligned with it. After any pipeline code change, run regression: `cd kg_pipeline && python src/validate_run.py --neo4j`.
+
+**Current phase**: Phase 5 (mobile app). All phases through Phase 4 are complete. Phase 5 has one pending item (wearables integration). Phase 6 (monetization) is not yet started.
 
 ## Overview
 
@@ -33,7 +35,7 @@ Each pipeline agent writes a **manifest** to `data/manifests/` so the next agent
 - **`src/kg_gap_analyzer.py`** — Identifies gaps in KG coverage for targeted fetching.
 - **`run_pipeline.py`** — Orchestrator; supports `--steps fetch,extract,ingest`.
 - **`config.yaml`** — Controls `fetch.days_back`, `fetch.max_results`, `fetch.journals`, `extract.model`, smart-fetch settings, gap analysis.
-- Separate `docker-compose.yml` for Neo4j only (used during pipeline development).
+- Separate `docker-compose.yml` for Neo4j only (used during pipeline development). If Neo4j is down, start it with `docker-compose up -d` from `kg_pipeline/` — **not** the root `docker compose`.
 
 ### FastAPI Server (`server/`)
 
@@ -185,6 +187,13 @@ Predicates: `PREVENTS`, `CAUSES`, `TREATS`, `CONTAINS`, `AGGRAVATES`, `REDUCES_R
 | `CORS_ORIGINS` | `server/.env` | Comma-separated origins or `*` |
 | `CONTEXT_ENCRYPTION_KEY` | root `.env` or `server/.env` | Enables encrypted `/api/me/context/save` |
 | `MASTER_GRAPH_PATH` | `server/.env` | Enables pipeline stats in `/api/kg/stats` |
+
+## Reference Docs
+
+- `docs/SUMMARY_PLAN_AND_ARCHITECTURE.md` — Full plan and architecture overview
+- `docs/AGENTS_AND_ARTIFACTS.md` — Pipeline agents and their artifacts
+- `docs/PIPELINE_AGENTS.md` — Pipeline fetch volume, keywords, model behavior
+- `docs/KG_SCHEMA_AND_EVIDENCE.md` — Canonical KG schema reference
 
 ## New Agent Checklist
 
