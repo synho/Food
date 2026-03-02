@@ -3,6 +3,44 @@ Generated: 2026-03-01
 
 ---
 
+## 👋 When You Come Back — Say "Hi Food"
+
+**One command to start everything:**
+```bash
+cd ~/Projects/Food
+bash hi_food.sh
+```
+
+This will:
+1. Start Neo4j + FastAPI server + Next.js web (`make start`)
+2. Health-check all services (`make check`)
+3. Run the pipeline to catch new papers published since last session
+4. Start `watch_kg.py` daemon (continuous 10-min gap-filling)
+
+**Then open:**
+- App → http://localhost:3000
+- KG Dashboard → http://localhost:3000/kg
+- **Graph Explorer → http://localhost:3000/kg/explore** ← try "Vitamin D", "Type 2 diabetes"
+- API Docs → http://localhost:8000/docs
+
+**To continue improving KG:**
+```bash
+cd kg_pipeline && source venv/bin/activate
+python improve_kg.py --iters 10   # 10-iteration gap-fill loop
+```
+
+**To check what's changed:**
+```bash
+make kg-status                    # node/rel counts
+tail -f kg_pipeline/logs/watch_kg.log  # watcher activity
+```
+
+**Last session left off at:**
+- KG: **17,291 nodes · 31,826 rels · 19,727 triples** from 2,710 papers
+- Next focus: **UI refinement in Cursor** (see TODOs section)
+
+---
+
 ## 1. Directory Structure
 
 ```
