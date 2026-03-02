@@ -16,6 +16,8 @@ import {
 } from "@/lib/api";
 import { UserContextForm } from "@/components/UserContextForm";
 import { EvidenceBlock } from "@/components/EvidenceBlock";
+import { EvidenceLegend } from "@/components/EvidenceBadge";
+import { SectionSkeleton } from "@/components/Skeleton";
 import { SelfIntroBlock } from "@/components/SelfIntroBlock";
 import { EditableContextSummary } from "@/components/EditableContextSummary";
 import { ClinicalInsights } from "@/components/ClinicalInsights";
@@ -53,7 +55,9 @@ function getInputSummaryLine(ctx: UserContext, t: (key: string) => string): stri
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  type SectionKey = "general" | "position" | "recommendations" | "safestPath" | "earlySignals";
+  const [sectionErrors, setSectionErrors] = useState<Partial<Record<SectionKey, string>>>({});
+  const [sectionRetrying, setSectionRetrying] = useState<SectionKey | null>(null);
   const [lastContext, setLastContext] = useState<UserContext | null>(null);
   const [restoredContext, setRestoredContext] = useState<UserContext | null>(null);
   const [drugInput, setDrugInput] = useState("");
@@ -115,42 +119,62 @@ export default function Home() {
 
   const handleSubmit = async (ctx: UserContext) => {
     setLoading(true);
-    setError(null);
     setLastContext(ctx);
+    setSectionErrors({});
     didAutoFetchDrug.current = false;
-    // Persist context so the Health Map page can auto-load it
     try { localStorage.setItem("health_context", JSON.stringify(ctx)); } catch { /* ignore */ }
+    setResults({ recommendations: null, position: null, safestPath: null, earlySignals: null, general: null });
+
+    const [recR, posR, pathR, earlyR, genR] = await Promise.allSettled([
+      fetchRecommendations(ctx),
+      fetchPosition(ctx),
+      fetchSafestPath(ctx),
+      fetchEarlySignals(ctx),
+      fetchGeneralGuidance(ctx),
+    ]);
+
+    const toErr = (r: PromiseRejectedResult): string => {
+      const msg = r.reason instanceof Error ? r.reason.message : "Request failed";
+      return /failed to fetch|network error|load failed/i.test(msg) ? t("extractErrorServer") : msg;
+    };
+
     setResults({
-      recommendations: null,
-      position: null,
-      safestPath: null,
-      earlySignals: null,
-      general: null,
+      recommendations: recR.status === "fulfilled" ? recR.value : null,
+      position:        posR.status === "fulfilled" ? posR.value : null,
+      safestPath:      pathR.status === "fulfilled" ? pathR.value : null,
+      earlySignals:    earlyR.status === "fulfilled" ? earlyR.value : null,
+      general:         genR.status === "fulfilled" ? genR.value : null,
     });
+    setSectionErrors({
+      recommendations: recR.status === "rejected" ? toErr(recR) : undefined,
+      position:        posR.status === "rejected" ? toErr(posR) : undefined,
+      safestPath:      pathR.status === "rejected" ? toErr(pathR) : undefined,
+      earlySignals:    earlyR.status === "rejected" ? toErr(earlyR) : undefined,
+      general:         genR.status === "rejected" ? toErr(genR) : undefined,
+    });
+
+    if (Array.isArray(ctx.medications) && ctx.medications.length > 0) {
+      setDrugInput(ctx.medications.join(", "));
+    }
+    setLoading(false);
+  };
+
+  const retrySection = async (key: SectionKey, fetchFn: (ctx: UserContext) => Promise<unknown>) => {
+    if (!lastContext) return;
+    setSectionRetrying(key);
+    setSectionErrors(prev => ({ ...prev, [key]: undefined }));
     try {
-      const [rec, pos, path, early, gen] = await Promise.all([
-        fetchRecommendations(ctx),
-        fetchPosition(ctx),
-        fetchSafestPath(ctx),
-        fetchEarlySignals(ctx),
-        fetchGeneralGuidance(ctx),
-      ]);
-      setResults({
-        recommendations: rec,
-        position: pos,
-        safestPath: path,
-        earlySignals: early,
-        general: gen,
-      });
-      if (Array.isArray(ctx.medications) && ctx.medications.length > 0) {
-        setDrugInput(ctx.medications.join(", "));
-      }
+      const result = await fetchFn(lastContext);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setResults(prev => ({ ...prev, [key]: result as any }));
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Request failed";
-      const isNetworkError = /failed to fetch|network error|load failed/i.test(msg);
-      setError(isNetworkError ? t("extractErrorServer") : msg);
+      setSectionErrors(prev => ({
+        ...prev,
+        [key]: /failed to fetch|network error|load failed/i.test(msg) ? t("extractErrorServer") : msg,
+      }));
     } finally {
-      setLoading(false);
+      setSectionRetrying(null);
     }
   };
 
@@ -300,7 +324,7 @@ export default function Home() {
               }
             }}
             disabled={saveRestoreLoading}
-            className="rounded bg-slate-600 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+            className="rounded bg-slate-700 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
           >
             {t("restoreButton")}
           </button>
@@ -310,9 +334,9 @@ export default function Home() {
         )}
       </section>
 
-      {error && (
-        <div className="mb-6 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-          {error}
+      {(loading || Object.values(results).some(Boolean)) && (
+        <div className="mb-4">
+          <EvidenceLegend />
         </div>
       )}
 
@@ -328,76 +352,115 @@ export default function Home() {
         </section>
       )}
 
-      {results.general && (
+      {(loading || sectionErrors.general || results.general) && (
         <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
           {summary.labels.general && <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">{summary.labels.general}</p>}
           <h2 className="mb-3 text-lg font-semibold text-gray-800">General guidance (why pay attention)</h2>
-          {results.general.food_guidance_summary && (
-            <p className="mb-3 text-sm text-gray-700">{results.general.food_guidance_summary}</p>
+          {loading && !results.general && !sectionErrors.general && <SectionSkeleton lines={3} />}
+          {sectionErrors.general && (
+            <div className="flex items-center justify-between rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+              <span>{sectionErrors.general}</span>
+              <button onClick={() => retrySection("general", fetchGeneralGuidance)} disabled={sectionRetrying === "general"} className="ml-3 rounded bg-red-100 px-2 py-1 text-xs font-medium hover:bg-red-200 disabled:opacity-50">
+                {sectionRetrying === "general" ? "Retrying…" : "Retry"}
+              </button>
+            </div>
           )}
-          {results.general.age_related_changes.length > 0 && (
-            <ul className="space-y-2">
-              {results.general.age_related_changes.map((a, i) => (
-                <li key={i} className="rounded border border-gray-100 p-2">
-                  <span className="font-medium">{a.change}</span>
-                  {a.life_stage && <span className="ml-2 text-xs text-gray-500">({a.life_stage})</span>}
-                  <p className="text-sm text-gray-600">{a.why_pay_attention}</p>
-                  <EvidenceBlock evidenceList={a.evidence} variant="knowledge" />
-                </li>
-              ))}
-            </ul>
+          {results.general && (
+            <>
+              {results.general.food_guidance_summary && (
+                <p className="mb-3 text-sm text-gray-700">{results.general.food_guidance_summary}</p>
+              )}
+              {results.general.age_related_changes.length > 0 && (
+                <ul className="space-y-2">
+                  {results.general.age_related_changes.map((a, i) => (
+                    <li key={i} className="rounded border border-gray-100 p-2">
+                      <span className="font-medium">{a.change}</span>
+                      {a.life_stage && <span className="ml-2 text-xs text-gray-500">({a.life_stage})</span>}
+                      <p className="text-sm text-gray-600">{a.why_pay_attention}</p>
+                      <EvidenceBlock evidenceList={a.evidence} variant="knowledge" />
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           )}
         </section>
       )}
 
-      {results.position && (results.position.nearby_risks.length > 0 || (results.position.active_conditions?.length ?? 0) > 0 || (results.position.active_symptoms?.length ?? 0) > 0) && (
+      {(loading || sectionErrors.position || results.position) && (
         <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
           {summary.labels.position && <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">{summary.labels.position}</p>}
           <h2 className="mb-3 text-lg font-semibold text-gray-800">Your position &amp; nearby risks</h2>
-          {results.position.active_conditions?.length > 0 && (
-            <p className="text-sm text-gray-600">Conditions: {results.position.active_conditions.join(", ")}</p>
+          {loading && !results.position && !sectionErrors.position && <SectionSkeleton lines={3} />}
+          {sectionErrors.position && (
+            <div className="flex items-center justify-between rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+              <span>{sectionErrors.position}</span>
+              <button onClick={() => retrySection("position", fetchPosition)} disabled={sectionRetrying === "position"} className="ml-3 rounded bg-red-100 px-2 py-1 text-xs font-medium hover:bg-red-200 disabled:opacity-50">
+                {sectionRetrying === "position" ? "Retrying…" : "Retry"}
+              </button>
+            </div>
           )}
-          {results.position.active_symptoms?.length > 0 && (
-            <p className="text-sm text-gray-600">Symptoms: {results.position.active_symptoms.join(", ")}</p>
-          )}
-          {results.position.nearby_risks.length > 0 && (
-            <ul className="mt-2 space-y-2">
-              {results.position.nearby_risks.map((risk, i) => (
-                <li key={i} className="rounded border border-gray-100 p-2">
-                  <span className="font-medium">{risk.name}</span>
-                  <span className="ml-2 rounded bg-blue-100 px-1.5 py-0.5 text-xs text-blue-800">{risk.kind}</span>
-                  <p className="text-sm text-gray-600">{risk.reason}</p>
-                  {risk.evidence?.length > 0 && <EvidenceBlock evidenceList={risk.evidence} variant="info" />}
-                </li>
-              ))}
-            </ul>
+          {results.position && (results.position.nearby_risks.length > 0 || (results.position.active_conditions?.length ?? 0) > 0 || (results.position.active_symptoms?.length ?? 0) > 0) && (
+            <>
+              {results.position.active_conditions?.length > 0 && (
+                <p className="text-sm text-gray-600">Conditions: {results.position.active_conditions.join(", ")}</p>
+              )}
+              {results.position.active_symptoms?.length > 0 && (
+                <p className="text-sm text-gray-600">Symptoms: {results.position.active_symptoms.join(", ")}</p>
+              )}
+              {results.position.nearby_risks.length > 0 && (
+                <ul className="mt-2 space-y-2">
+                  {results.position.nearby_risks.map((risk, i) => (
+                    <li key={i} className="rounded border border-gray-100 p-2">
+                      <span className="font-medium">{risk.name}</span>
+                      <span className="ml-2 rounded bg-blue-100 px-1.5 py-0.5 text-xs text-blue-800">{risk.kind}</span>
+                      <p className="text-sm text-gray-600">{risk.reason}</p>
+                      {risk.evidence?.length > 0 && <EvidenceBlock evidenceList={risk.evidence} variant="info" />}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           )}
         </section>
       )}
 
-      {results.recommendations && (
+      {(loading || sectionErrors.recommendations || results.recommendations) && (
         <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
           {summary.labels.recommendations && <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">{summary.labels.recommendations}</p>}
           <h2 className="mb-3 text-lg font-semibold text-gray-800">Recommended foods</h2>
-          <ul className="space-y-3">
-            {results.recommendations.recommended.map((r, i) => (
-              <li key={i} className="rounded border border-green-100 bg-green-50/50 p-2">
-                <span className="font-medium text-green-800">{r.food}</span>
-                <p className="text-sm text-gray-700">{r.reason}</p>
-                <EvidenceBlock evidenceList={r.evidence} variant="knowledge" />
-              </li>
-            ))}
-          </ul>
-          <h2 className="mb-3 mt-4 text-lg font-semibold text-gray-800">Foods to limit</h2>
-          <ul className="space-y-3">
-            {results.recommendations.restricted.map((r, i) => (
-              <li key={i} className="rounded border border-amber-100 bg-amber-50/50 p-2">
-                <span className="font-medium text-amber-800">{r.food}</span>
-                <p className="text-sm text-gray-700">{r.reason}</p>
-                <EvidenceBlock evidenceList={r.evidence} variant="knowledge" />
-              </li>
-            ))}
-          </ul>
+          {loading && !results.recommendations && !sectionErrors.recommendations && <SectionSkeleton lines={4} />}
+          {sectionErrors.recommendations && (
+            <div className="flex items-center justify-between rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+              <span>{sectionErrors.recommendations}</span>
+              <button onClick={() => retrySection("recommendations", fetchRecommendations)} disabled={sectionRetrying === "recommendations"} className="ml-3 rounded bg-red-100 px-2 py-1 text-xs font-medium hover:bg-red-200 disabled:opacity-50">
+                {sectionRetrying === "recommendations" ? "Retrying…" : "Retry"}
+              </button>
+            </div>
+          )}
+          {results.recommendations && (
+            <>
+              <ul className="space-y-3">
+                {results.recommendations.recommended.map((r, i) => (
+                  <li key={i} className="rounded border border-green-100 bg-green-50/50 p-2">
+                    <span className="font-medium text-green-800">{r.food}</span>
+                    <p className="text-sm text-gray-700">{r.reason}</p>
+                    <EvidenceBlock evidenceList={r.evidence} variant="knowledge" />
+                  </li>
+                ))}
+              </ul>
+              <h2 className="mb-3 mt-4 text-lg font-semibold text-gray-800">Foods to limit</h2>
+              <ul className="space-y-3">
+                {results.recommendations.restricted.map((r, i) => (
+                  <li key={i} className="rounded border border-amber-100 bg-amber-50/50 p-2">
+                    <span className="font-medium text-amber-800">{r.food}</span>
+                    <p className="text-sm text-gray-700">{r.reason}</p>
+                    <EvidenceBlock evidenceList={r.evidence} variant="knowledge" />
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </section>
       )}
 
@@ -408,63 +471,87 @@ export default function Home() {
         />
       )}
 
-      {results.safestPath && results.safestPath.steps.length > 0 && (
+      {(loading || sectionErrors.safestPath || results.safestPath) && (
         <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
           {summary.labels.safestPath && <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">{summary.labels.safestPath}</p>}
           <h2 className="mb-3 text-lg font-semibold text-gray-800">Safest path (evacuation to safety)</h2>
-          <ul className="space-y-3">
-            {results.safestPath.steps.map((step, i) => (
-              <li key={i} className="rounded border border-amber-200 bg-amber-50/30 p-2">
-                <p className="font-medium text-amber-900">{step.action}</p>
-                <p className="text-sm text-gray-700">{step.reason}</p>
-                <EvidenceBlock evidenceList={step.evidence} variant="wisdom" />
-              </li>
-            ))}
-          </ul>
+          {loading && !results.safestPath && !sectionErrors.safestPath && <SectionSkeleton lines={3} />}
+          {sectionErrors.safestPath && (
+            <div className="flex items-center justify-between rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+              <span>{sectionErrors.safestPath}</span>
+              <button onClick={() => retrySection("safestPath", fetchSafestPath)} disabled={sectionRetrying === "safestPath"} className="ml-3 rounded bg-red-100 px-2 py-1 text-xs font-medium hover:bg-red-200 disabled:opacity-50">
+                {sectionRetrying === "safestPath" ? "Retrying…" : "Retry"}
+              </button>
+            </div>
+          )}
+          {results.safestPath && results.safestPath.steps.length > 0 && (
+            <ul className="space-y-3">
+              {results.safestPath.steps.map((step, i) => (
+                <li key={i} className="rounded border border-amber-200 bg-amber-50/30 p-2">
+                  <p className="font-medium text-amber-900">{step.action}</p>
+                  <p className="text-sm text-gray-700">{step.reason}</p>
+                  <EvidenceBlock evidenceList={step.evidence} variant="wisdom" />
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       )}
 
-      {results.earlySignals && (results.earlySignals.early_signals.length > 0 || results.earlySignals.foods_that_reduce.length > 0 || results.earlySignals.foods_to_avoid.length > 0) && (
+      {(loading || sectionErrors.earlySignals || results.earlySignals) && (
         <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
           {summary.labels.earlySignals && <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">{summary.labels.earlySignals}</p>}
           <h2 className="mb-3 text-lg font-semibold text-gray-800">Early signals (prepare in advance)</h2>
-          {results.earlySignals.early_signals.length > 0 && (
-            <>
-              <h3 className="text-sm font-medium text-gray-700">Signals to watch</h3>
-              <ul className="mb-3 space-y-2">
-                {results.earlySignals.early_signals.map((s, i) => (
-                  <li key={i} className="text-sm">
-                    <span className="font-medium">{s.symptom}</span> → <span className="font-medium">{s.disease}</span>
-                    <EvidenceBlock evidenceList={s.evidence} variant="info" />
-                  </li>
-                ))}
-              </ul>
-            </>
+          {loading && !results.earlySignals && !sectionErrors.earlySignals && <SectionSkeleton lines={3} />}
+          {sectionErrors.earlySignals && (
+            <div className="flex items-center justify-between rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+              <span>{sectionErrors.earlySignals}</span>
+              <button onClick={() => retrySection("earlySignals", fetchEarlySignals)} disabled={sectionRetrying === "earlySignals"} className="ml-3 rounded bg-red-100 px-2 py-1 text-xs font-medium hover:bg-red-200 disabled:opacity-50">
+                {sectionRetrying === "earlySignals" ? "Retrying…" : "Retry"}
+              </button>
+            </div>
           )}
-          {results.earlySignals.foods_that_reduce.length > 0 && (
+          {results.earlySignals && (results.earlySignals.early_signals.length > 0 || results.earlySignals.foods_that_reduce.length > 0 || results.earlySignals.foods_to_avoid.length > 0) && (
             <>
-              <h3 className="text-sm font-medium text-gray-700">Foods that may reduce</h3>
-              <ul className="mb-3 space-y-1">
-                {results.earlySignals.foods_that_reduce.map((r, i) => (
-                  <li key={i} className="text-sm text-green-700">{r.food} — {r.reason}</li>
-                ))}
-              </ul>
-            </>
-          )}
-          {results.earlySignals.foods_to_avoid.length > 0 && (
-            <>
-              <h3 className="text-sm font-medium text-gray-700">Foods to avoid</h3>
-              <ul className="space-y-1">
-                {results.earlySignals.foods_to_avoid.map((r, i) => (
-                  <li key={i} className="text-sm text-amber-700">{r.food} — {r.reason}</li>
-                ))}
-              </ul>
+              {results.earlySignals.early_signals.length > 0 && (
+                <>
+                  <h3 className="text-sm font-medium text-gray-700">Signals to watch</h3>
+                  <ul className="mb-3 space-y-2">
+                    {results.earlySignals.early_signals.map((s, i) => (
+                      <li key={i} className="text-sm">
+                        <span className="font-medium">{s.symptom}</span> → <span className="font-medium">{s.disease}</span>
+                        <EvidenceBlock evidenceList={s.evidence} variant="info" />
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              {results.earlySignals.foods_that_reduce.length > 0 && (
+                <>
+                  <h3 className="text-sm font-medium text-gray-700">Foods that may reduce</h3>
+                  <ul className="mb-3 space-y-1">
+                    {results.earlySignals.foods_that_reduce.map((r, i) => (
+                      <li key={i} className="text-sm text-green-700">{r.food} — {r.reason}</li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              {results.earlySignals.foods_to_avoid.length > 0 && (
+                <>
+                  <h3 className="text-sm font-medium text-gray-700">Foods to avoid</h3>
+                  <ul className="space-y-1">
+                    {results.earlySignals.foods_to_avoid.map((r, i) => (
+                      <li key={i} className="text-sm text-amber-700">{r.food} — {r.reason}</li>
+                    ))}
+                  </ul>
+                </>
+              )}
             </>
           )}
         </section>
       )}
 
-      {!loading && !error && results.recommendations && results.recommendations.recommended.length === 0 && results.recommendations.restricted.length === 0 && (
+      {!loading && !sectionErrors.recommendations && results.recommendations && results.recommendations.recommended.length === 0 && results.recommendations.restricted.length === 0 && (
         <p className="text-sm text-gray-500">{t("noRecs")}</p>
       )}
 

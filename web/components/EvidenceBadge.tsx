@@ -39,6 +39,30 @@ export function EvidenceBadge({
   );
 }
 
+/** Compact legend explaining the blue / green / gold badge system. */
+export function EvidenceLegend() {
+  return (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-xs text-gray-600">
+      <span className="font-medium text-gray-700">Evidence level:</span>
+      <span className="flex items-center gap-1">
+        <span className="inline-block h-2.5 w-2.5 rounded-sm bg-blue-500" />
+        <strong>Information</strong>
+        <span className="text-gray-400">— raw evidence, single source</span>
+      </span>
+      <span className="flex items-center gap-1">
+        <span className="inline-block h-2.5 w-2.5 rounded-sm bg-green-500" />
+        <strong>Knowledge</strong>
+        <span className="text-gray-400">— KG-backed, may be multi-source</span>
+      </span>
+      <span className="flex items-center gap-1">
+        <span className="inline-block h-2.5 w-2.5 rounded-sm bg-amber-400" />
+        <strong>Wisdom</strong>
+        <span className="text-gray-400">— actionable recommendation</span>
+      </span>
+    </div>
+  );
+}
+
 export function EvidenceList({
   evidenceList,
   variant = "info",
