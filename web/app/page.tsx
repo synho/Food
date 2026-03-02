@@ -22,6 +22,7 @@ import { SelfIntroBlock } from "@/components/SelfIntroBlock";
 import { EditableContextSummary } from "@/components/EditableContextSummary";
 import { ClinicalInsights } from "@/components/ClinicalInsights";
 import { useLocale } from "@/contexts/LocaleContext";
+import { useTheme } from "@/contexts/ThemeContext";
 
 /** Derive which parts of context the user provided, for labels and ordering. */
 function getContextSummary(ctx: UserContext | null) {
@@ -90,6 +91,32 @@ export default function Home() {
   const [showShortForm, setShowShortForm] = useState(false);
 
   const { locale, setLocale, t } = useLocale();
+  const { theme, toggleTheme } = useTheme();
+
+  // Draft autosave: restore intro text + extracted context on mount
+  useEffect(() => {
+    try {
+      const savedIntro = localStorage.getItem("health_nav_draft_intro");
+      if (savedIntro) setIntroText(savedIntro);
+      const savedCtx = localStorage.getItem("health_nav_draft_context");
+      if (savedCtx) setExtractedContext(JSON.parse(savedCtx));
+    } catch { /* ignore */ }
+  }, []);
+
+  // Persist intro text as user types
+  useEffect(() => {
+    if (introText) {
+      try { localStorage.setItem("health_nav_draft_intro", introText); } catch { /* ignore */ }
+    }
+  }, [introText]);
+
+  // Persist extracted context when it changes
+  useEffect(() => {
+    if (extractedContext) {
+      try { localStorage.setItem("health_nav_draft_context", JSON.stringify(extractedContext)); } catch { /* ignore */ }
+    }
+  }, [extractedContext]);
+
   const summary = getContextSummary(lastContext);
   const inputSummaryLines = lastContext ? getInputSummaryLine(lastContext, t) : [];
   const didAutoFetchDrug = useRef(false);
@@ -156,6 +183,11 @@ export default function Home() {
     if (Array.isArray(ctx.medications) && ctx.medications.length > 0) {
       setDrugInput(ctx.medications.join(", "));
     }
+    // Clear draft once guidance has been fetched
+    try {
+      localStorage.removeItem("health_nav_draft_intro");
+      localStorage.removeItem("health_nav_draft_context");
+    } catch { /* ignore */ }
     setLoading(false);
   };
 
@@ -198,11 +230,21 @@ export default function Home() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
-      <div className="mb-4 flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-900">{t("home.title")}</h1>
-        <div className="flex rounded-lg border border-gray-200 bg-white p-0.5 text-sm">
-          <button type="button" onClick={() => setLocale("en")} className={"rounded-md px-3 py-1.5 " + (locale === "en" ? "bg-gray-100 font-medium" : "text-gray-600 hover:bg-gray-50")}>EN</button>
-          <button type="button" onClick={() => setLocale("ko")} className={"rounded-md px-3 py-1.5 " + (locale === "ko" ? "bg-gray-100 font-medium" : "text-gray-600 hover:bg-gray-50")}>한글</button>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-gray-50 sm:text-2xl">{t("home.title")}</h1>
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            className="rounded-lg border border-gray-200 bg-white p-1.5 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
+            {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+          </button>
+          <div className="flex rounded-lg border border-gray-200 bg-white p-0.5 text-sm dark:border-gray-700 dark:bg-gray-800">
+            <button type="button" onClick={() => setLocale("en")} className={"rounded-md px-3 py-1.5 " + (locale === "en" ? "bg-gray-100 font-medium dark:bg-gray-700" : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-700")}>EN</button>
+            <button type="button" onClick={() => setLocale("ko")} className={"rounded-md px-3 py-1.5 " + (locale === "ko" ? "bg-gray-100 font-medium dark:bg-gray-700" : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-700")}>한글</button>
+          </div>
         </div>
       </div>
       <p className="mb-8 text-gray-600 leading-relaxed">{t("home.intro")}</p>
@@ -263,10 +305,10 @@ export default function Home() {
         </div>
       )}
 
-      <section className="mb-8 rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-sm">
+      <section className="mb-8 rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800/60">
         <h2 className="mb-2 text-base font-semibold text-slate-800">{t("privacy.title")}</h2>
         <p className="mb-3 text-sm text-slate-600 leading-relaxed">{t("privacy.desc")}</p>
-        <div className="flex flex-wrap items-end gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end sm:gap-3">
           <button
             type="button"
             onClick={async () => {
@@ -298,13 +340,13 @@ export default function Home() {
             </div>
           )}
         </div>
-        <div className="mt-3 flex flex-wrap items-end gap-2">
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end sm:gap-2">
           <input
             type="text"
             placeholder={t("restorePlaceholder")}
             value={restoreToken}
             onChange={(e) => setRestoreToken(e.target.value)}
-            className="min-w-[140px] rounded border border-gray-300 px-2 py-1.5 text-sm font-mono"
+            className="w-full rounded border border-gray-300 bg-white px-2 py-1.5 text-sm font-mono dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 sm:w-auto sm:min-w-[140px]"
           />
           <button
             type="button"
@@ -341,7 +383,7 @@ export default function Home() {
       )}
 
       {results.recommendations && inputSummaryLines.length > 0 && (
-        <section className="mb-6 rounded-lg border border-slate-200 bg-slate-50 p-3 shadow-sm">
+        <section className="mb-6 rounded-lg border border-slate-200 bg-slate-50 p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800/60">
           <h2 className="mb-2 text-sm font-semibold text-slate-700">{t("inputSummary.title")}</h2>
           <ul className="space-y-1 text-sm text-slate-600">
             {inputSummaryLines.map((line, i) => (
@@ -353,9 +395,9 @@ export default function Home() {
       )}
 
       {(loading || sectionErrors.general || results.general) && (
-        <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+        <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           {summary.labels.general && <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">{summary.labels.general}</p>}
-          <h2 className="mb-3 text-lg font-semibold text-gray-800">General guidance (why pay attention)</h2>
+          <h2 className="mb-3 text-lg font-semibold text-gray-800 dark:text-gray-100">General guidance (why pay attention)</h2>
           {loading && !results.general && !sectionErrors.general && <SectionSkeleton lines={3} />}
           {sectionErrors.general && (
             <div className="flex items-center justify-between rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
@@ -373,7 +415,7 @@ export default function Home() {
               {results.general.age_related_changes.length > 0 && (
                 <ul className="space-y-2">
                   {results.general.age_related_changes.map((a, i) => (
-                    <li key={i} className="rounded border border-gray-100 p-2">
+                    <li key={i} className="rounded border border-gray-100 p-2 dark:border-gray-700">
                       <span className="font-medium">{a.change}</span>
                       {a.life_stage && <span className="ml-2 text-xs text-gray-500">({a.life_stage})</span>}
                       <p className="text-sm text-gray-600">{a.why_pay_attention}</p>
@@ -388,9 +430,9 @@ export default function Home() {
       )}
 
       {(loading || sectionErrors.position || results.position) && (
-        <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+        <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           {summary.labels.position && <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">{summary.labels.position}</p>}
-          <h2 className="mb-3 text-lg font-semibold text-gray-800">Your position &amp; nearby risks</h2>
+          <h2 className="mb-3 text-lg font-semibold text-gray-800 dark:text-gray-100">Your position &amp; nearby risks</h2>
           {loading && !results.position && !sectionErrors.position && <SectionSkeleton lines={3} />}
           {sectionErrors.position && (
             <div className="flex items-center justify-between rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
@@ -411,7 +453,7 @@ export default function Home() {
               {results.position.nearby_risks.length > 0 && (
                 <ul className="mt-2 space-y-2">
                   {results.position.nearby_risks.map((risk, i) => (
-                    <li key={i} className="rounded border border-gray-100 p-2">
+                    <li key={i} className="rounded border border-gray-100 p-2 dark:border-gray-700">
                       <span className="font-medium">{risk.name}</span>
                       <span className="ml-2 rounded bg-blue-100 px-1.5 py-0.5 text-xs text-blue-800">{risk.kind}</span>
                       <p className="text-sm text-gray-600">{risk.reason}</p>
@@ -426,9 +468,9 @@ export default function Home() {
       )}
 
       {(loading || sectionErrors.recommendations || results.recommendations) && (
-        <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+        <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           {summary.labels.recommendations && <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">{summary.labels.recommendations}</p>}
-          <h2 className="mb-3 text-lg font-semibold text-gray-800">Recommended foods</h2>
+          <h2 className="mb-3 text-lg font-semibold text-gray-800 dark:text-gray-100">Recommended foods</h2>
           {loading && !results.recommendations && !sectionErrors.recommendations && <SectionSkeleton lines={4} />}
           {sectionErrors.recommendations && (
             <div className="flex items-center justify-between rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
@@ -442,7 +484,7 @@ export default function Home() {
             <>
               <ul className="space-y-3">
                 {results.recommendations.recommended.map((r, i) => (
-                  <li key={i} className="rounded border border-green-100 bg-green-50/50 p-2">
+                  <li key={i} className="rounded border border-green-100 bg-green-50/50 p-2 dark:border-green-900 dark:bg-green-900/20">
                     <span className="font-medium text-green-800">{r.food}</span>
                     <p className="text-sm text-gray-700">{r.reason}</p>
                     <EvidenceBlock evidenceList={r.evidence} variant="knowledge" />
@@ -452,7 +494,7 @@ export default function Home() {
               <h2 className="mb-3 mt-4 text-lg font-semibold text-gray-800">Foods to limit</h2>
               <ul className="space-y-3">
                 {results.recommendations.restricted.map((r, i) => (
-                  <li key={i} className="rounded border border-amber-100 bg-amber-50/50 p-2">
+                  <li key={i} className="rounded border border-amber-100 bg-amber-50/50 p-2 dark:border-amber-900 dark:bg-amber-900/20">
                     <span className="font-medium text-amber-800">{r.food}</span>
                     <p className="text-sm text-gray-700">{r.reason}</p>
                     <EvidenceBlock evidenceList={r.evidence} variant="knowledge" />
@@ -472,9 +514,9 @@ export default function Home() {
       )}
 
       {(loading || sectionErrors.safestPath || results.safestPath) && (
-        <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+        <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           {summary.labels.safestPath && <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">{summary.labels.safestPath}</p>}
-          <h2 className="mb-3 text-lg font-semibold text-gray-800">Safest path (evacuation to safety)</h2>
+          <h2 className="mb-3 text-lg font-semibold text-gray-800 dark:text-gray-100">Safest path (evacuation to safety)</h2>
           {loading && !results.safestPath && !sectionErrors.safestPath && <SectionSkeleton lines={3} />}
           {sectionErrors.safestPath && (
             <div className="flex items-center justify-between rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
@@ -487,7 +529,7 @@ export default function Home() {
           {results.safestPath && results.safestPath.steps.length > 0 && (
             <ul className="space-y-3">
               {results.safestPath.steps.map((step, i) => (
-                <li key={i} className="rounded border border-amber-200 bg-amber-50/30 p-2">
+                <li key={i} className="rounded border border-amber-200 bg-amber-50/30 p-2 dark:border-amber-800 dark:bg-amber-900/20">
                   <p className="font-medium text-amber-900">{step.action}</p>
                   <p className="text-sm text-gray-700">{step.reason}</p>
                   <EvidenceBlock evidenceList={step.evidence} variant="wisdom" />
@@ -499,9 +541,9 @@ export default function Home() {
       )}
 
       {(loading || sectionErrors.earlySignals || results.earlySignals) && (
-        <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+        <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           {summary.labels.earlySignals && <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">{summary.labels.earlySignals}</p>}
-          <h2 className="mb-3 text-lg font-semibold text-gray-800">Early signals (prepare in advance)</h2>
+          <h2 className="mb-3 text-lg font-semibold text-gray-800 dark:text-gray-100">Early signals (prepare in advance)</h2>
           {loading && !results.earlySignals && !sectionErrors.earlySignals && <SectionSkeleton lines={3} />}
           {sectionErrors.earlySignals && (
             <div className="flex items-center justify-between rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
@@ -555,19 +597,19 @@ export default function Home() {
         <p className="text-sm text-gray-500">{t("noRecs")}</p>
       )}
 
-      <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+      <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         {summary.labels.drugSubstitution && <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">{summary.labels.drugSubstitution}</p>}
-        <h2 className="mb-3 text-lg font-semibold text-gray-800">{t("drugSection.title")}</h2>
+        <h2 className="mb-3 text-lg font-semibold text-gray-800 dark:text-gray-100">{t("drugSection.title")}</h2>
         <p className="mb-3 text-sm text-gray-600 leading-relaxed">
           {t("drugSection.desc")}
         </p>
-        <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
           <input
             type="text"
             placeholder="e.g. Metformin (comma-separated for multiple)"
             value={drugInput}
             onChange={(e) => setDrugInput(e.target.value)}
-            className="min-w-[200px] rounded border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 sm:w-auto sm:min-w-[200px]"
           />
           <button
             type="button"
@@ -645,7 +687,7 @@ export default function Home() {
         )}
       </section>
 
-      <footer className="mt-10 border-t border-gray-200 pt-4 text-center text-sm text-gray-500">
+      <footer className="mt-10 border-t border-gray-200 pt-4 text-center text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
         <Link href="/kg" className="text-blue-600 hover:underline">
           Knowledge Graph — Status
         </Link>
@@ -659,5 +701,21 @@ export default function Home() {
         </Link>
       </footer>
     </main>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+    </svg>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+    </svg>
   );
 }

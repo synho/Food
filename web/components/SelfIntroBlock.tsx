@@ -66,16 +66,16 @@ export function SelfIntroBlock({
   }, []);
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="mb-2 text-xl font-semibold text-gray-900">{t("intro.title")}</h2>
-      <p className="mb-4 text-sm text-gray-600 leading-relaxed">{t("intro.desc")}</p>
+    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <h2 className="mb-2 text-xl font-semibold text-gray-900 dark:text-gray-100">{t("intro.title")}</h2>
+      <p className="mb-4 text-sm text-gray-600 leading-relaxed dark:text-gray-400">{t("intro.desc")}</p>
       <div className="relative">
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder={t("intro.placeholder")}
           rows={6}
-          className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-500"
           aria-label="Tell us about yourself"
         />
         <div className="mt-2 flex flex-wrap items-center gap-2">
