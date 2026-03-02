@@ -467,3 +467,118 @@ def me_trajectory(token: str = "", limit: int = 50):
         raise HTTPException(status_code=422, detail="token query parameter is required")
     from server.db import get_trajectory
     return get_trajectory(token.strip(), limit=min(limit, 200))
+
+
+# ----- KG Graph Explorer -----
+
+@app.get("/api/kg/explore")
+def kg_explore(entity: str = "", hops: int = 1, limit: int = 80):
+    """
+    Return a subgraph neighborhood around a named entity for interactive visualization.
+    hops: 1 (direct neighbors) or 2 (2-hop neighbors, heavier).
+    Returns: { center, nodes: [{id, name, type}], edges: [{source, target, type, context, source_id}] }
+    """
+    from fastapi import HTTPException
+    if not entity.strip():
+        raise HTTPException(status_code=422, detail="entity query parameter is required")
+
+    limit = max(10, min(limit, 200))
+    hops  = max(1, min(hops, 2))
+
+    from server.neo4j_client import get_driver
+    driver = get_driver()
+
+    try:
+        with driver.session() as s:
+            # Step 1: find closest matching node
+            match_result = s.run(
+                """
+                MATCH (n)
+                WHERE toLower(n.name) = toLower($entity)
+                   OR toLower(n.name) CONTAINS toLower($entity)
+                RETURN n.name AS name, labels(n)[0] AS type
+                ORDER BY
+                  CASE WHEN toLower(n.name) = toLower($entity) THEN 0 ELSE 1 END,
+                  size(n.name)
+                LIMIT 1
+                """,
+                entity=entity.strip(),
+            ).single()
+
+            if not match_result:
+                return {"center": None, "nodes": [], "edges": []}
+
+            center_name = match_result["name"]
+            center_type = match_result["type"] or "Unknown"
+
+            # Step 2: fetch 1-hop (or 2-hop) neighborhood
+            if hops == 1:
+                rows = s.run(
+                    """
+                    MATCH (start {name: $name})-[r]-(neighbor)
+                    RETURN
+                      start.name  AS src_name,  labels(start)[0]    AS src_type,
+                      type(r)     AS rel_type,  r.context            AS context,
+                      r.source_id AS source_id,
+                      neighbor.name AS tgt_name, labels(neighbor)[0] AS tgt_type
+                    LIMIT $limit
+                    """,
+                    name=center_name, limit=limit,
+                ).data()
+            else:
+                rows = s.run(
+                    """
+                    MATCH (start {name: $name})-[r1]-(n1)-[r2]-(n2)
+                    WHERE n2.name <> $name
+                    RETURN
+                      start.name AS src_name, labels(start)[0] AS src_type,
+                      type(r1)   AS rel_type,  r1.context       AS context,
+                      r1.source_id AS source_id,
+                      n1.name    AS tgt_name,  labels(n1)[0]    AS tgt_type
+                    UNION
+                    MATCH (start {name: $name})-[r]-(neighbor)
+                    RETURN
+                      start.name  AS src_name, labels(start)[0]    AS src_type,
+                      type(r)     AS rel_type,  r.context            AS context,
+                      r.source_id AS source_id,
+                      neighbor.name AS tgt_name, labels(neighbor)[0] AS tgt_type
+                    LIMIT $limit
+                    """,
+                    name=center_name, limit=limit,
+                ).data()
+
+        # Build deduplicated node + edge lists
+        nodes_seen: dict[str, dict] = {}
+        edges: list[dict] = []
+        edge_seen: set[tuple] = set()
+
+        nodes_seen[center_name] = {"id": center_name, "name": center_name, "type": center_type, "is_center": True}
+
+        for row in rows:
+            for key_n, key_t in [("src_name", "src_type"), ("tgt_name", "tgt_type")]:
+                n, t = row.get(key_n), row.get(key_t)
+                if n and n not in nodes_seen:
+                    nodes_seen[n] = {"id": n, "name": n, "type": t or "Unknown", "is_center": False}
+
+            src, tgt, rel = row.get("src_name"), row.get("tgt_name"), row.get("rel_type")
+            if src and tgt and rel:
+                edge_key = (min(src, tgt), max(src, tgt), rel)
+                if edge_key not in edge_seen:
+                    edge_seen.add(edge_key)
+                    edges.append({
+                        "source":    src,
+                        "target":    tgt,
+                        "type":      rel,
+                        "context":   (row.get("context") or "")[:200],
+                        "source_id": row.get("source_id") or "",
+                    })
+
+        return {
+            "center": center_name,
+            "nodes":  list(nodes_seen.values()),
+            "edges":  edges,
+        }
+
+    except Exception as e:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=str(e))

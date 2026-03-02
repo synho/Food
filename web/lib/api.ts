@@ -16,6 +16,7 @@ import type {
   MechanismResponse,
   DrugInteractionResponse,
   PipelineRun,
+  KgExploreResponse,
 } from "./types";
 
 const BASE =
@@ -275,6 +276,18 @@ export async function fetchDrugInteractions(medications: string[]): Promise<Drug
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ medications }),
   });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+/** KG Graph Explorer: subgraph neighborhood around a named entity. */
+export async function fetchKgExplore(
+  entity: string,
+  hops: 1 | 2 = 1,
+  limit: number = 80,
+): Promise<KgExploreResponse> {
+  const params = new URLSearchParams({ entity, hops: String(hops), limit: String(limit) });
+  const res = await fetch(`${API}/api/kg/explore?${params}`);
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }

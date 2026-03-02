@@ -83,6 +83,8 @@ export default function KgDashboardPage() {
             <Link href="/map" className="text-slate-500 transition hover:text-slate-800">Health Map</Link>
             <span className="text-slate-300">|</span>
             <Link href="/clinical" className="text-slate-500 transition hover:text-slate-800">Clinical Explorer</Link>
+            <span className="text-slate-300">|</span>
+            <Link href="/kg/explore" className="rounded-lg bg-teal-600 px-3 py-1 text-sm font-medium text-white hover:bg-teal-700">Graph Explorer →</Link>
             <h1 className="text-xl font-semibold text-slate-800">Knowledge Graph — Status</h1>
           </div>
           <div className="flex items-center gap-3">

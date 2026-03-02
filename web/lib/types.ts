@@ -294,6 +294,29 @@ export interface DrugInteractionResponse {
   disclaimer: string;
 }
 
+// ── KG Graph Explorer types ─────────────────────────────────────────────────
+
+export interface KgExploreNode {
+  id:        string;
+  name:      string;
+  type:      string;
+  is_center: boolean;
+}
+
+export interface KgExploreEdge {
+  source:    string;
+  target:    string;
+  type:      string;
+  context:   string;
+  source_id: string;
+}
+
+export interface KgExploreResponse {
+  center: string | null;
+  nodes:  KgExploreNode[];
+  edges:  KgExploreEdge[];
+}
+
 /** A single pipeline run record from /api/pipeline/history. */
 export interface PipelineRun {
   id: number;
