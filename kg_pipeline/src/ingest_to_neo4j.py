@@ -1,6 +1,11 @@
 from neo4j import GraphDatabase
+from neo4j.exceptions import ServiceUnavailable, TransientError
 import json
+import logging
 import os
+import random
+import time
+from pathlib import Path
 from dotenv import load_dotenv
 
 from config_loader import get_paths_config
@@ -8,6 +13,43 @@ from ontology import normalize_entity_type, normalize_predicate, normalize_entit
 from artifacts import AGENT_EXTRACT, AGENT_INGEST, get_run_id, read_manifest, write_manifest
 
 load_dotenv()
+
+_LOGS_DIR = Path(__file__).resolve().parent.parent / "logs"
+_LOGS_DIR.mkdir(exist_ok=True)
+
+def _setup_logger() -> logging.Logger:
+    logger = logging.getLogger("ingest")
+    if logger.handlers:
+        return logger
+    logger.setLevel(logging.INFO)
+    fmt = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+    fh = logging.FileHandler(_LOGS_DIR / "ingest.log")
+    fh.setFormatter(fmt)
+    ch = logging.StreamHandler()
+    ch.setFormatter(fmt)
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+    return logger
+
+log = _setup_logger()
+
+_MAX_RETRIES = 5
+_BASE_DELAY  = 1.0   # seconds
+_MAX_DELAY   = 60.0  # seconds
+
+def _execute_with_retry(session, fn, triple):
+    """Execute a write transaction with exponential backoff on transient Neo4j errors."""
+    for attempt in range(_MAX_RETRIES):
+        try:
+            session.execute_write(fn, triple)
+            return
+        except (ServiceUnavailable, TransientError) as e:
+            if attempt == _MAX_RETRIES - 1:
+                raise
+            delay = min(_BASE_DELAY * (2 ** attempt) + random.uniform(0, 0.5), _MAX_DELAY)
+            log.warning("Transient error (attempt %d/%d), retrying in %.1fs: %s",
+                        attempt + 1, _MAX_RETRIES, delay, e)
+            time.sleep(delay)
 
 # Neo4j connection details (project default id/password: foodnot4self)
 NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
@@ -34,22 +76,28 @@ class KnowledgeGraphIngestor:
         with self.driver.session() as session:
             for label in labels:
                 session.run(f"CREATE INDEX IF NOT EXISTS FOR (n:{label}) ON (n.name)")
-        print(f"Schema indexes created/verified for: {', '.join(labels)}")
+        log.info("Schema indexes created/verified for: %s", ", ".join(labels))
 
     def ingest_triples(self, triples):
         skipped = 0
+        ingested = 0
+        total = len(triples)
         with self.driver.session() as session:
             for triple in triples:
                 if not triple.get("source_id"):
                     subj = triple.get("subject", "?")
                     pred = triple.get("predicate", "?")
-                    obj = triple.get("object", "?")
-                    print(f"WARNING: skipping triple with missing source_id: {subj} --{pred}--> {obj}")
+                    obj  = triple.get("object", "?")
+                    log.warning("Skipping triple with missing source_id: %s --%s--> %s", subj, pred, obj)
                     skipped += 1
                     continue
-                session.execute_write(self._create_relationship, triple)
+                _execute_with_retry(session, self._create_relationship, triple)
+                ingested += 1
+                if ingested % 100 == 0:
+                    log.info("Progress: %d/%d triples ingested", ingested, total)
         if skipped:
-            print(f"WARNING: {skipped} triple(s) skipped due to missing source_id (zero-error rule).")
+            log.warning("%d triple(s) skipped due to missing source_id (zero-error rule).", skipped)
+        return ingested
 
     @staticmethod
     def _create_relationship(tx, triple):
@@ -109,28 +157,28 @@ def main():
     if prev and prev.get("master_graph_path") and os.path.exists(prev["master_graph_path"]):
         master_file = prev["master_graph_path"]
     if not os.path.exists(master_file):
-        print(f"Master graph file not found: {master_file}")
+        log.error("Master graph file not found: %s", master_file)
         return
 
     with open(master_file, "r") as f:
         triples = json.load(f)
 
-    print(f"Ingesting {len(triples)} triples into Neo4j...")
+    log.info("Ingesting %d triples into Neo4j...", len(triples))
     try:
         ingestor = KnowledgeGraphIngestor(NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD)
         ingestor.setup_schema()
-        ingestor.ingest_triples(triples)
+        ingested = ingestor.ingest_triples(triples)
         ingestor.close()
         write_manifest(AGENT_INGEST, run_id, {
-            "triples_ingested": len(triples),
+            "triples_ingested": ingested,
             "master_graph_path": master_file,
             "status": "ok",
         })
-        print("Ingestion complete.")
+        log.info("Ingestion complete. %d/%d triples written.", ingested, len(triples))
     except Exception as e:
         write_manifest(AGENT_INGEST, run_id, {"status": "error", "error": str(e)})
-        print(f"Failed to ingest to Neo4j: {e}")
-        print("Tip: Neo4j auth defaults: user/password foodnot4self. Set NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD in .env to override.")
+        log.error("Failed to ingest to Neo4j: %s", e)
+        log.error("Tip: Neo4j auth defaults: foodnot4self/foodnot4self. Set NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD in .env to override.")
 
 if __name__ == "__main__":
     main()

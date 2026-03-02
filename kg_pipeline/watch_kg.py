@@ -32,11 +32,13 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
-ROOT = Path(__file__).resolve().parent          # kg_pipeline/
-SRC  = ROOT / "src"
+ROOT        = Path(__file__).resolve().parent   # kg_pipeline/
+SRC         = ROOT / "src"
 VENV_PYTHON = ROOT / "venv" / "bin" / "python"
 DATA_ROOT   = ROOT.parent / "data"
 DB_PATH     = DATA_ROOT / "health_map.db"
+LOGS_DIR    = ROOT / "logs"
+LOGS_DIR.mkdir(exist_ok=True)
 
 _stop = False
 
@@ -164,13 +166,54 @@ def _gap_summary() -> str:
         return f"gap analysis error: {e}"
 
 
+# ── Overnight report logging ──────────────────────────────────────────────────
+
+def _append_log(log_path: Path, line: str) -> None:
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(log_path, "a") as f:
+        f.write(f"{ts}  {line}\n")
+
+
+def _log_cycle_summary(
+    log_path: Path,
+    cycle: int,
+    broad_new: int,
+    smart_new: int,
+    counts_before: dict,
+    counts_after: dict,
+) -> None:
+    dn = dr = 0
+    if "error" not in counts_before and "error" not in counts_after:
+        dn = counts_after.get("nodes", 0) - counts_before.get("nodes", 0)
+        dr = counts_after.get("rels",  0) - counts_before.get("rels",  0)
+    total_nodes = counts_after.get("nodes", "?")
+    total_rels  = counts_after.get("rels",  "?")
+    _append_log(
+        log_path,
+        f"[CYCLE {cycle:>4}]  papers +{broad_new + smart_new}"
+        f"  nodes +{dn}  rels +{dr}"
+        f"  total={total_nodes} nodes / {total_rels} rels",
+    )
+
+
+def _log_hourly_snapshot(log_path: Path) -> None:
+    counts = _kg_counts()
+    if "error" in counts:
+        _append_log(log_path, f"[HOURLY SNAPSHOT]  Neo4j unreachable: {counts['error']}")
+    else:
+        _append_log(
+            log_path,
+            f"[HOURLY SNAPSHOT]  {counts['nodes']:,} nodes  {counts['rels']:,} rels",
+        )
+
+
 # ── Single cycle ──────────────────────────────────────────────────────────────
 
 def run_cycle(
     cycle: int,
     empty_smart_streak: int,
     gap_only: bool,
-) -> tuple[int, int]:
+) -> tuple[int, int, dict, dict]:
     """
     Execute one fill cycle.
 
@@ -237,7 +280,8 @@ def run_cycle(
             print(f"       {line}")
 
     # ── KG delta ──────────────────────────────────────────────────────────────
-    total_new = broad_new + smart_new
+    total_new    = broad_new + smart_new
+    counts_after = counts_before  # default: nothing changed
     if total_new > 0:
         counts_after = _kg_counts()
         if "error" not in counts_after and "error" not in counts_before:
@@ -248,7 +292,7 @@ def run_cycle(
                 f"{counts_after['nodes']:,} nodes  ·  {counts_after['rels']:,} rels"
             )
 
-    return broad_new, smart_new
+    return broad_new, smart_new, counts_before, counts_after
 
 
 # ── Main loop ─────────────────────────────────────────────────────────────────
@@ -261,13 +305,21 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )
-    parser.add_argument("--once",     action="store_true",
+    parser.add_argument("--once",      action="store_true",
                         help="Run one cycle then exit")
-    parser.add_argument("--interval", type=int, default=10,
+    parser.add_argument("--interval",  type=int, default=10,
                         help="Minutes between cycles (default: 10)")
-    parser.add_argument("--gap-only", action="store_true",
+    parser.add_argument("--gap-only",  action="store_true",
                         help="Skip broad sweep; run smart gap-fetch only")
+    parser.add_argument("--overnight", action="store_true",
+                        help="Overnight mode: set interval=60m and enable report log")
+    parser.add_argument("--log-file",  type=str,
+                        default=str(LOGS_DIR / "overnight_report.log"),
+                        help="Path for cycle/hourly summary log (default: logs/overnight_report.log)")
     args = parser.parse_args()
+
+    if args.overnight:
+        args.interval = 60
 
     if not VENV_PYTHON.exists():
         print(f"[watch_kg] ERROR: venv not found at {VENV_PYTHON}")
@@ -277,16 +329,31 @@ def main():
     signal.signal(signal.SIGINT,  _handle_signal)
     signal.signal(signal.SIGTERM, _handle_signal)
 
+    log_path           = Path(args.log_file)
     interval_sec       = args.interval * 60
     cycle              = 1
     empty_smart_streak = 0
+    last_hourly        = datetime.now()
 
     print(f"[watch_kg] Starting — interval={args.interval}m  gap-only={args.gap_only}  Ctrl+C to stop")
     print(f"[watch_kg] Venv     : {VENV_PYTHON}")
     print(f"[watch_kg] DB       : {DB_PATH}")
+    print(f"[watch_kg] Log      : {log_path}")
+    _append_log(log_path, f"[START] watch_kg started  interval={args.interval}m  gap-only={args.gap_only}")
 
     while not _stop:
-        broad_new, smart_new = run_cycle(cycle, empty_smart_streak, args.gap_only)
+        broad_new, smart_new, counts_before, counts_after = run_cycle(
+            cycle, empty_smart_streak, args.gap_only
+        )
+
+        # Per-cycle summary to log
+        _log_cycle_summary(log_path, cycle, broad_new, smart_new, counts_before, counts_after)
+
+        # Hourly snapshot at wall-clock hour boundary
+        now = datetime.now()
+        if (now - last_hourly).total_seconds() >= 3600:
+            _log_hourly_snapshot(log_path)
+            last_hourly = now
 
         if smart_new == 0:
             empty_smart_streak += 1
@@ -310,6 +377,7 @@ def main():
                 break
             time.sleep(5)
 
+    _append_log(log_path, f"[STOP]  watch_kg stopped after {cycle - 1} cycle(s)")
     print("\n[watch_kg] Stopped.")
 
 
