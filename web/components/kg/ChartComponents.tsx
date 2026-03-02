@@ -160,13 +160,13 @@ export function DonutChart({ data }: { data: [string, number][] }) {
       </svg>
       <div className="mt-2 flex flex-wrap justify-center gap-x-3 gap-y-1">
         {segments.map(({ label, value }) => (
-          <div key={label} className="flex items-center gap-1 text-xs text-slate-600">
+          <div key={label} className="flex items-center gap-1 text-xs text-slate-600 dark:text-gray-300">
             <span
               className="inline-block h-2.5 w-2.5 rounded-full flex-shrink-0"
               style={{ backgroundColor: ENTITY_HEX[label] ?? "#94a3b8" }}
             />
             <span>{label}</span>
-            <span className="text-slate-400 tabular-nums">({value})</span>
+            <span className="text-slate-400 tabular-nums dark:text-gray-500">({value})</span>
           </div>
         ))}
       </div>
@@ -211,8 +211,8 @@ export function RingScore({ value, total }: { value: number; total: number }) {
           {label}
         </text>
       </svg>
-      <p className="mt-1 text-center text-xs font-medium text-slate-700">Source ID Coverage</p>
-      <p className="text-center text-xs text-slate-400">
+      <p className="mt-1 text-center text-xs font-medium text-slate-700 dark:text-gray-300">Source ID Coverage</p>
+      <p className="text-center text-xs text-slate-400 dark:text-gray-500">
         {value.toLocaleString()} / {total.toLocaleString()} triples
       </p>
     </div>
@@ -239,19 +239,19 @@ export function EntityBarChart({ data }: { data: Record<string, number> }) {
                   className="inline-block h-3 w-3 rounded-full flex-shrink-0"
                   style={{ backgroundColor: hex }}
                 />
-                <span className="text-sm font-semibold text-slate-800">{label}</span>
+                <span className="text-sm font-semibold text-slate-800 dark:text-gray-100">{label}</span>
               </div>
-              <span className="text-sm tabular-nums font-medium text-slate-600">
+              <span className="text-sm tabular-nums font-medium text-slate-600 dark:text-gray-300">
                 {value.toLocaleString()}
               </span>
             </div>
-            <div className="h-5 rounded-md bg-slate-100 overflow-hidden">
+            <div className="h-5 rounded-md bg-slate-100 overflow-hidden dark:bg-gray-700">
               <div
                 className={`h-full rounded-md ${bg} transition-all duration-700`}
                 style={{ width: `${pct}%` }}
               />
             </div>
-            <p className="mt-0.5 text-xs text-slate-400">{desc}</p>
+            <p className="mt-0.5 text-xs text-slate-400 dark:text-gray-500">{desc}</p>
           </div>
         );
       })}
@@ -268,7 +268,7 @@ export function RelBarChart({ data }: { data: Record<string, number> }) {
     <div>
       <div className="mb-5 flex flex-wrap gap-3">
         {(["beneficial", "harmful", "structural", "medical", "relational"] as RelGroup[]).map((g) => (
-          <div key={g} className="flex items-center gap-1.5 text-xs text-slate-600">
+          <div key={g} className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-gray-300">
             <span
               className="inline-block h-2.5 w-2.5 rounded-sm"
               style={{ backgroundColor: GROUP_HEX[g] }}
@@ -291,19 +291,19 @@ export function RelBarChart({ data }: { data: Record<string, number> }) {
                     className="inline-block h-3 w-3 rounded-sm flex-shrink-0"
                     style={{ backgroundColor: hex }}
                   />
-                  <span className="text-sm font-semibold text-slate-800">{label}</span>
+                  <span className="text-sm font-semibold text-slate-800 dark:text-gray-100">{label}</span>
                 </div>
-                <span className="text-sm tabular-nums font-medium text-slate-600">
+                <span className="text-sm tabular-nums font-medium text-slate-600 dark:text-gray-300">
                   {value.toLocaleString()}
                 </span>
               </div>
-              <div className="h-5 rounded-md bg-slate-100 overflow-hidden">
+              <div className="h-5 rounded-md bg-slate-100 overflow-hidden dark:bg-gray-700">
                 <div
                   className="h-full rounded-md transition-all duration-700"
                   style={{ width: `${pct}%`, backgroundColor: hex }}
                 />
               </div>
-              <p className="mt-0.5 text-xs text-slate-400">{desc}</p>
+              <p className="mt-0.5 text-xs text-slate-400 dark:text-gray-500">{desc}</p>
             </div>
           );
         })}
@@ -319,20 +319,20 @@ export function StatCard({
   title: string; value: string | number; sub?: string; accent?: "blue" | "emerald" | "violet" | "teal";
 }) {
   const border =
-    accent === "blue" ? "border-blue-200" :
-    accent === "emerald" ? "border-emerald-200" :
-    accent === "teal" ? "border-teal-200" :
-    "border-violet-200";
+    accent === "blue" ? "border-blue-200 dark:border-blue-900" :
+    accent === "emerald" ? "border-emerald-200 dark:border-emerald-900" :
+    accent === "teal" ? "border-teal-200 dark:border-teal-900" :
+    "border-violet-200 dark:border-violet-900";
   const bg =
-    accent === "blue" ? "bg-blue-50" :
-    accent === "emerald" ? "bg-emerald-50" :
-    accent === "teal" ? "bg-teal-50" :
-    "bg-violet-50";
+    accent === "blue" ? "bg-blue-50 dark:bg-blue-900/20" :
+    accent === "emerald" ? "bg-emerald-50 dark:bg-emerald-900/20" :
+    accent === "teal" ? "bg-teal-50 dark:bg-teal-900/20" :
+    "bg-violet-50 dark:bg-violet-900/20";
   return (
     <div className={`rounded-xl border-2 ${border} ${bg} p-4 shadow-sm`}>
-      <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">{title}</div>
-      <div className="mt-1 text-2xl font-bold tabular-nums text-gray-900">{value}</div>
-      {sub != null && <div className="mt-0.5 text-xs text-gray-500">{sub}</div>}
+      <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{title}</div>
+      <div className="mt-1 text-2xl font-bold tabular-nums text-gray-900 dark:text-gray-100">{value}</div>
+      {sub != null && <div className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{sub}</div>}
     </div>
   );
 }

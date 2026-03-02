@@ -943,17 +943,17 @@ function JourneyPanel({ trajectory, currentY }: { trajectory: Snapshot[]; curren
 
   if (trajectory.length === 1) {
     return (
-      <div className="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-4 shadow-sm space-y-3">
-        <h3 className="text-xs font-bold uppercase tracking-wide text-indigo-700">Your Health Journey</h3>
+      <div className="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-4 shadow-sm space-y-3 dark:border-indigo-800 dark:bg-indigo-900/20">
+        <h3 className="text-xs font-bold uppercase tracking-wide text-indigo-700 dark:text-indigo-300">Your Health Journey</h3>
         <HealthScoreGauge score={score} />
-        <p className="text-xs text-center text-slate-500 italic">Come back to track your journey</p>
+        <p className="text-xs text-center text-slate-500 italic dark:text-gray-400">Come back to track your journey</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-4 shadow-sm space-y-3">
-      <h3 className="text-xs font-bold uppercase tracking-wide text-indigo-700">Your Health Journey</h3>
+    <div className="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-4 shadow-sm space-y-3 dark:border-indigo-800 dark:bg-indigo-900/20">
+      <h3 className="text-xs font-bold uppercase tracking-wide text-indigo-700 dark:text-indigo-300">Your Health Journey</h3>
       <HealthScoreGauge score={score} />
       <DriftIndicator snapshots={trajectory} />
       <TrajectorySparkline snapshots={trajectory} />
@@ -983,13 +983,13 @@ function HealthPersonaCard({ persona, zone, complexity, momentum, score, conditi
   };
 
   return (
-    <div className="rounded-2xl border bg-white p-4 shadow-sm space-y-2.5"
+    <div className="rounded-2xl border bg-white p-4 shadow-sm space-y-2.5 dark:bg-gray-800"
       style={{ borderColor: persona.color + "60" }}>
-      <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Your Health Persona</p>
+      <p className="text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-gray-500">Your Health Persona</p>
       <div className="flex items-center gap-3">
         <span className="rounded-lg px-2.5 py-1.5 text-sm font-black text-white"
           style={{ backgroundColor: persona.color }}>{persona.code}</span>
-        <span className="text-sm font-bold text-slate-800">{persona.name}</span>
+        <span className="text-sm font-bold text-slate-800 dark:text-gray-100">{persona.name}</span>
       </div>
       <div className="flex gap-1.5">
         {[
@@ -997,12 +997,12 @@ function HealthPersonaCard({ persona, zone, complexity, momentum, score, conditi
           { label: dimLabel("complexity", complexity) },
           { label: dimLabel("momentum", momentum) },
         ].map(({ label }) => (
-          <span key={label} className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-600">
+          <span key={label} className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-600 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
             {label}
           </span>
         ))}
       </div>
-      <p className="text-xs text-slate-600 leading-relaxed italic">{"\u201C"}{desc}{"\u201D"}</p>
+      <p className="text-xs text-slate-600 leading-relaxed italic dark:text-gray-300">{"\u201C"}{desc}{"\u201D"}</p>
     </div>
   );
 }
@@ -1016,11 +1016,11 @@ function BotPanel({ bots, showBots, onToggle, trajectory }: {
   if (bots.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3 dark:border-gray-700 dark:bg-gray-800">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-bold uppercase tracking-wide text-slate-400">People Like You</p>
+        <p className="text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-gray-500">People Like You</p>
         <button type="button" onClick={onToggle}
-          className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs text-slate-500 hover:border-blue-300 hover:text-blue-600 transition-colors">
+          className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs text-slate-500 hover:border-blue-300 hover:text-blue-600 transition-colors dark:border-gray-600 dark:text-gray-400 dark:hover:border-blue-500 dark:hover:text-blue-400">
           {showBots ? "Hide" : "Show on map"}
         </button>
       </div>
@@ -1032,15 +1032,15 @@ function BotPanel({ bots, showBots, onToggle, trajectory }: {
               style={{ backgroundColor: BOT_ROLE_COLORS[bot.role] ?? "#94a3b8" }} />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs font-bold text-slate-800">{bot.name}</span>
-                <span className="text-xs text-slate-500">({bot.age})</span>
+                <span className="text-xs font-bold text-slate-800 dark:text-gray-100">{bot.name}</span>
+                <span className="text-xs text-slate-500 dark:text-gray-400">({bot.age})</span>
                 <span className="rounded-full px-1.5 py-0.5 font-bold text-white"
                   style={{ backgroundColor: botPersona.persona.color, fontSize: "9px" }}>
                   {botPersona.persona.code}
                 </span>
-                <span className="text-xs text-slate-500">Score {bot.score}</span>
+                <span className="text-xs text-slate-500 dark:text-gray-400">Score {bot.score}</span>
               </div>
-              <p className="text-xs text-slate-500 italic mt-0.5">{"\u201C"}{bot.description}{"\u201D"}</p>
+              <p className="text-xs text-slate-500 italic mt-0.5 dark:text-gray-400">{"\u201C"}{bot.description}{"\u201D"}</p>
             </div>
           </div>
         );
@@ -1079,22 +1079,22 @@ function HealthIdBadge({ token, onRestore }: {
   if (!token) return null;
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2">
-      <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Your Health ID</p>
+    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2 dark:border-gray-700 dark:bg-gray-800">
+      <p className="text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-gray-500">Your Health ID</p>
       <div className="flex items-center gap-2">
-        <span className="rounded-md bg-white border border-slate-200 px-2.5 py-1 text-xs font-mono font-bold text-slate-700 tracking-wider">
+        <span className="rounded-md bg-white border border-slate-200 px-2.5 py-1 text-xs font-mono font-bold text-slate-700 tracking-wider dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
           {shortId}
         </span>
         <button type="button" onClick={handleCopy}
-          className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-500 hover:border-blue-300 hover:text-blue-600 transition-colors">
+          className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-500 hover:border-blue-300 hover:text-blue-600 transition-colors dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:border-blue-500 dark:hover:text-blue-400">
           {copied ? "Copied!" : "Copy"}
         </button>
       </div>
-      <p className="text-xs text-slate-400 leading-snug">
+      <p className="text-xs text-slate-400 leading-snug dark:text-gray-500">
         Saved anonymously on this device. Copy ID to restore elsewhere.
       </p>
       <button type="button" onClick={() => setShowRestore(v => !v)}
-        className="text-xs text-slate-500 hover:text-blue-600 transition-colors">
+        className="text-xs text-slate-500 hover:text-blue-600 transition-colors dark:text-gray-400 dark:hover:text-blue-400">
         {showRestore ? "\u25BE Hide restore" : "\u25B8 Restore from another device"}
       </button>
       {showRestore && (
@@ -1102,7 +1102,7 @@ function HealthIdBadge({ token, onRestore }: {
           <input type="text" value={restoreInput} onChange={e => setRestoreInput(e.target.value)}
             placeholder="Paste your Health ID"
             onKeyDown={e => { if (e.key === "Enter") handleRestore(); }}
-            className="flex-1 rounded-md border border-slate-200 px-2 py-1 text-xs font-mono focus:border-blue-400 focus:outline-none" />
+            className="flex-1 rounded-md border border-slate-200 px-2 py-1 text-xs font-mono focus:border-blue-400 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-500" />
           <button type="button" onClick={handleRestore}
             disabled={!restoreInput.trim()}
             className="rounded-md bg-blue-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50 transition-colors">
@@ -1188,50 +1188,50 @@ const RISK_BORDER: Record<string, string> = {
 function LandminePanel({ landmine, onClose }: { landmine: LandmineDisease; onClose: () => void }) {
   const borderColor = RISK_BORDER[landmine.risk_level] ?? "#94a3b8";
   return (
-    <div className="relative rounded-xl border-2 bg-white p-4 shadow-lg space-y-3"
+    <div className="relative rounded-xl border-2 bg-white p-4 shadow-lg space-y-3 dark:bg-gray-800"
       style={{ borderColor }}>
       <button onClick={onClose}
-        className="absolute right-3 top-3 text-slate-400 hover:text-slate-700 text-lg leading-none">×</button>
+        className="absolute right-3 top-3 text-slate-400 hover:text-slate-700 text-lg leading-none dark:text-gray-500 dark:hover:text-gray-300">×</button>
 
       {/* Header */}
       <div className="flex items-start gap-2 pr-6">
         <div>
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="font-bold text-slate-900">{landmine.name}</h3>
-            <span className="text-slate-500 text-sm">({landmine.korean})</span>
+            <h3 className="font-bold text-slate-900 dark:text-gray-100">{landmine.name}</h3>
+            <span className="text-slate-500 text-sm dark:text-gray-400">({landmine.korean})</span>
             <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${RISK_BADGE[landmine.risk_level]}`}>
               {RISK_LABEL[landmine.risk_level]}
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5 italic">{landmine.territory}</p>
+          <p className="text-xs text-slate-500 mt-0.5 italic dark:text-gray-400">{landmine.territory}</p>
         </div>
       </div>
 
       {/* Why critical */}
-      <div className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-700 leading-relaxed">
-        <span className="font-semibold text-slate-800">Why this is a landmine: </span>
+      <div className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-700 leading-relaxed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+        <span className="font-semibold text-slate-800 dark:text-gray-100">Why this is a landmine: </span>
         {landmine.why_critical}
       </div>
 
       {/* Risk factors */}
       {(landmine.risk_factors_present.length > 0 || landmine.risk_factors_missing.length > 0) && (
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1.5">Risk factors</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1.5 dark:text-gray-500">Risk factors</p>
           <div className="space-y-1">
             {landmine.risk_factors_present.map((rf, i) => (
               <div key={i} className="flex items-center gap-2 text-xs">
                 <span className="text-red-500 font-bold">✗</span>
-                <span className="text-red-700 font-medium">{rf}</span>
+                <span className="text-red-700 font-medium dark:text-red-400">{rf}</span>
               </div>
             ))}
             {landmine.risk_factors_missing.slice(0, 4).map((rf, i) => (
               <div key={i} className="flex items-center gap-2 text-xs">
                 <span className="text-emerald-500">✓</span>
-                <span className="text-slate-500">{rf}</span>
+                <span className="text-slate-500 dark:text-gray-400">{rf}</span>
               </div>
             ))}
             {landmine.risk_factors_missing.length > 4 && (
-              <p className="text-xs text-slate-400">+{landmine.risk_factors_missing.length - 4} more not present</p>
+              <p className="text-xs text-slate-400 dark:text-gray-500">+{landmine.risk_factors_missing.length - 4} more not present</p>
             )}
           </div>
         </div>
@@ -1240,10 +1240,10 @@ function LandminePanel({ landmine, onClose }: { landmine: LandmineDisease; onClo
       {/* Early warning signs */}
       {landmine.early_warning_signs.length > 0 && (
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1.5">Early warning signs</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1.5 dark:text-gray-500">Early warning signs</p>
           <div className="flex flex-wrap gap-1">
             {landmine.early_warning_signs.map((sign, i) => (
-              <span key={i} className="rounded-full bg-amber-50 border border-amber-200 px-2 py-0.5 text-xs text-amber-700">
+              <span key={i} className="rounded-full bg-amber-50 border border-amber-200 px-2 py-0.5 text-xs text-amber-700 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300">
                 {sign}
               </span>
             ))}
@@ -1253,9 +1253,9 @@ function LandminePanel({ landmine, onClose }: { landmine: LandmineDisease; onClo
 
       {/* Escape routes */}
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1.5">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1.5 dark:text-gray-500">
           Escape routes {landmine.kg_evidence.length > 0 && (
-            <span className="rounded-full bg-emerald-100 text-emerald-700 px-1.5 py-0.5 text-xs ml-1 normal-case font-normal">
+            <span className="rounded-full bg-emerald-100 text-emerald-700 px-1.5 py-0.5 text-xs ml-1 normal-case font-normal dark:bg-emerald-900/20 dark:text-emerald-400">
               {landmine.kg_evidence.length} KG sources
             </span>
           )}
@@ -1264,9 +1264,9 @@ function LandminePanel({ landmine, onClose }: { landmine: LandmineDisease; onClo
           {landmine.escape_routes.slice(0, 4).map((route, i) => (
             <div key={i} className="flex items-start gap-2 text-xs">
               <span className="text-emerald-500 mt-0.5">→</span>
-              <span className="text-slate-700">{route}</span>
+              <span className="text-slate-700 dark:text-gray-200">{route}</span>
               {landmine.kg_evidence[i] && (
-                <span className="ml-auto rounded px-1 py-0.5 text-xs bg-blue-50 text-blue-600 flex-shrink-0">
+                <span className="ml-auto rounded px-1 py-0.5 text-xs bg-blue-50 text-blue-600 flex-shrink-0 dark:bg-blue-900/20 dark:text-blue-400">
                   {landmine.kg_evidence[i].predicate}
                 </span>
               )}
@@ -1292,32 +1292,32 @@ function NarrativeText({ text }: { text: string }) {
 function InfoPanel({ risk, onClose }: { risk: NearbyRisk; onClose: () => void }) {
   const sev = riskSev(risk);
   return (
-    <div className="relative rounded-xl border-2 bg-white p-4 shadow-lg"
+    <div className="relative rounded-xl border-2 bg-white p-4 shadow-lg dark:bg-gray-800"
       style={{ borderColor: SEV_HEX[sev] }}>
       <button onClick={onClose}
-        className="absolute right-3 top-3 text-slate-400 hover:text-slate-700 text-lg leading-none">×</button>
+        className="absolute right-3 top-3 text-slate-400 hover:text-slate-700 text-lg leading-none dark:text-gray-500 dark:hover:text-gray-300">×</button>
       <div className="flex items-center gap-2 mb-2">
         <span className="h-3 w-3 rounded-full" style={{ backgroundColor: SEV_HEX[sev] }} />
-        <h3 className="font-bold text-slate-900">{risk.name}</h3>
+        <h3 className="font-bold text-slate-900 dark:text-gray-100">{risk.name}</h3>
         <span className="rounded px-1.5 py-0.5 text-xs font-bold text-white"
           style={{ backgroundColor: SEV_HEX[sev] }}>{sev.toUpperCase()}</span>
-        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600 capitalize">{risk.kind}</span>
+        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600 capitalize dark:bg-gray-700 dark:text-gray-300">{risk.kind}</span>
       </div>
-      {risk.reason && <p className="text-sm text-slate-700 mb-3 leading-relaxed">{risk.reason}</p>}
+      {risk.reason && <p className="text-sm text-slate-700 mb-3 leading-relaxed dark:text-gray-200">{risk.reason}</p>}
       {risk.evidence?.length > 0 && (
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1.5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1.5 dark:text-gray-500">
             Evidence ({risk.evidence.length} source{risk.evidence.length !== 1 ? "s" : ""})
           </p>
           <div className="space-y-1.5">
             {risk.evidence.slice(0, 3).map((ev, i) => (
-              <div key={i} className="rounded border border-slate-100 bg-slate-50 px-2.5 py-1.5 text-xs">
+              <div key={i} className="rounded border border-slate-100 bg-slate-50 px-2.5 py-1.5 text-xs dark:border-gray-600 dark:bg-gray-700">
                 <span className={`inline-block rounded px-1 py-0.5 text-xs font-medium mr-1 ${
-                  ev.source_type === "FDA" ? "bg-red-100 text-red-700" : "bg-blue-100 text-blue-700"
+                  ev.source_type === "FDA" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
                 }`}>{ev.source_type || "PMC"}</span>
-                <span className="font-mono text-slate-600">{ev.source_id}</span>
-                {ev.journal && <span className="ml-1 italic text-slate-500">{ev.journal}</span>}
-                {ev.context && <p className="mt-1 text-slate-500">"{ev.context}"</p>}
+                <span className="font-mono text-slate-600 dark:text-gray-300">{ev.source_id}</span>
+                {ev.journal && <span className="ml-1 italic text-slate-500 dark:text-gray-400">{ev.journal}</span>}
+                {ev.context && <p className="mt-1 text-slate-500 dark:text-gray-400">"{ev.context}"</p>}
               </div>
             ))}
           </div>
@@ -1331,13 +1331,13 @@ function ChainPanel({ chain }: { chain: FoodChainResponse }) {
   const beneficial = chain.chain.filter(l =>
     ["PREVENTS","ALLEVIATES","REDUCES_RISK_OF","TREATS"].includes(l.relationship_type));
   return (
-    <div className="rounded-xl border border-violet-200 bg-violet-50 p-4">
+    <div className="rounded-xl border border-violet-200 bg-violet-50 p-4 dark:border-violet-800 dark:bg-violet-900/20">
       <div className="flex items-center gap-2 mb-3">
-        <span className="font-bold text-violet-900 text-base">{chain.food}</span>
-        <span className="text-xs text-slate-500">{chain.chain.length} chain links</span>
+        <span className="font-bold text-violet-900 text-base dark:text-violet-300">{chain.food}</span>
+        <span className="text-xs text-slate-500 dark:text-gray-400">{chain.chain.length} chain links</span>
       </div>
       {chain.chain.length === 0 ? (
-        <p className="text-sm text-slate-500">No chains found in the KG for this food.</p>
+        <p className="text-sm text-slate-500 dark:text-gray-400">No chains found in the KG for this food.</p>
       ) : (
         <div className="space-y-2">
           {beneficial.slice(0, 4).map((l, i) => (
@@ -1443,7 +1443,7 @@ function InterrogationPanel({
   if (questions.length === 0 && insights.length === 0 && inferred.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border border-blue-200 bg-blue-50/60 p-4 shadow-sm space-y-3">
+    <div className="rounded-2xl border border-blue-200 bg-blue-50/60 p-4 shadow-sm space-y-3 dark:border-blue-800 dark:bg-blue-900/20">
       <CompletenessBar score={score} checksRemaining={checksRemaining} />
       <p className="text-xs text-slate-600 leading-relaxed">{delta}</p>
 
@@ -1538,9 +1538,9 @@ function InterrogationPanel({
             Sharpen your assessment ({regularQs.length} question{regularQs.length !== 1 ? "s" : ""})
           </p>
           {regularQs.map((q) => (
-            <div key={q.id} className="rounded-xl border border-slate-200 bg-white p-3 space-y-2">
-              <p className="text-xs font-semibold text-slate-800">{q.question}</p>
-              {q.context && <p className="text-xs text-slate-500 leading-snug">{q.context}</p>}
+            <div key={q.id} className="rounded-xl border border-slate-200 bg-white p-3 space-y-2 dark:border-gray-600 dark:bg-gray-700">
+              <p className="text-xs font-semibold text-slate-800 dark:text-gray-100">{q.question}</p>
+              {q.context && <p className="text-xs text-slate-500 leading-snug dark:text-gray-400">{q.context}</p>}
 
               {q.type === "confirm" && (
                 <div className="flex gap-2">
@@ -1668,10 +1668,10 @@ function PipelineWidget() {
   if (!status) return null;
   const isRunning = status.state === "running";
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs flex items-center justify-between gap-2">
+    <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs flex items-center justify-between gap-2 dark:border-gray-700 dark:bg-gray-800">
       <div className="flex items-center gap-1.5">
-        <span className={`h-2 w-2 rounded-full ${isRunning ? "bg-green-400 animate-pulse" : "bg-slate-300"}`} />
-        <span className="text-slate-500">
+        <span className={`h-2 w-2 rounded-full ${isRunning ? "bg-green-400 animate-pulse" : "bg-slate-300 dark:bg-gray-500"}`} />
+        <span className="text-slate-500 dark:text-gray-400">
           {isRunning
             ? "Fetching new evidence…"
             : status.next_run_in_minutes != null
@@ -1679,7 +1679,7 @@ function PipelineWidget() {
               : "Scheduler ready"}
         </span>
         {status.last_new_papers != null && !isRunning && (
-          <span className="text-slate-400">· +{status.last_new_papers} papers last run</span>
+          <span className="text-slate-400 dark:text-gray-500">· +{status.last_new_papers} papers last run</span>
         )}
       </div>
       <button type="button"
@@ -1689,7 +1689,7 @@ function PipelineWidget() {
           await triggerPipeline().catch(() => {});
           setTimeout(() => { fetchPipelineStatus().then(setStatus).catch(() => {}); setTriggering(false); }, 1000);
         }}
-        className="rounded px-2 py-0.5 text-xs bg-white border border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-600 disabled:opacity-40 transition-colors">
+        className="rounded px-2 py-0.5 text-xs bg-white border border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-600 disabled:opacity-40 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 dark:hover:border-blue-500 dark:hover:text-blue-400">
         {isRunning || triggering ? "Running…" : "Run now"}
       </button>
     </div>
@@ -2022,17 +2022,17 @@ export default function HealthMapPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-950">
       {/* ── Header ───────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
+      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/90">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 flex-wrap gap-2">
           <div>
-            <h1 className="text-lg font-bold text-slate-900">Health Journey Map</h1>
-            <p className="text-xs text-slate-500">Your personal health landscape — navigate toward your best health</p>
+            <h1 className="text-lg font-bold text-slate-900 dark:text-gray-100">Health Journey Map</h1>
+            <p className="text-xs text-slate-500 hidden sm:block dark:text-gray-400">Your personal health landscape — navigate toward your best health</p>
           </div>
           <div className="flex items-center gap-4 text-sm">
-            <Link href="/" className="text-slate-500 hover:text-slate-800">← Home</Link>
-            <Link href="/kg" className="text-slate-500 hover:text-slate-800">KG Status</Link>
+            <Link href="/" className="text-slate-500 hover:text-slate-800 dark:text-gray-400 dark:hover:text-gray-200">← Home</Link>
+            <Link href="/kg" className="text-slate-500 hover:text-slate-800 dark:text-gray-400 dark:hover:text-gray-200">KG Status</Link>
           </div>
         </div>
       </header>
@@ -2045,18 +2045,18 @@ export default function HealthMapPage() {
 
             {/* ── CASE A: Context loaded from home page ──────────────────── */}
             {hasCtx ? (
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4 dark:border-gray-700 dark:bg-gray-800">
                 <div>
                   <div className="flex items-center justify-between">
-                    <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wide">Your Profile</h2>
+                    <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wide dark:text-gray-100">Your Profile</h2>
                     {loading && (
-                      <span className="text-xs text-blue-600 animate-pulse">Locating…</span>
+                      <span className="text-xs text-blue-600 animate-pulse dark:text-blue-400">Locating…</span>
                     )}
                     {hasSubmitted && !loading && (
-                      <span className="text-xs text-emerald-600 font-medium">Map ready</span>
+                      <span className="text-xs text-emerald-600 font-medium dark:text-emerald-400">Map ready</span>
                     )}
                   </div>
-                  <p className="mt-0.5 text-xs text-slate-500">
+                  <p className="mt-0.5 text-xs text-slate-500 dark:text-gray-400">
                     Using info from your home profile.
                   </p>
                 </div>
@@ -2072,7 +2072,7 @@ export default function HealthMapPage() {
                 <button
                   type="button"
                   onClick={() => setShowRefine(v => !v)}
-                  className="w-full rounded-lg border border-dashed border-slate-300 py-2 text-xs text-slate-500 hover:border-blue-400 hover:text-blue-600 transition-colors"
+                  className="w-full rounded-lg border border-dashed border-slate-300 py-2 text-xs text-slate-500 hover:border-blue-400 hover:text-blue-600 transition-colors dark:border-gray-600 dark:text-gray-400 dark:hover:border-blue-500 dark:hover:text-blue-400"
                 >
                   {showRefine ? "▲ Hide" : "▾ Tell me more — medications, goals, lifestyle…"}
                 </button>
@@ -2080,13 +2080,13 @@ export default function HealthMapPage() {
                 {/* Conversational refinement input */}
                 {showRefine && (
                   <div className="space-y-2">
-                    <p className="text-xs text-slate-600 leading-relaxed">{refinePrompt}</p>
+                    <p className="text-xs text-slate-600 leading-relaxed dark:text-gray-300">{refinePrompt}</p>
                     <textarea
                       value={refineText}
                       onChange={e => setRefineText(e.target.value)}
                       placeholder="e.g. I also take Metformin and try to walk 30 min a day. My goal is to sleep better."
                       rows={3}
-                      className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm placeholder:text-slate-400 focus:border-blue-400 focus:outline-none resize-none"
+                      className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm placeholder:text-slate-400 focus:border-blue-400 focus:outline-none resize-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                     />
                     {refineError && <p className="text-xs text-red-600">{refineError}</p>}
                     <button
@@ -2104,10 +2104,10 @@ export default function HealthMapPage() {
               </div>
             ) : (
               /* ── CASE B: New user — chat-style intro ───────────────────── */
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4 dark:border-gray-700 dark:bg-gray-800">
                 <div>
-                  <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wide">Tell Me About Yourself</h2>
-                  <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+                  <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wide dark:text-gray-100">Tell Me About Yourself</h2>
+                  <p className="mt-1 text-xs text-slate-500 leading-relaxed dark:text-gray-400">
                     Just type naturally — age, health conditions, symptoms, medications, goals. No need for a form.
                   </p>
                 </div>
@@ -2116,9 +2116,9 @@ export default function HealthMapPage() {
                   onChange={e => setIntroText(e.target.value)}
                   placeholder={`e.g. "I'm 48, female, have Type 2 diabetes and high blood pressure. I've been feeling tired lately and want to eat better."`}
                   rows={5}
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm placeholder:text-slate-400 focus:border-blue-400 focus:outline-none resize-none"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm placeholder:text-slate-400 focus:border-blue-400 focus:outline-none resize-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                 />
-                {introError && <p className="text-xs text-red-600">{introError}</p>}
+                {introError && <p className="text-xs text-red-600 dark:text-red-400">{introError}</p>}
                 <button
                   type="button"
                   onClick={handleIntroSubmit}
@@ -2127,7 +2127,7 @@ export default function HealthMapPage() {
                 >
                   {introLoading ? "Finding your position…" : "Show me my health map →"}
                 </button>
-                <p className="text-xs text-center text-slate-400">
+                <p className="text-xs text-center text-slate-400 dark:text-gray-500">
                   Or go to <Link href="/" className="text-blue-500 hover:underline">Home</Link> for a full guided experience.
                 </p>
               </div>
@@ -2135,13 +2135,13 @@ export default function HealthMapPage() {
 
             {/* ── Zone indicator ─────────────────────────────────────────── */}
             {(hasCtx || hasSubmitted) && (
-              <div className="rounded-2xl border-2 bg-white p-4 shadow-sm"
+              <div className="rounded-2xl border-2 bg-white p-4 shadow-sm dark:bg-gray-800"
                 style={{ borderColor: zone.hex }}>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="h-3 w-3 rounded-full" style={{ backgroundColor: zone.hex }} />
                   <span className="text-sm font-bold" style={{ color: zone.hex }}>{zone.name}</span>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-600 leading-relaxed dark:text-gray-300">
                   <NarrativeText text={narrative} />
                 </p>
               </div>
@@ -2194,8 +2194,8 @@ export default function HealthMapPage() {
 
             {/* ── Safest path directions ──────────────────────────────────── */}
             {steps.length > 0 && (
-              <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm">
-                <h3 className="text-xs font-bold uppercase tracking-wide text-emerald-700 mb-3">
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm dark:border-emerald-800 dark:bg-emerald-900/20">
+                <h3 className="text-xs font-bold uppercase tracking-wide text-emerald-700 mb-3 dark:text-emerald-400">
                   Route Directions ({steps.length} steps)
                 </h3>
                 <ol className="space-y-2">
@@ -2206,12 +2206,12 @@ export default function HealthMapPage() {
                         {i + 1}
                       </span>
                       <div>
-                        <p className="text-xs font-semibold text-slate-800">{step.action}</p>
+                        <p className="text-xs font-semibold text-slate-800 dark:text-gray-100">{step.action}</p>
                         {step.reason && (
-                          <p className="text-xs text-slate-500 leading-snug mt-0.5">{step.reason}</p>
+                          <p className="text-xs text-slate-500 leading-snug mt-0.5 dark:text-gray-400">{step.reason}</p>
                         )}
                         {step.evidence?.length > 0 && (
-                          <p className="text-xs text-emerald-600 mt-0.5">
+                          <p className="text-xs text-emerald-600 mt-0.5 dark:text-emerald-400">
                             {step.evidence.length} source{step.evidence.length !== 1 ? "s" : ""}
                           </p>
                         )}
@@ -2223,16 +2223,16 @@ export default function HealthMapPage() {
             )}
 
             {/* ── Food-chain explorer ─────────────────────────────────────── */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-              <h3 className="text-xs font-bold uppercase tracking-wide text-slate-600 mb-3">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+              <h3 className="text-xs font-bold uppercase tracking-wide text-slate-600 mb-3 dark:text-gray-400">
                 Food → Nutrient → Effect
               </h3>
               <form onSubmit={handleFoodChain} className="flex gap-2 mb-3">
                 <input type="text" value={foodInput} onChange={e => setFoodInput(e.target.value)}
                   placeholder="e.g. Salmon, Spinach"
-                  className="flex-1 rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm focus:border-violet-400 focus:outline-none" />
+                  className="flex-1 min-w-0 rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm focus:border-violet-400 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500" />
                 <button type="submit" disabled={chainLoading || !foodInput.trim()}
-                  className="rounded-lg bg-violet-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-violet-700 disabled:opacity-50">
+                  className="rounded-lg bg-violet-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-violet-700 disabled:opacity-50 flex-shrink-0">
                   {chainLoading ? "…" : "Trace"}
                 </button>
               </form>
@@ -2258,15 +2258,15 @@ export default function HealthMapPage() {
 
           {/* ── RIGHT: Map ───────────────────────────────────────────────── */}
           <div className="flex-1 min-w-0 space-y-4">
-            <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-              <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2.5 bg-slate-50">
-                <div className="flex items-center gap-3 text-xs text-slate-500">
+            <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden dark:border-gray-700 dark:bg-gray-800">
+              <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2.5 bg-slate-50 flex-wrap gap-1.5 dark:border-gray-700 dark:bg-gray-700">
+                <div className="flex items-center gap-3 text-xs text-slate-500 flex-wrap dark:text-gray-400">
                   <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-green-500" /> Thriving</span>
                   <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-amber-400" /> Navigation</span>
                   <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-orange-400" /> Risk</span>
                   <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-red-500" /> Critical</span>
                 </div>
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-slate-400 dark:text-gray-500">
                   {hasSubmitted ? "KG-enhanced position" : hasCtx ? "Loading position…" : "Enter your profile to navigate"}
                 </span>
               </div>
@@ -2338,8 +2338,8 @@ export default function HealthMapPage() {
 
             {/* ── Risk grid ────────────────────────────────────────────── */}
             {risks.length > 0 && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                <h3 className="text-xs font-bold uppercase tracking-wide text-slate-500 mb-3">
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                <h3 className="text-xs font-bold uppercase tracking-wide text-slate-500 mb-3 dark:text-gray-400">
                   Risk Zones Near You ({risks.length})
                 </h3>
                 <div className="grid gap-2 sm:grid-cols-2">
@@ -2349,19 +2349,19 @@ export default function HealthMapPage() {
                     return (
                       <button key={i} type="button"
                         onClick={() => setSelectedRisk(isSelected ? null : risk)}
-                        className={`text-left rounded-xl border-l-4 border border-slate-100 p-3 transition-all hover:shadow-md ${isSelected ? "ring-2 ring-offset-1" : ""}`}
+                        className={`text-left rounded-xl border-l-4 border border-slate-100 p-3 transition-all hover:shadow-md dark:border-gray-700 ${isSelected ? "ring-2 ring-offset-1 dark:ring-offset-gray-800" : ""}`}
                         style={{ borderLeftColor: SEV_HEX[sev], outlineColor: isSelected ? SEV_HEX[sev] : undefined }}>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs font-bold text-slate-800 truncate pr-2">{risk.name}</span>
+                          <span className="text-xs font-bold text-slate-800 truncate pr-2 dark:text-gray-100">{risk.name}</span>
                           <span className="text-xs font-bold rounded px-1.5 py-0.5 flex-shrink-0"
                             style={{ backgroundColor: SEV_GLOW[sev], color: SEV_HEX[sev] }}>
                             {sev.toUpperCase()}
                           </span>
                         </div>
-                        {risk.reason && <p className="text-xs text-slate-500 leading-snug line-clamp-2">{risk.reason}</p>}
+                        {risk.reason && <p className="text-xs text-slate-500 leading-snug line-clamp-2 dark:text-gray-400">{risk.reason}</p>}
                         <div className="mt-1.5 flex items-center gap-2">
-                          <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-xs text-slate-500 capitalize">{risk.kind}</span>
-                          <span className="text-xs text-slate-400">{risk.evidence?.length ?? 0} source{risk.evidence?.length !== 1 ? "s" : ""}</span>
+                          <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-xs text-slate-500 capitalize dark:bg-gray-700 dark:text-gray-400">{risk.kind}</span>
+                          <span className="text-xs text-slate-400 dark:text-gray-500">{risk.evidence?.length ?? 0} source{risk.evidence?.length !== 1 ? "s" : ""}</span>
                         </div>
                       </button>
                     );
@@ -2372,10 +2372,10 @@ export default function HealthMapPage() {
 
             {/* ── Landmine grid ─────────────────────────────────────────── */}
             {landmineData && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                <h3 className="text-xs font-bold uppercase tracking-wide text-slate-500 mb-3 flex items-center gap-2">
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                <h3 className="text-xs font-bold uppercase tracking-wide text-slate-500 mb-3 flex items-center gap-2 dark:text-gray-400">
                   Landmine Diseases — Navigate Around These
-                  <span className="rounded-full bg-red-100 text-red-700 px-2 py-0.5 text-xs font-bold normal-case">
+                  <span className="rounded-full bg-red-100 text-red-700 px-2 py-0.5 text-xs font-bold normal-case dark:bg-red-900/20 dark:text-red-400">
                     {landmineData.landmines.filter(l => l.risk_level !== "none").length} on your radar
                   </span>
                 </h3>
@@ -2386,18 +2386,18 @@ export default function HealthMapPage() {
                     return (
                       <button key={lm.name} type="button"
                         onClick={() => setSelectedLandmine(isSelected ? null : lm)}
-                        className={`text-left rounded-xl border-l-4 border border-slate-100 p-3 transition-all hover:shadow-md ${isSelected ? "ring-2 ring-offset-1" : ""}`}
+                        className={`text-left rounded-xl border-l-4 border border-slate-100 p-3 transition-all hover:shadow-md dark:border-gray-700 ${isSelected ? "ring-2 ring-offset-1 dark:ring-offset-gray-800" : ""}`}
                         style={{ borderLeftColor: bc, outlineColor: isSelected ? bc : undefined,
                                  opacity: lm.risk_level === "none" ? 0.5 : 1 }}>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs font-bold text-slate-800 truncate pr-1">{lm.name}</span>
+                          <span className="text-xs font-bold text-slate-800 truncate pr-1 dark:text-gray-100">{lm.name}</span>
                           <span className={`text-xs font-bold rounded px-1.5 py-0.5 flex-shrink-0 ${RISK_BADGE[lm.risk_level]}`}>
                             {lm.risk_level.toUpperCase()}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-500">{lm.korean}</p>
+                        <p className="text-xs text-slate-500 dark:text-gray-400">{lm.korean}</p>
                         {lm.risk_factors_present.length > 0 && (
-                          <p className="text-xs text-red-600 mt-1">
+                          <p className="text-xs text-red-600 mt-1 dark:text-red-400">
                             {lm.risk_factors_present.length} risk factor{lm.risk_factors_present.length !== 1 ? "s" : ""} present
                           </p>
                         )}
@@ -2410,17 +2410,17 @@ export default function HealthMapPage() {
 
             {/* ── Early signals ─────────────────────────────────────────── */}
             {earlySignals.length > 0 && (
-              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm">
-                <h3 className="text-xs font-bold uppercase tracking-wide text-amber-700 mb-3">
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm dark:border-amber-800 dark:bg-amber-900/20">
+                <h3 className="text-xs font-bold uppercase tracking-wide text-amber-700 mb-3 dark:text-amber-400">
                   Early Signals — Watch These Indicators
                 </h3>
                 <div className="grid gap-2 sm:grid-cols-2">
                   {earlySignals.map((sig, i) => (
                     <div key={i} className="flex items-center gap-2 text-sm">
                       <span className="text-amber-500">⚑</span>
-                      <span className="font-medium text-slate-800">{sig.symptom}</span>
-                      <span className="text-slate-400">→</span>
-                      <span className="text-amber-800">{sig.disease}</span>
+                      <span className="font-medium text-slate-800 dark:text-gray-100">{sig.symptom}</span>
+                      <span className="text-slate-400 dark:text-gray-500">→</span>
+                      <span className="text-amber-800 dark:text-amber-400">{sig.disease}</span>
                     </div>
                   ))}
                 </div>
@@ -2429,11 +2429,11 @@ export default function HealthMapPage() {
 
             {/* ── Empty state ───────────────────────────────────────────── */}
             {!hasSubmitted && !loading && (
-              <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 p-5 text-center">
-                <p className="text-sm text-slate-500">
+              <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 p-5 text-center dark:border-gray-600 dark:bg-gray-800/50">
+                <p className="text-sm text-slate-500 dark:text-gray-400">
                   {hasCtx
                     ? "Loading your position from profile…"
-                    : <>Fill in your profile on the left, or go to <Link href="/" className="text-blue-600 hover:underline">Home</Link> for the full guided experience.</>
+                    : <>Fill in your profile on the left, or go to <Link href="/" className="text-blue-600 hover:underline dark:text-blue-400">Home</Link> for the full guided experience.</>
                   }
                 </p>
               </div>

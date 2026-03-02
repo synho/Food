@@ -31,8 +31,8 @@ export function BiomarkerTab() {
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-slate-800 mb-1">{t("clinical.biomarker.heading")}</h3>
-      <p className="text-sm text-slate-500 mb-4">{t("clinical.biomarker.desc")}</p>
+      <h3 className="text-lg font-semibold text-slate-800 mb-1 dark:text-gray-100">{t("clinical.biomarker.heading")}</h3>
+      <p className="text-sm text-slate-500 mb-4 dark:text-gray-400">{t("clinical.biomarker.desc")}</p>
 
       <div className="flex gap-2 mb-6">
         <div className="flex-1">
@@ -54,7 +54,7 @@ export function BiomarkerTab() {
       </div>
 
       {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</div>
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">{error}</div>
       )}
 
       {data && (
@@ -64,12 +64,12 @@ export function BiomarkerTab() {
           ) : (
             <div className="space-y-4">
               {data.biomarkers.map((bm, i) => (
-                <div key={i} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div key={i} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="inline-block h-3 w-3 rounded-full bg-teal-500 flex-shrink-0" />
-                    <h4 className="font-semibold text-slate-800">{bm.biomarker}</h4>
-                    <span className="text-xs text-slate-400">for</span>
-                    <span className="text-sm font-medium text-red-700">{bm.disease}</span>
+                    <h4 className="font-semibold text-slate-800 dark:text-gray-100">{bm.biomarker}</h4>
+                    <span className="text-xs text-slate-400 dark:text-gray-500">for</span>
+                    <span className="text-sm font-medium text-red-700 dark:text-red-400">{bm.disease}</span>
                   </div>
 
                   <EvidenceBlock
@@ -85,7 +85,7 @@ export function BiomarkerTab() {
 
                   {bm.food_recommendations.length > 0 && (
                     <div className="mt-3">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2 dark:text-gray-400">
                         {t("clinical.biomarker.foodRecs")}
                       </p>
                       <div className="space-y-1.5">
@@ -95,11 +95,11 @@ export function BiomarkerTab() {
                               {fr.direction === "increases" ? "↑" : "↓"}
                             </span>
                             <div>
-                              <span className="font-medium text-slate-800">{fr.food}</span>
-                              <span className="text-slate-500 ml-1">
+                              <span className="font-medium text-slate-800 dark:text-gray-100">{fr.food}</span>
+                              <span className="text-slate-500 ml-1 dark:text-gray-400">
                                 ({t(`clinical.biomarker.${fr.direction}`)})
                               </span>
-                              <p className="text-xs text-slate-500">{fr.context}</p>
+                              <p className="text-xs text-slate-500 dark:text-gray-400">{fr.context}</p>
                             </div>
                           </div>
                         ))}

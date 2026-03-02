@@ -230,7 +230,7 @@ export default function Home() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 no-print">
         <h1 className="text-xl font-bold text-gray-900 dark:text-gray-50 sm:text-2xl">{t("home.title")}</h1>
         <div className="flex shrink-0 items-center gap-2">
           <button
@@ -247,10 +247,10 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <p className="mb-8 text-gray-600 leading-relaxed">{t("home.intro")}</p>
+      <p className="mb-8 text-gray-600 leading-relaxed no-print">{t("home.intro")}</p>
 
       {!showShortForm && extractedContext == null && (
-        <div className="mb-8">
+        <div className="mb-8 no-print">
           <SelfIntroBlock
             onContinue={handleContinueIntro}
             loading={extractLoading}
@@ -267,7 +267,7 @@ export default function Home() {
       )}
 
       {!showShortForm && extractedContext != null && (
-        <div className="mb-8">
+        <div className="mb-8 no-print">
           <EditableContextSummary
             context={extractedContext}
             onChange={setExtractedContext}
@@ -295,7 +295,7 @@ export default function Home() {
       )}
 
       {showShortForm && (
-        <div className="mb-8">
+        <div className="mb-8 no-print">
           <UserContextForm onSubmit={handleSubmit} loading={loading} initialContext={restoredContext} />
           <p className="mt-3 text-center text-sm text-gray-500">
             <button type="button" onClick={() => setShowShortForm(false)} className="text-blue-600 hover:underline">
@@ -305,7 +305,7 @@ export default function Home() {
         </div>
       )}
 
-      <section className="mb-8 rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800/60">
+      <section className="mb-8 rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800/60 no-print">
         <h2 className="mb-2 text-base font-semibold text-slate-800">{t("privacy.title")}</h2>
         <p className="mb-3 text-sm text-slate-600 leading-relaxed">{t("privacy.desc")}</p>
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end sm:gap-3">
@@ -377,8 +377,18 @@ export default function Home() {
       </section>
 
       {(loading || Object.values(results).some(Boolean)) && (
-        <div className="mb-4">
+        <div className="mb-4 flex items-center justify-between gap-3 flex-wrap">
           <EvidenceLegend />
+          {Object.values(results).some(Boolean) && !loading && (
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="no-print rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+              title="Save as PDF or print"
+            >
+              Print / Save PDF
+            </button>
+          )}
         </div>
       )}
 

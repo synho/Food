@@ -7,3 +7,28 @@
   --badge-knowledge: #22c55e;
   --badge-wisdom: #eab308;
 }
+
+@media print {
+  /* Hide chrome — nav, forms, controls */
+  header,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Show only results */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Prevent cards from splitting across pages */
+  .print-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Remove shadows and heavy borders for cleaner print */
+  * {
+    box-shadow: none !important;
+  }
+}
