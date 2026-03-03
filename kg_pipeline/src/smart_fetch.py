@@ -181,6 +181,105 @@ TOPIC_CLUSTERS: dict[str, dict] = {
                      "breast cancer diet", "phytochemicals cancer"],
         "mesh": ["Neoplasms", "Colorectal Neoplasms", "Diet"],
     },
+    # ── Cancer disease-family clusters ──────────────────────────────────────
+    "cancer_breast_gynecologic": {
+        "entities": ["Breast cancer", "Ovarian cancer", "Cervical cancer", "Endometrial cancer"],
+        "keywords": ["breast cancer diet", "ovarian cancer nutrition", "phytoestrogen cancer",
+                     "soy breast cancer", "cruciferous vegetables cancer", "estrogen diet cancer",
+                     "cervical cancer nutrition", "gynecologic cancer prevention diet"],
+        "mesh": ["Breast Neoplasms", "Ovarian Neoplasms", "Uterine Cervical Neoplasms",
+                 "Phytoestrogens", "Diet"],
+    },
+    "cancer_gi_tract": {
+        "entities": ["Colorectal cancer", "Gastric cancer", "Esophageal cancer"],
+        "keywords": ["colorectal cancer diet", "fiber colon cancer", "red meat colorectal cancer",
+                     "gastric cancer nutrition", "esophageal cancer diet", "microbiome colorectal",
+                     "colorectal cancer prevention food", "processed meat cancer risk"],
+        "mesh": ["Colorectal Neoplasms", "Stomach Neoplasms", "Esophageal Neoplasms",
+                 "Dietary Fiber", "Diet"],
+    },
+    "cancer_lung_urologic": {
+        "entities": ["Lung cancer", "Prostate cancer", "Bladder cancer", "Kidney cancer"],
+        "keywords": ["lung cancer diet", "prostate cancer nutrition", "lycopene prostate",
+                     "selenium cancer", "antioxidant cancer prevention", "bladder cancer diet",
+                     "renal cell carcinoma nutrition", "smoking diet lung cancer"],
+        "mesh": ["Lung Neoplasms", "Prostatic Neoplasms", "Urinary Bladder Neoplasms",
+                 "Antioxidants", "Diet"],
+    },
+    # ── Autoimmune & inflammatory ───────────────────────────────────────────
+    "autoimmune_systemic": {
+        "entities": ["Rheumatoid arthritis", "Systemic lupus erythematosus", "Multiple sclerosis",
+                     "Type 1 diabetes", "Psoriasis"],
+        "keywords": ["autoimmune disease diet", "rheumatoid arthritis nutrition", "lupus diet",
+                     "multiple sclerosis nutrition", "anti-inflammatory autoimmune",
+                     "vitamin D autoimmune", "elimination diet autoimmune", "psoriasis diet"],
+        "mesh": ["Autoimmune Diseases", "Arthritis, Rheumatoid", "Lupus Erythematosus, Systemic",
+                 "Multiple Sclerosis", "Diet"],
+    },
+    "autoimmune_gi": {
+        "entities": ["Crohn's disease", "Ulcerative colitis", "Celiac disease"],
+        "keywords": ["crohn disease diet", "ulcerative colitis nutrition", "celiac disease diet",
+                     "IBD nutrition", "inflammatory bowel disease food", "gluten-free diet celiac",
+                     "FODMAP IBD", "exclusive enteral nutrition crohn"],
+        "mesh": ["Crohn Disease", "Colitis, Ulcerative", "Celiac Disease",
+                 "Inflammatory Bowel Diseases", "Diet, Gluten-Free"],
+    },
+    # ── GI / Digestive ──────────────────────────────────────────────────────
+    "gi_functional": {
+        "entities": ["Irritable bowel syndrome", "Gastroesophageal reflux disease",
+                     "Peptic ulcer", "Functional dyspepsia"],
+        "keywords": ["IBS diet", "FODMAP", "GERD diet", "acid reflux food",
+                     "peptic ulcer nutrition", "functional dyspepsia diet", "low FODMAP",
+                     "trigger foods GI", "probiotics IBS"],
+        "mesh": ["Irritable Bowel Syndrome", "Gastroesophageal Reflux", "Peptic Ulcer",
+                 "Diet, Food, and Nutrition"],
+    },
+    # ── Mental health (beyond depression) ───────────────────────────────────
+    "mental_health_expanded": {
+        "entities": ["Anxiety disorder", "Bipolar disorder", "PTSD",
+                     "Schizophrenia", "Eating disorder"],
+        "keywords": ["anxiety diet", "bipolar disorder nutrition", "PTSD diet",
+                     "schizophrenia nutrition", "eating disorder nutrition",
+                     "gut brain axis anxiety", "omega-3 mental health", "B vitamins psychiatric",
+                     "magnesium anxiety", "ketogenic diet psychiatric"],
+        "mesh": ["Anxiety Disorders", "Bipolar Disorder", "Stress Disorders, Post-Traumatic",
+                 "Schizophrenia", "Feeding and Eating Disorders", "Diet"],
+    },
+    # ── Respiratory ─────────────────────────────────────────────────────────
+    "respiratory": {
+        "entities": ["COPD", "Asthma", "Pulmonary fibrosis"],
+        "keywords": ["COPD nutrition", "asthma diet", "antioxidant lung",
+                     "vitamin D respiratory", "omega-3 asthma", "pulmonary fibrosis diet",
+                     "Mediterranean diet lung", "dietary pattern asthma"],
+        "mesh": ["Pulmonary Disease, Chronic Obstructive", "Asthma",
+                 "Pulmonary Fibrosis", "Diet"],
+    },
+    # ── Musculoskeletal ─────────────────────────────────────────────────────
+    "musculoskeletal": {
+        "entities": ["Osteoarthritis", "Gout", "Rheumatoid arthritis", "Back pain"],
+        "keywords": ["osteoarthritis diet", "gout diet", "purine food gout",
+                     "anti-inflammatory joint", "collagen nutrition", "omega-3 arthritis",
+                     "glucosamine food", "uric acid diet"],
+        "mesh": ["Osteoarthritis", "Gout", "Arthritis, Rheumatoid", "Diet"],
+    },
+    # ── Eye diseases ────────────────────────────────────────────────────────
+    "eye_disease": {
+        "entities": ["Macular degeneration", "Glaucoma", "Diabetic retinopathy", "Cataracts"],
+        "keywords": ["macular degeneration diet", "lutein zeaxanthin eye", "glaucoma nutrition",
+                     "diabetic retinopathy diet", "cataract prevention food",
+                     "AREDS nutrients", "omega-3 eye health", "antioxidant vision"],
+        "mesh": ["Macular Degeneration", "Glaucoma", "Diabetic Retinopathy",
+                 "Cataract", "Lutein", "Diet"],
+    },
+    # ── Common chronic conditions ───────────────────────────────────────────
+    "common_chronic": {
+        "entities": ["Anemia", "Migraine", "Hypothyroidism", "Hyperthyroidism", "Insomnia"],
+        "keywords": ["iron deficiency anemia diet", "migraine trigger food", "thyroid diet",
+                     "iodine thyroid", "insomnia nutrition", "tryptophan sleep",
+                     "magnesium migraine", "B12 anemia", "selenium thyroid"],
+        "mesh": ["Anemia, Iron-Deficiency", "Migraine Disorders", "Thyroid Diseases",
+                 "Sleep Initiation and Maintenance Disorders", "Diet"],
+    },
     # Always-active clusters (no KG entities to check — always run)
     "inflammation": {
         "entities": [],

@@ -29,6 +29,27 @@ fetch:
                    "inflammaging", "autophagy", "mTOR", "NAD+",
                    "caloric restriction", "intermittent fasting"]
 
+  # Drug-nutrient and food-drug interaction keywords (targets CONTRAINDICATED_WITH, COMPLEMENTS_DRUG gaps)
+  drug_interaction_keywords:
+    - "drug nutrient interaction"
+    - "food drug interaction"
+    - "drug herb interaction"
+    - "nutraceutical interaction"
+    - "nutrient drug interaction"
+    - "warfarin vitamin K"
+    - "metformin vitamin B12"
+    - "statin coenzyme Q10"
+
+  # Life-stage specific nutrition keywords (targets LifeStage node gap)
+  lifestage_keywords:
+    - "geriatric nutrition"
+    - "pediatric nutrition"
+    - "pregnancy nutrition"
+    - "adolescent nutrition"
+    - "menopause diet"
+    - "infant nutrition"
+    - "elderly dietary"
+
   # High-impact open access medical journals (PubMed journal names)
   journals:
     - "Nat Med"           # Nature Medicine
@@ -102,6 +123,50 @@ fetch:
     # Sleep / Circadian
     - "Sleep"                          # Sleep & nutrition interactions
     - "J Sleep Res"                    # Sleep research & diet
+    # Drug-nutrient interactions (targeting CONTRAINDICATED_WITH / COMPLEMENTS_DRUG gaps)
+    - "J Clin Pharmacol"               # Journal of Clinical Pharmacology
+    - "Eur J Clin Pharmacol"           # European Journal of Clinical Pharmacology
+    - "Drug Metab Dispos"              # Drug Metabolism and Disposition
+    - "Br J Clin Pharmacol"            # British Journal of Clinical Pharmacology
+    # Life stage / geriatric / pediatric (targeting LifeStage node gap)
+    - "J Am Geriatr Soc"               # Journal of the American Geriatrics Society
+    - "Maturitas"                      # Menopause & midlife women's health
+    - "J Pediatr Gastroenterol Nutr"   # Pediatric nutrition
+    - "Menopause"                      # Menopause & nutritional interventions
+    # Clinical trials / biomarkers (targeting ClinicalTrial node gap)
+    - "Trials"                         # BioMed Central Trials — RCT protocols & results
+    - "Clin Chem"                      # Clinical Chemistry — biomarker assays & nutrition
+    - "Biomarkers"                     # Biomarkers — nutrition-biomarker studies
+    # Mechanism / biochemical pathways (targeting BiochemicalPathway gap)
+    - "Mol Nutr Food Res"              # Molecular Nutrition and Food Research
+    - "Free Radic Biol Med"            # Free Radical Biology and Medicine — oxidative stress
+    # Microbiome expansion
+    - "Gut Microbes"                   # Gut Microbes — microbiome-diet interactions
+    # Oncology / Cancer
+    - "J Clin Oncol"                   # Journal of Clinical Oncology — top cancer journal
+    - "CA Cancer J Clin"               # CA: Cancer Journal for Clinicians — highest impact
+    - "Cancer Res"                     # Cancer Research — mechanisms
+    - "Br J Cancer"                    # British Journal of Cancer — broad oncology
+    - "Int J Cancer"                   # International Journal of Cancer — epidemiology
+    - "Cancer Epidemiol Biomarkers Prev"  # Cancer epidemiology & biomarkers
+    # Autoimmune / Rheumatology
+    - "Ann Rheum Dis"                  # Annals of Rheumatic Diseases — top rheumatology
+    - "Arthritis Rheumatol"            # Arthritis & Rheumatology
+    - "J Autoimmun"                    # Journal of Autoimmunity
+    - "Mult Scler"                     # Multiple Sclerosis journal
+    # GI / Digestive
+    - "Am J Gastroenterol"             # American Journal of Gastroenterology
+    - "J Crohns Colitis"              # Journal of Crohn's & Colitis
+    # Mental Health
+    - "Br J Psychiatry"               # British Journal of Psychiatry
+    - "Biol Psychiatry"               # Biological Psychiatry
+    # Respiratory
+    - "Am J Respir Crit Care Med"     # Top respiratory journal
+    - "Chest"                          # Chest — pulmonary medicine
+    - "Thorax"                         # Thorax — respiratory research
+    # Eye
+    - "Ophthalmology"                  # Top ophthalmology journal
+    - "Br J Ophthalmol"               # British Journal of Ophthalmology
 
 paths:
   raw_papers: "data/raw_papers"
@@ -119,7 +184,7 @@ paths:
 #   model: "bedrock/anthropic.claude-3-haiku-20240307-v1:0"  # $0.25/$1.25 per 1M — highest accuracy
 #   bedrock_region: "us-east-1"              # optional; default us-east-1
 extract:
-  model: "bedrock/amazon.nova-micro-v1:0"   # AWS Bedrock Nova Micro — no quota limits, 1s delay between papers
+  model: "bedrock/amazon.nova-lite-v1:0"    # AWS Bedrock Nova Lite — better predicate precision; reduces RELATES_TO fallback rate
 
 smart_fetch:
   nutrition_journals:
@@ -189,6 +254,30 @@ smart_fetch:
     - "Public Health Nutr"
     - "Int J Food Sci Nutr"
     - "Food Funct"
+    # Oncology / Cancer
+    - "J Clin Oncol"
+    - "CA Cancer J Clin"
+    - "Cancer Res"
+    - "Br J Cancer"
+    - "Int J Cancer"
+    # Autoimmune / Rheumatology
+    - "Ann Rheum Dis"
+    - "Arthritis Rheumatol"
+    - "J Autoimmun"
+    - "Mult Scler"
+    # GI / Digestive
+    - "Am J Gastroenterol"
+    - "J Crohns Colitis"
+    # Mental Health
+    - "Br J Psychiatry"
+    - "Biol Psychiatry"
+    # Respiratory
+    - "Am J Respir Crit Care Med"
+    - "Chest"
+    - "Thorax"
+    # Eye
+    - "Ophthalmology"
+    - "Br J Ophthalmol"
 
   # ── Medical KG clusters (biomarkers, mechanisms, trials, drug interactions) ──
   medical_clusters:

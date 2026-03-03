@@ -140,18 +140,44 @@ def main():
 
     query = build_search_query(journals, days_back=days_back, topic_keywords=topic_keywords, humans_only=humans_only)
     pmcids = search_pmc(query, max_results=max_results)
-    # Optional second query for aging/biology: merge PMCIDs (dedupe, preserve order)
-    aging_keywords = cfg.get("aging_keywords") or []
-    if aging_keywords:
-        query_aging = build_search_query(journals, days_back=days_back, topic_keywords=aging_keywords, humans_only=humans_only)
-        pmcids_aging = search_pmc(query_aging, max_results=max_results)
-        seen = set(pmcids)
-        for pid in pmcids_aging:
+
+    # Track which source query discovered each PMCID (for manifest provenance)
+    pmcid_sources: dict[str, list[str]] = {}  # pmcid → [source_labels]
+    pmcids_by_source: dict[str, list[str]] = {"main": list(pmcids)}
+    seen: set[str] = set(pmcids)
+    for pid in pmcids:
+        pmcid_sources.setdefault(pid, []).append("main")
+
+    def _merge_query_results(label: str, keywords: list[str]) -> None:
+        """Run a secondary PubMed query, merge+dedupe PMCIDs, track provenance."""
+        q = build_search_query(journals, days_back=days_back, topic_keywords=keywords, humans_only=humans_only)
+        results = search_pmc(q, max_results=max_results)
+        new_count = 0
+        pmcids_by_source[label] = []
+        for pid in results:
+            pmcid_sources.setdefault(pid, []).append(label)
+            pmcids_by_source[label].append(pid)
             if pid not in seen:
                 seen.add(pid)
                 pmcids.append(pid)
-        if pmcids_aging:
-            print(f"Merged {len(pmcids_aging)} from aging query; total {len(pmcids)} unique.")
+                new_count += 1
+        if results:
+            print(f"Merged {len(results)} from {label} query ({new_count} new); total {len(pmcids)} unique.")
+
+    # Optional second query for aging/biology
+    aging_keywords = cfg.get("aging_keywords") or []
+    if aging_keywords:
+        _merge_query_results("aging", aging_keywords)
+
+    # Drug-interaction keywords (targets CONTRAINDICATED_WITH / COMPLEMENTS_DRUG gaps)
+    drug_interaction_keywords = cfg.get("drug_interaction_keywords") or []
+    if drug_interaction_keywords:
+        _merge_query_results("drug_interaction", drug_interaction_keywords)
+
+    # Life-stage keywords (targets LifeStage node gap)
+    lifestage_keywords = cfg.get("lifestage_keywords") or []
+    if lifestage_keywords:
+        _merge_query_results("lifestage", lifestage_keywords)
 
     skip_existing = cfg.get("skip_existing", True)
     if skip_existing and os.path.isdir(raw_dir):
@@ -168,7 +194,7 @@ def main():
         elif existing and not to_fetch:
             print("All found articles already downloaded. Nothing to fetch.")
             run_id = get_run_id()
-            write_manifest(AGENT_FETCH, run_id, {"pmcids_fetched": [], "file_paths": [], "raw_papers_dir": raw_dir, "config_fetch": cfg})
+            write_manifest(AGENT_FETCH, run_id, {"pmcids_fetched": [], "file_paths": [], "raw_papers_dir": raw_dir, "config_fetch": cfg, "pmcids_by_source": {}})
             return
         pmcids = to_fetch
 
@@ -181,6 +207,8 @@ def main():
         print(f"Fetching PMC{pd}...")
         article_data = fetch_article_data(pd)
         if article_data:
+            # Tag paper with the query source(s) that discovered it
+            article_data["fetch_sources"] = pmcid_sources.get(pd, ["unknown"])
             articles.append(article_data)
             out_path = os.path.join(raw_dir, f"PMC{pd}.json")
             with open(out_path, "w", encoding="utf-8") as f:
@@ -189,13 +217,22 @@ def main():
         time.sleep(delay_sec)
 
     pmcids_fetched = [a.get("pmcid", "") for a in articles]
+    # Per-source breakdown: {source_label: ["PMC123", ...]} for provenance
+    source_summary = {
+        label: [f"PMC{p}" for p in pids]
+        for label, pids in pmcids_by_source.items() if pids
+    }
     write_manifest(AGENT_FETCH, run_id, {
         "pmcids_fetched": pmcids_fetched,
         "file_paths": file_paths,
         "raw_papers_dir": raw_dir,
         "config_fetch": cfg,
+        "pmcids_by_source": source_summary,
     })
     print(f"Successfully downloaded and saved {len(articles)} articles.")
+    if source_summary:
+        for label, pids in source_summary.items():
+            print(f"  {label}: {len(pids)} papers")
 
 if __name__ == "__main__":
     main()
