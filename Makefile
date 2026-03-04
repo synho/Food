@@ -1,13 +1,15 @@
 # Health Navigation — 간편 실행 및 모니터링 (레포 루트에서 실행)
 
-.PHONY: neo4j-up neo4j-down neo4j-console pipeline validate check check-skip-web check-skip-server-web ports server server-8001 web kg-status docker-up docker-down help start stop start-step1 start-step2 start-step3 stop-step1 stop-step2 stop-step3 test-start-stop check-sync test
+.PHONY: neo4j-up neo4j-down neo4j-console pipeline validate check check-skip-web check-skip-server-web ports server server-8001 web kg-status kg-monitor docker-up docker-down help start stop restart status start-step1 start-step2 start-step3 stop-step1 stop-step2 stop-step3 test-start-stop check-sync test
 
 help:
 	@echo "사용법: make [대상]"
 	@echo ""
 	@echo "  === 한 번에 켜기/끄기 (로컬) ==="
 	@echo "  start          전체 기동 (Neo4j → Server → Web), 백그라운드"
-	@echo "  stop           전체 중지 (Web → Server → Neo4j)"
+	@echo "  stop           전체 중지 (Web → Server → Neo4j + pipeline jobs)"
+	@echo "  restart        stop + start in one command"
+	@echo "  status         quick process status (no HTTP round-trip)"
 	@echo "  start-step1    ㅡ 1단계: Neo4j만 기동"
 	@echo "  start-step2    ㅡ 2단계: API 서버만 기동"
 	@echo "  start-step3    ㅡ 3단계: 웹만 기동"
@@ -32,11 +34,11 @@ help:
 	@echo "  check-skip-web / check-skip-server-web  일부만 확인"
 
 neo4j-up:
-	cd kg_pipeline && docker-compose up -d
+	cd kg_pipeline && docker compose up -d
 	@echo "Neo4j 기동. 확인: make check"
 
 neo4j-down:
-	cd kg_pipeline && docker-compose down
+	cd kg_pipeline && docker compose down
 
 # --- Start/Stop full stack (local, step by step) ---
 start:
@@ -46,6 +48,19 @@ start:
 stop:
 	@chmod +x scripts/stop_local.sh 2>/dev/null || true
 	@./scripts/stop_local.sh
+
+restart:
+	@chmod +x scripts/stop_local.sh scripts/start_local.sh 2>/dev/null || true
+	@./scripts/stop_local.sh
+	@sleep 2
+	@./scripts/start_local.sh
+
+status:
+	@echo "=== Process Status ==="
+	@printf "  Neo4j  : "; curl -sf http://localhost:7474 >/dev/null 2>&1 && echo "UP" || echo "DOWN"
+	@printf "  Server : "; { [ -f .run/server.pid ] && kill -0 $$(cat .run/server.pid) 2>/dev/null && echo "UP (PID $$(cat .run/server.pid))"; } || { python3 -c "import socket; s=socket.socket(); s.settimeout(1); exit(0 if s.connect_ex(('127.0.0.1',8000))==0 else 1)" 2>/dev/null && echo "UP (untracked, port 8000)" || echo "DOWN"; }
+	@printf "  Web    : "; { [ -f .run/web.pid ] && kill -0 $$(cat .run/web.pid) 2>/dev/null && echo "UP (PID $$(cat .run/web.pid))"; } || { python3 -c "import socket; s=socket.socket(); s.settimeout(1); exit(0 if s.connect_ex(('127.0.0.1',3000))==0 else 1)" 2>/dev/null && echo "UP (untracked, port 3000)" || echo "DOWN"; }
+	@printf "  Expand : "; [ -f kg_pipeline/.run/expansion.pid ] && kill -0 $$(cat kg_pipeline/.run/expansion.pid) 2>/dev/null && echo "RUNNING (PID $$(cat kg_pipeline/.run/expansion.pid))" || echo "idle"
 
 start-step1:
 	@chmod +x scripts/start_local.sh 2>/dev/null || true
@@ -100,6 +115,9 @@ check:
 
 kg-status:
 	@if [ -f kg_pipeline/venv/bin/python ]; then kg_pipeline/venv/bin/python scripts/kg_status.py; else python3 scripts/kg_status.py --no-neo4j; fi
+
+kg-monitor:
+	@cd kg_pipeline && node monitor.js
 
 # Uses kg_pipeline venv Python when present (neo4j driver). May need a few seconds after starting Neo4j.
 debug-neo4j:

@@ -70,6 +70,10 @@ if ! curl -sf "${NEO4J_HTTP}" >/dev/null 2>&1; then
 else
   echo "  Neo4j already running."
 fi
+# Verify Bolt port in addition to HTTP
+python3 -c "import socket; s=socket.socket(); s.settimeout(3); r=s.connect_ex(('127.0.0.1',7687)); s.close(); exit(r)" 2>/dev/null \
+  && echo "  Neo4j Bolt OK." \
+  || echo "  WARNING: Neo4j HTTP up but Bolt (7687) not responding yet."
 echo ""
 fi
 
@@ -98,13 +102,20 @@ if [ ! -f "$SERVER_PID" ] || ! kill -0 "$(cat "$SERVER_PID")" 2>/dev/null; then
     else
       UVC="python3 -m uvicorn server.main:app"
     fi
+    [ -f "$RUN_DIR/server.log" ] && mv "$RUN_DIR/server.log" "$RUN_DIR/server.log.prev"
     $UVC --host 0.0.0.0 --port "$SERVER_PORT" </dev/null >> "$RUN_DIR/server.log" 2>&1 &
     echo $! > "$SERVER_PID"
     echo "  Server started (PID $(cat "$SERVER_PID")). Log: .run/server.log"
-    sleep 2
-    if ! curl -sf "http://127.0.0.1:${SERVER_PORT}/health" >/dev/null 2>&1; then
-      echo "  WARNING: Server may still be starting. Check: .run/server.log"
-    fi
+    echo -n "  Waiting for server"
+    for i in $(seq 1 15); do
+      if curl -sf "http://127.0.0.1:${SERVER_PORT}/health" >/dev/null 2>&1; then
+        echo " OK"
+        break
+      fi
+      echo -n "."
+      sleep 1
+      if [ "$i" -eq 15 ]; then echo " TIMEOUT — check .run/server.log"; fi
+    done
   fi
 fi
 echo ""
@@ -125,6 +136,7 @@ if [ ! -f "$WEB_PID" ] || ! kill -0 "$(cat "$WEB_PID")" 2>/dev/null; then
   if port_in_use "$WEB_PORT"; then
     echo "  Port $WEB_PORT already in use. Skip start (or stop other process and retry)."
   else
+    [ -f "$RUN_DIR/web.log" ] && mv "$RUN_DIR/web.log" "$RUN_DIR/web.log.prev"
     (cd web && PORT="$WEB_PORT" exec npm run dev) </dev/null >> "$RUN_DIR/web.log" 2>&1 &
     echo $! > "$WEB_PID"
     echo "  Web started (PID $(cat "$WEB_PID")). Log: .run/web.log"

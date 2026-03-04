@@ -23,9 +23,13 @@ run_stop() { [ -z "$ONLY_STEP" ] || [ "$ONLY_STEP" = "$1" ]; }
 stop_pid() {
   local PID="$1" NAME="$2"
   if kill -0 "$PID" 2>/dev/null; then
-    # Kill children first to prevent reparenting to PID 1
     pkill -P "$PID" 2>/dev/null || true
-    kill "$PID" 2>/dev/null || true
+    kill -TERM "$PID" 2>/dev/null || true
+    for i in $(seq 1 10); do
+      kill -0 "$PID" 2>/dev/null || break
+      sleep 0.5
+    done
+    kill -0 "$PID" 2>/dev/null && kill -KILL "$PID" 2>/dev/null || true
     echo "  $NAME stopped (PID $PID)."
   else
     echo "  $NAME not running (stale PID $PID)."
@@ -34,6 +38,25 @@ stop_pid() {
 
 echo "=== Health Navigation — Stop (local) ==="
 echo ""
+
+# --- Step 0: Stop pipeline jobs ---
+if [ -z "$ONLY_STEP" ]; then
+echo "[Step 0] Stopping pipeline jobs..."
+for name in expansion overnight watch_kg; do
+  pid_file="$REPO_ROOT/kg_pipeline/.run/${name}.pid"
+  if [ -f "$pid_file" ]; then
+    PID=$(cat "$pid_file")
+    if kill -0 "$PID" 2>/dev/null; then
+      kill -TERM "$PID" 2>/dev/null && echo "  Stopped $name (PID $PID)."
+      sleep 2
+      kill -0 "$PID" 2>/dev/null && kill -KILL "$PID" 2>/dev/null || true
+    fi
+    rm -f "$pid_file"
+  fi
+done
+pkill -f "watch_kg.py" 2>/dev/null || true
+echo ""
+fi
 
 # --- Step 1: Stop Web ---
 if run_stop 1; then
@@ -61,14 +84,21 @@ fi
 echo ""
 fi
 
-# --- Step 3: Stop Neo4j (Homebrew only; Docker left running) ---
+# --- Step 3: Stop Neo4j ---
 if run_stop 3; then
-echo "[Step 3/3] Stopping Neo4j (Homebrew service)..."
+echo "[Step 3/3] Stopping Neo4j..."
+# Stop Docker Neo4j if running
+if command -v docker &>/dev/null; then
+  if docker ps --format '{{.Names}}' 2>/dev/null | grep -qE "neo4j|kg_pipeline"; then
+    echo "  Stopping Docker Neo4j..."
+    (cd "$REPO_ROOT/kg_pipeline" && docker compose down 2>/dev/null) || true
+  fi
+fi
+# Stop Homebrew Neo4j
 if brew services list 2>/dev/null | grep -q "neo4j.*started"; then
   brew services stop neo4j 2>/dev/null && echo "  Neo4j stopped." || echo "  Neo4j stop returned an error (may need sudo)."
 else
   echo "  Neo4j not running as brew service (or brew not available)."
-  echo "  If you started Neo4j with 'make neo4j-console', stop it with Ctrl+C in that terminal."
 fi
 echo ""
 fi
