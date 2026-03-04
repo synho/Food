@@ -34,6 +34,8 @@ ALL_STEPS = {
     "gap-report": ("kg_gap_analyzer.py", "0. KG gap report (what's missing, no download)"),
     "extract": ("extract_triples.py", "2. Extract agent (ontology-based triples)"),
     "ingest": ("ingest_to_neo4j.py", "3. Ingest agent (Neo4j)"),
+    "audit": ("audit_kg_quality.py", "4. KG quality audit (no writes)"),
+    "contradictions": ("detect_contradictions.py", "5. Contradiction detection (no writes)"),
 }
 
 

@@ -314,9 +314,9 @@ export function RelBarChart({ data }: { data: Record<string, number> }) {
 
 // ─── Stat card ────────────────────────────────────────────────────────────────
 export function StatCard({
-  title, value, sub, accent = "blue",
+  title, value, sub, accent = "blue", delta,
 }: {
-  title: string; value: string | number; sub?: string; accent?: "blue" | "emerald" | "violet" | "teal";
+  title: string; value: string | number; sub?: string; accent?: "blue" | "emerald" | "violet" | "teal"; delta?: string | null;
 }) {
   const border =
     accent === "blue" ? "border-blue-200 dark:border-blue-900" :
@@ -328,10 +328,20 @@ export function StatCard({
     accent === "emerald" ? "bg-emerald-50 dark:bg-emerald-900/20" :
     accent === "teal" ? "bg-teal-50 dark:bg-teal-900/20" :
     "bg-violet-50 dark:bg-violet-900/20";
+  const isPositive = delta != null && delta.startsWith("+");
   return (
     <div className={`rounded-xl border-2 ${border} ${bg} p-4 shadow-sm`}>
       <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{title}</div>
-      <div className="mt-1 text-2xl font-bold tabular-nums text-gray-900 dark:text-gray-100">{value}</div>
+      <div className="mt-1 flex items-baseline gap-2">
+        <span className="text-2xl font-bold tabular-nums text-gray-900 dark:text-gray-100">{value}</span>
+        {delta != null && (
+          <span className={`text-sm font-semibold tabular-nums ${
+            isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"
+          }`}>
+            {delta}
+          </span>
+        )}
+      </div>
       {sub != null && <div className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{sub}</div>}
     </div>
   );

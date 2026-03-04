@@ -1,0 +1,4439 @@
+{
+  "timestamp": "2026-03-03T04:07:17.796448+00:00",
+  "pairs_checked": 6,
+  "contradictions": [
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "hypovitaminosis d",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC11643912",
+        "context": "The prevalence of vitamin D insufficiency and deficiency in patients undergoing elective primary TKA is alarmingly high.",
+        "journal": "Nutrients",
+        "pub_date": "2024-11-21",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC9919642",
+        "context": "Hypovitaminosis D is a global public health problem.",
+        "journal": "Nutrients",
+        "pub_date": "2023-01-29",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "hypovitaminosis d",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC11643912",
+        "context": "The prevalence of vitamin D insufficiency and deficiency in patients undergoing elective primary TKA is alarmingly high.",
+        "journal": "Nutrients",
+        "pub_date": "2024-11-21",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12158240",
+        "context": "Preterm newborns are particularly susceptible to hypovitaminosis D...",
+        "journal": "Nutrients",
+        "pub_date": "2025-05-30",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC11676626",
+        "context": "Vitamin D deficiency is a significant public health issue among Roma women and their newborns",
+        "journal": "Nutrients",
+        "pub_date": "2024-12-18",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC9963378",
+        "context": "Seasonality, advanced age, sex, dark skin pigmentation, and limited exposure to sunlight were reported as causes of vitamin D deficiency.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2023-02-13",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC11676626",
+        "context": "Vitamin D deficiency is a significant public health issue among Roma women and their newborns",
+        "journal": "Nutrients",
+        "pub_date": "2024-12-18",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12694000",
+        "context": "Given the suboptimal vitamin D intake and status among the United Kingdom population, the Scientific Advisory Committee on Nutrition is seeking suitable food vehicles for vitamin D fortification.",
+        "journal": "Nutrients",
+        "pub_date": "2025-11-29",
+        "evidence_type": "other",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC11676626",
+        "context": "Vitamin D deficiency is a significant public health issue among Roma women and their newborns",
+        "journal": "Nutrients",
+        "pub_date": "2024-12-18",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12389060",
+        "context": "The inverse relationship between 25(OH)D and parathyroid hormone (PTH) concentrations was examined to define the breakpoint at which PTH was maximally suppressed using a segmented regression analysis.",
+        "journal": "Nutrients",
+        "pub_date": "2025-08-14",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "100% juice",
+      "subject_labels": [
+        "Food"
+      ],
+      "object": "disease",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "11723140",
+        "context": "The findings collate evidence showing some potential health benefits associated with 100% juice consumption, with fewer potential risks.",
+        "journal": "Nutrition Reviews",
+        "pub_date": "2025-02-01",
+        "evidence_type": "review",
+        "evidence_strength": 2
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "11723140",
+        "context": "The position of 100% juice in healthy eating guidelines remains controversial due to its lower dietary fiber and higher free-sugar contents compared with whole fruits and vegetables.",
+        "journal": "Nutrition Reviews",
+        "pub_date": "2025-02-01",
+        "evidence_type": "review",
+        "evidence_strength": 2
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12171927",
+        "context": "The male, the temperature, summer, autumn the intake of VitD supplements, the intake frequency of dairy products and egg products are protective factors for VitDD and VitDI.",
+        "journal": "Public Health Nutrition",
+        "pub_date": "2025-06-04",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC9963378",
+        "context": "Seasonality, advanced age, sex, dark skin pigmentation, and limited exposure to sunlight were reported as causes of vitamin D deficiency.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2023-02-13",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12171927",
+        "context": "The male, the temperature, summer, autumn the intake of VitD supplements, the intake frequency of dairy products and egg products are protective factors for VitDD and VitDI.",
+        "journal": "Public Health Nutrition",
+        "pub_date": "2025-06-04",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12694000",
+        "context": "Given the suboptimal vitamin D intake and status among the United Kingdom population, the Scientific Advisory Committee on Nutrition is seeking suitable food vehicles for vitamin D fortification.",
+        "journal": "Nutrients",
+        "pub_date": "2025-11-29",
+        "evidence_type": "other",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12171927",
+        "context": "The male, the temperature, summer, autumn the intake of VitD supplements, the intake frequency of dairy products and egg products are protective factors for VitDD and VitDI.",
+        "journal": "Public Health Nutrition",
+        "pub_date": "2025-06-04",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12389060",
+        "context": "The inverse relationship between 25(OH)D and parathyroid hormone (PTH) concentrations was examined to define the breakpoint at which PTH was maximally suppressed using a segmented regression analysis.",
+        "journal": "Nutrients",
+        "pub_date": "2025-08-14",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "breakfast variety",
+      "subject_labels": [
+        "LifestyleFactor"
+      ],
+      "object": "unhealthy dietary and lifestyle patterns",
+      "object_labels": [
+        "LifestyleFactor"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12348111",
+        "context": "Students who consumed \u22655 types of food showed statistically significant associations with healthier practices.",
+        "journal": "Nutrients",
+        "pub_date": "2025-07-24",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12348111",
+        "context": "Students who consumed a greater variety of breakfast foods exhibited more favorable dietary and lifestyle patterns.",
+        "journal": "Nutrients",
+        "pub_date": "2025-07-24",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "tea",
+      "subject_labels": [
+        "Food"
+      ],
+      "object": "liver cancer",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12389169",
+        "context": "Current tea drinking showed an inverse association with liver cancer (OR: 0.51; 95% CI: 0.39\u20130.66).",
+        "journal": "Nutrients",
+        "pub_date": "2025-08-15",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12389169",
+        "context": "Former tea drinking showed a positive association (OR: 3.56; 95% CI: 2.42\u20135.23).",
+        "journal": "Nutrients",
+        "pub_date": "2025-08-15",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "physical activity",
+      "subject_labels": [
+        "LifestyleFactor"
+      ],
+      "object": "fried foods",
+      "object_labels": [
+        "Food"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12566812",
+        "context": "Active mothers in occupational PA showed mother\u2013child associations for fruits, vegetables, and dairy foods, whereas inactive mothers showed associations for fried foods and sweets.",
+        "journal": "Nutrients",
+        "pub_date": "2025-10-15",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12566812",
+        "context": "Active mothers in occupational PA showed mother\u2013child associations for fruits, vegetables, and dairy foods, whereas inactive mothers showed associations for fried foods and sweets.",
+        "journal": "Nutrients",
+        "pub_date": "2025-10-15",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "physical activity",
+      "subject_labels": [
+        "LifestyleFactor"
+      ],
+      "object": "salty snacks",
+      "object_labels": [
+        "Food"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12566812",
+        "context": "Active mothers in the leisure-time/commuting domain showed mother\u2013child associations for fried foods and red meat consumption, while active fathers showed associations for fruits and salty snacks consumption.",
+        "journal": "Nutrients",
+        "pub_date": "2025-10-15",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12566812",
+        "context": "Active mothers in the leisure-time/commuting domain showed mother\u2013child associations for fried foods and red meat consumption, while active fathers showed associations for fruits and salty snacks consumption.",
+        "journal": "Nutrients",
+        "pub_date": "2025-10-15",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12567200",
+        "context": "Public health interventions are required to improve 25(OH)D status in UK ethnic minority groups.",
+        "journal": "Nutrients",
+        "pub_date": "2025-10-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC9963378",
+        "context": "Seasonality, advanced age, sex, dark skin pigmentation, and limited exposure to sunlight were reported as causes of vitamin D deficiency.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2023-02-13",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12567200",
+        "context": "Public health interventions are required to improve 25(OH)D status in UK ethnic minority groups.",
+        "journal": "Nutrients",
+        "pub_date": "2025-10-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12694000",
+        "context": "Given the suboptimal vitamin D intake and status among the United Kingdom population, the Scientific Advisory Committee on Nutrition is seeking suitable food vehicles for vitamin D fortification.",
+        "journal": "Nutrients",
+        "pub_date": "2025-11-29",
+        "evidence_type": "other",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12567200",
+        "context": "Public health interventions are required to improve 25(OH)D status in UK ethnic minority groups.",
+        "journal": "Nutrients",
+        "pub_date": "2025-10-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12389060",
+        "context": "The inverse relationship between 25(OH)D and parathyroid hormone (PTH) concentrations was examined to define the breakpoint at which PTH was maximally suppressed using a segmented regression analysis.",
+        "journal": "Nutrients",
+        "pub_date": "2025-08-14",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "fruit and vegetable (fv) intake",
+      "subject_labels": [
+        "Food"
+      ],
+      "object": "frailty",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12735815",
+        "context": "Increased FV intake was significantly associated with a lower risk of frailty (OR = 0.44, 95% CI = 0.264\u20130.731, Q4 vs. Q1).",
+        "journal": "Nutrients",
+        "pub_date": "2025-12-11",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12735815",
+        "context": "Women with inadequate FV intake had a higher risk of frailty (OR = 2.06, 95% CI = 1.34\u20133.16) compared to those with adequate intake, regardless of vitamin C supplement use.",
+        "journal": "Nutrients",
+        "pub_date": "2025-12-11",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "calcium",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "osteoporosis",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12788094",
+        "context": "Calcium inadequacy exceeded 95% in all subgroups.",
+        "journal": "Nutrients",
+        "pub_date": "2025-12-31",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12844650",
+        "context": "Insufficient calcium intake increases the risk of osteoporosis.",
+        "journal": "Nutrients",
+        "pub_date": "2026-01-12",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "eaa density",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "protein malnutrition",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12799415",
+        "context": "Increasing dietary EAA intake may improve health and function",
+        "journal": "The Journal of Nutrition",
+        "pub_date": "2025-10-01",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12799415",
+        "context": "Dietary protein quality refers to the capacity of a food to meet the human metabolic needs for essential amino acids (EAAs) and nitrogen. This is critical in low- and middle-income countries, where severe protein malnutrition occurs",
+        "journal": "The Journal of Nutrition",
+        "pub_date": "2025-10-01",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "therapeutic plasma exchange",
+      "subject_labels": [
+        "Drug"
+      ],
+      "object": "persistent asymptomatic hypocalcemia",
+      "object_labels": [
+        "Symptom"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12819856",
+        "context": "These findings underscore the need for improved care protocols and vigilant monitoring of mineral metabolism in TPE patients, especially those receiving long-term treatment.",
+        "journal": "The Journal of Clinical Endocrinology and Metabolism",
+        "pub_date": "2026-02-01",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12819856",
+        "context": "Nearly 25% of patients experienced persistent asymptomatic hypocalcemia.",
+        "journal": "The Journal of Clinical Endocrinology and Metabolism",
+        "pub_date": "2026-02-01",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "calcium",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "osteoporosis",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12844650",
+        "context": "Calcium is essential for bone health and reduces the risk of osteoporosis.",
+        "journal": "Nutrients",
+        "pub_date": "2026-01-12",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12844650",
+        "context": "Insufficient calcium intake increases the risk of osteoporosis.",
+        "journal": "Nutrients",
+        "pub_date": "2026-01-12",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "treatment withdrawal and disease monitoring",
+      "subject_labels": [
+        "Mechanism"
+      ],
+      "object": "relapse",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12855600",
+        "context": "Results from the SETS aHUS trial informed the risk of relapse diagnosis or progression.",
+        "journal": "Nephrology Dialysis Transplantation",
+        "pub_date": "2026-02-01",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12855600",
+        "context": "Withdrawal patients had an average reduction of 0.0005 patient life years (LYs) over an 80-year time horizon.",
+        "journal": "Nephrology Dialysis Transplantation",
+        "pub_date": "2026-02-01",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      }
+    },
+    {
+      "subject": "educational attainment",
+      "subject_labels": [
+        "LifestyleFactor"
+      ],
+      "object": "alzheimer's disease",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "12883339",
+        "context": "Higher educational attainment, better cognitive performance, and greater relative fat intake were associated with later AAO; whereas the remaining were linked to earlier onset.",
+        "journal": "Alzheimer's & Dementia",
+        "pub_date": "2026-02-08",
+        "evidence_type": "Observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "12883339",
+        "context": "Higher educational attainment, better cognitive performance, and greater relative fat intake were associated with later AAO; whereas the remaining were linked to earlier onset.",
+        "journal": "Alzheimer's & Dementia",
+        "pub_date": "2026-02-08",
+        "evidence_type": "Observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "sensor-based devices",
+      "subject_labels": [
+        "Study"
+      ],
+      "object": "burden on respondents and practitioners",
+      "object_labels": [
+        "LifestyleFactor"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12887789",
+        "context": "These technologies have potential to enhance dietary assessment and its accuracy, support personalized dietary interventions through real time, context-aware feedback, and reduce burden on respondents and practitioners.",
+        "journal": "Advances in Nutrition",
+        "pub_date": "2026-02-01",
+        "evidence_type": "review",
+        "evidence_strength": 2
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12887789",
+        "context": "Traditional dietary assessment methods used in nutrition research and practice are self-reported, burdensome, and prone to error, limiting utility.",
+        "journal": "Advances in Nutrition",
+        "pub_date": "2026-02-01",
+        "evidence_type": "review",
+        "evidence_strength": 2
+      }
+    },
+    {
+      "subject": "25-hydroxy-vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "covid-19",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC10097275",
+        "context": "Such a relationship was no longer observed for subjects with 25OHD concentrations above 20 ng/mL.",
+        "journal": "Nutrients",
+        "pub_date": "2023-03-24",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC10097275",
+        "context": "An increased risk of subsequent COVID-19 infection was only observed in those with severe 25OHD deficiency (<12 ng/mL).",
+        "journal": "Nutrients",
+        "pub_date": "2023-03-24",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "calcium",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "osteoporosis",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12899934",
+        "context": "calcium inadequacy pervaded all patterns (867\u2013927.5 mg per day, 7\u201313% below requirements)",
+        "journal": "Nutrients",
+        "pub_date": "2026-02-05",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12844650",
+        "context": "Insufficient calcium intake increases the risk of osteoporosis.",
+        "journal": "Nutrients",
+        "pub_date": "2026-01-12",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC7281985",
+        "context": "The evidence of a link between vitamin D deficiency and adverse outcomes is overwhelming and clearly points towards avoidance of vitamin D deficiency especially in early life.",
+        "journal": "Nutrients",
+        "pub_date": "2020-04-28",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC9963378",
+        "context": "Seasonality, advanced age, sex, dark skin pigmentation, and limited exposure to sunlight were reported as causes of vitamin D deficiency.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2023-02-13",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC7281985",
+        "context": "The evidence of a link between vitamin D deficiency and adverse outcomes is overwhelming and clearly points towards avoidance of vitamin D deficiency especially in early life.",
+        "journal": "Nutrients",
+        "pub_date": "2020-04-28",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12694000",
+        "context": "Given the suboptimal vitamin D intake and status among the United Kingdom population, the Scientific Advisory Committee on Nutrition is seeking suitable food vehicles for vitamin D fortification.",
+        "journal": "Nutrients",
+        "pub_date": "2025-11-29",
+        "evidence_type": "other",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC7281985",
+        "context": "The evidence of a link between vitamin D deficiency and adverse outcomes is overwhelming and clearly points towards avoidance of vitamin D deficiency especially in early life.",
+        "journal": "Nutrients",
+        "pub_date": "2020-04-28",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12389060",
+        "context": "The inverse relationship between 25(OH)D and parathyroid hormone (PTH) concentrations was examined to define the breakpoint at which PTH was maximally suppressed using a segmented regression analysis.",
+        "journal": "Nutrients",
+        "pub_date": "2025-08-14",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "coffee",
+      "subject_labels": [
+        "Food"
+      ],
+      "object": "rheumatoid arthritis",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "9025922",
+        "context": "Results showed that oily fish, alcohol, coffee and breakfast cereals have protective roles in RA",
+        "journal": "Nutrients",
+        "pub_date": "2022-04-08",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC11644016",
+        "context": "Coffee may be linked to an increased risk.",
+        "journal": "Nutrients",
+        "pub_date": "2024-11-26",
+        "evidence_type": "meta_analysis",
+        "evidence_strength": 4
+      }
+    },
+    {
+      "subject": "physical activity",
+      "subject_labels": [
+        "LifestyleFactor"
+      ],
+      "object": "non-communicable diseases",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "9367817",
+        "context": "Low fruit and vegetable (F&V) intake, sedentary behavior, excessive alcohol consumption, and smoking are risk factors for the development of non-communicable diseases.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2022-07-27",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12472676",
+        "context": "Physical inactivity and unhealthy dietary habits are among the major global public health concerns, contributing significantly to the increasing prevalence of non-communicable diseases.",
+        "journal": "Nutrients",
+        "pub_date": "2025-09-13",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "osteoporosis",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12910436",
+        "context": "Adequate vitamin D status is essential for calcium absorption and bone mineralisation; deficiency is a major modifiable risk factor for osteoporosis across the life course.",
+        "journal": "BMJ",
+        "pub_date": "2026-01-20",
+        "evidence_type": "review",
+        "evidence_strength": 2
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC7196732",
+        "context": "Icelandic adolescents should be encouraged to increase their vitamin D intake as it is possible that their current intake is insufficient to achieve optimal peak bone mass.",
+        "journal": "Public Health Nutrition",
+        "pub_date": "2020-06-01",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "osteoporosis",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC12910436",
+        "context": "Adequate vitamin D status is essential for calcium absorption and bone mineralisation; deficiency is a major modifiable risk factor for osteoporosis across the life course.",
+        "journal": "BMJ",
+        "pub_date": "2026-01-20",
+        "evidence_type": "review",
+        "evidence_strength": 2
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC10574730",
+        "context": "For better BMD, attention should be paid to... vitamin D, with intensification of efforts during the childbearing period.",
+        "journal": "Nutrients",
+        "pub_date": "2023-10-08",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "serum 25(oh)d concentration",
+      "subject_labels": [
+        "Biomarker"
+      ],
+      "object": "major cardiovascular events",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "11547645",
+        "context": "Serum 25(OH)D concentrations above 20 ng/mL are associated with significantly reduced risk of stroke and MACEs prospectively and in an apparent causal manner",
+        "journal": "Nutrients",
+        "pub_date": "2024-11-01",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "11547645",
+        "context": "risk of stroke and MACEs increases rapidly below 15 ng/mL (38 nmol/L)",
+        "journal": "Nutrients",
+        "pub_date": "2024-11-01",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC10948476",
+        "context": "Vitamin D deficiency is highly prevalent among community-dwelling adults in Kosovo and low serum 25(OH)D has been associated with low muscle strength.",
+        "journal": "European Journal of Nutrition",
+        "pub_date": "2024-01-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC9963378",
+        "context": "Seasonality, advanced age, sex, dark skin pigmentation, and limited exposure to sunlight were reported as causes of vitamin D deficiency.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2023-02-13",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC10948476",
+        "context": "Vitamin D deficiency is highly prevalent among community-dwelling adults in Kosovo and low serum 25(OH)D has been associated with low muscle strength.",
+        "journal": "European Journal of Nutrition",
+        "pub_date": "2024-01-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12694000",
+        "context": "Given the suboptimal vitamin D intake and status among the United Kingdom population, the Scientific Advisory Committee on Nutrition is seeking suitable food vehicles for vitamin D fortification.",
+        "journal": "Nutrients",
+        "pub_date": "2025-11-29",
+        "evidence_type": "other",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC10948476",
+        "context": "Vitamin D deficiency is highly prevalent among community-dwelling adults in Kosovo and low serum 25(OH)D has been associated with low muscle strength.",
+        "journal": "European Journal of Nutrition",
+        "pub_date": "2024-01-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12389060",
+        "context": "The inverse relationship between 25(OH)D and parathyroid hormone (PTH) concentrations was examined to define the breakpoint at which PTH was maximally suppressed using a segmented regression analysis.",
+        "journal": "Nutrients",
+        "pub_date": "2025-08-14",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC11013822",
+        "context": "This study confirms that the EVIDENCe-Q is a valid instrument for assessing the risk of vitamin D deficiency and insufficiency in children.",
+        "journal": "Nutrients",
+        "pub_date": "2024-03-27",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC9963378",
+        "context": "Seasonality, advanced age, sex, dark skin pigmentation, and limited exposure to sunlight were reported as causes of vitamin D deficiency.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2023-02-13",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC11013822",
+        "context": "This study confirms that the EVIDENCe-Q is a valid instrument for assessing the risk of vitamin D deficiency and insufficiency in children.",
+        "journal": "Nutrients",
+        "pub_date": "2024-03-27",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12694000",
+        "context": "Given the suboptimal vitamin D intake and status among the United Kingdom population, the Scientific Advisory Committee on Nutrition is seeking suitable food vehicles for vitamin D fortification.",
+        "journal": "Nutrients",
+        "pub_date": "2025-11-29",
+        "evidence_type": "other",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC11013822",
+        "context": "This study confirms that the EVIDENCe-Q is a valid instrument for assessing the risk of vitamin D deficiency and insufficiency in children.",
+        "journal": "Nutrients",
+        "pub_date": "2024-03-27",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12389060",
+        "context": "The inverse relationship between 25(OH)D and parathyroid hormone (PTH) concentrations was examined to define the breakpoint at which PTH was maximally suppressed using a segmented regression analysis.",
+        "journal": "Nutrients",
+        "pub_date": "2025-08-14",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "galglu",
+      "subject_labels": [
+        "Food"
+      ],
+      "object": "shortened lifespan",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "12938501",
+        "context": "Larval GALGLU consumption extended the lifespan of females when challenged with an obesogenic adult diet.",
+        "journal": "",
+        "pub_date": "2026-03-01",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "12938501",
+        "context": "Larval GALGLU consumption reduced the lifespan of males.",
+        "journal": "",
+        "pub_date": "2026-03-01",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC10819869",
+        "context": "The high prevalence of VD deficiency and inadequacy in geriatric ward admissions emphasizes the urgent need for targeted interventions and enhanced education for older adults, caregivers, and physicians to improve adherence to preventive supplementation practices.",
+        "journal": "Nutrients",
+        "pub_date": "2024-01-06",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC9963378",
+        "context": "Seasonality, advanced age, sex, dark skin pigmentation, and limited exposure to sunlight were reported as causes of vitamin D deficiency.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2023-02-13",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC10819869",
+        "context": "The high prevalence of VD deficiency and inadequacy in geriatric ward admissions emphasizes the urgent need for targeted interventions and enhanced education for older adults, caregivers, and physicians to improve adherence to preventive supplementation practices.",
+        "journal": "Nutrients",
+        "pub_date": "2024-01-06",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12694000",
+        "context": "Given the suboptimal vitamin D intake and status among the United Kingdom population, the Scientific Advisory Committee on Nutrition is seeking suitable food vehicles for vitamin D fortification.",
+        "journal": "Nutrients",
+        "pub_date": "2025-11-29",
+        "evidence_type": "other",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC10819869",
+        "context": "The high prevalence of VD deficiency and inadequacy in geriatric ward admissions emphasizes the urgent need for targeted interventions and enhanced education for older adults, caregivers, and physicians to improve adherence to preventive supplementation practices.",
+        "journal": "Nutrients",
+        "pub_date": "2024-01-06",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC12389060",
+        "context": "The inverse relationship between 25(OH)D and parathyroid hormone (PTH) concentrations was examined to define the breakpoint at which PTH was maximally suppressed using a segmented regression analysis.",
+        "journal": "Nutrients",
+        "pub_date": "2025-08-14",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "serum sodium",
+      "subject_labels": [
+        "Biomarker"
+      ],
+      "object": "biological aging",
+      "object_labels": [
+        "AgeRelatedChange"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "12095086",
+        "context": "Maintaining serum sodium levels within an optimal range (138-142 mmol/L) may help delay biological aging.",
+        "journal": "",
+        "pub_date": "2025-05-08",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "12095086",
+        "context": "Nonlinear analysis revealed a U-shaped relationship between serum sodium and biological age. The lowest biological age occurred at 139.3 mmol/L: each 1 mmol/L increase below this threshold was associated with a reduction of 0.10 years in biological age (95% CI: -0.15, -0.05), whereas values above it showed a 0.08-year increase (95% CI: 0.04, 0.13).",
+        "journal": "",
+        "pub_date": "2025-05-08",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "oral cancer",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "PMC10222073",
+        "context": "In four studies, the evidence supported a preventive action of vitamin D against oral cancer and a reduction in the negative side effects associated with chemo- and radiotherapy.",
+        "journal": "Nutrients",
+        "pub_date": "2023-05-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "PMC10222073",
+        "context": "Several studies that focused on genetic polymorphisms and the expression of the 1,25 dihydroxyvitamin D3 receptor (VDR) suggested significant associations with vitamin D and increased oral cancer risk and worse survival rates.",
+        "journal": "Nutrients",
+        "pub_date": "2023-05-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "serum 25(oh)d concentration",
+      "subject_labels": [
+        "Biomarker"
+      ],
+      "object": "stroke",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "REDUCES_RISK_OF",
+      "evidence_a": {
+        "source_id": "11547645",
+        "context": "Serum 25(OH)D concentrations above 20 ng/mL are associated with significantly reduced risk of stroke and MACEs prospectively and in an apparent causal manner",
+        "journal": "Nutrients",
+        "pub_date": "2024-11-01",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "INCREASES_RISK_OF",
+      "evidence_b": {
+        "source_id": "11547645",
+        "context": "risk of stroke and MACEs increases rapidly below 15 ng/mL (38 nmol/L)",
+        "journal": "Nutrients",
+        "pub_date": "2024-11-01",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "100% juice",
+      "subject_labels": [
+        "Food"
+      ],
+      "object": "symptom",
+      "object_labels": [
+        "Symptom"
+      ],
+      "predicate_a": "ALLEVIATES",
+      "evidence_a": {
+        "source_id": "11723140",
+        "context": "The findings collate evidence showing some potential health benefits associated with 100% juice consumption, with fewer potential risks.",
+        "journal": "Nutrition Reviews",
+        "pub_date": "2025-02-01",
+        "evidence_type": "review",
+        "evidence_strength": 2
+      },
+      "predicate_b": "AGGRAVATES",
+      "evidence_b": {
+        "source_id": "11723140",
+        "context": "The position of 100% juice in healthy eating guidelines remains controversial due to its lower dietary fiber and higher free-sugar contents compared with whole fruits and vegetables.",
+        "journal": "Nutrition Reviews",
+        "pub_date": "2025-02-01",
+        "evidence_type": "review",
+        "evidence_strength": 2
+      }
+    },
+    {
+      "subject": "lycopene",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "symptom",
+      "object_labels": [
+        "Symptom"
+      ],
+      "predicate_a": "ALLEVIATES",
+      "evidence_a": {
+        "source_id": "12157968",
+        "context": "Within the included studies, various lycopene sources were applied, including lycopene supplements, functional foods, and regular food products, as well as various lycopene doses from 1.35 mg to 27.8 mg per day.",
+        "journal": "Nutrients",
+        "pub_date": "2025-05-25",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "AGGRAVATES",
+      "evidence_b": {
+        "source_id": "12157968",
+        "context": "Within the included studies, various lycopene sources were applied, including lycopene supplements, functional foods, and regular food products, as well as various lycopene doses from 1.35 mg to 27.8 mg per day.",
+        "journal": "Nutrients",
+        "pub_date": "2025-05-25",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      }
+    },
+    {
+      "subject": "stress",
+      "subject_labels": [
+        "LifestyleFactor"
+      ],
+      "object": "good mental component summary (mcs)",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "ALLEVIATES",
+      "evidence_a": {
+        "source_id": "12885309",
+        "context": "For good MCS, low insomnia with low stress (+4.72 pp) and low BMI with exercise (+4.21 pp) showed synergy",
+        "journal": "PLOS One",
+        "pub_date": "2026-02-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "AGGRAVATES",
+      "evidence_b": {
+        "source_id": "12885309",
+        "context": "whereas stress with inactivity exhibited antagonism (\u20134.00 pp).",
+        "journal": "PLOS One",
+        "pub_date": "2026-02-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "physical activity",
+      "subject_labels": [
+        "LifestyleFactor"
+      ],
+      "object": "good mental component summary (mcs)",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "ALLEVIATES",
+      "evidence_a": {
+        "source_id": "12885309",
+        "context": "For good MCS, low insomnia with low stress (+4.72 pp) and low BMI with exercise (+4.21 pp) showed synergy",
+        "journal": "PLOS One",
+        "pub_date": "2026-02-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "AGGRAVATES",
+      "evidence_b": {
+        "source_id": "12885309",
+        "context": "whereas stress with inactivity exhibited antagonism (\u20134.00 pp).",
+        "journal": "PLOS One",
+        "pub_date": "2026-02-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "rehabilitation",
+      "subject_labels": [
+        "LifestyleFactor"
+      ],
+      "object": "sedentary time",
+      "object_labels": [
+        "Symptom"
+      ],
+      "predicate_a": "ALLEVIATES",
+      "evidence_a": {
+        "source_id": "PMC12923849",
+        "context": "Rehabilitation did not significantly improve 6MWD or muscle mass in either group. However, sedentary time decreased significantly in the higher functional exercise capacity group...",
+        "journal": "Scientific Reports",
+        "pub_date": "2026-02-04",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "AGGRAVATES",
+      "evidence_b": {
+        "source_id": "PMC12923849",
+        "context": "Rehabilitation did not significantly improve 6MWD or muscle mass in either group. However, sedentary time decreased significantly in the higher functional exercise capacity group, whereas it increased in the lower group.",
+        "journal": "Scientific Reports",
+        "pub_date": "2026-02-04",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "alzheimer's disease",
+      "subject_labels": [
+        "Disease"
+      ],
+      "object": "cognitive decline",
+      "object_labels": [
+        "Symptom"
+      ],
+      "predicate_a": "PREVENTS",
+      "evidence_a": {
+        "source_id": "12748508",
+        "context": "The symposium underscored that preventing AD will require intervening during the preclinical asymptomatic phase.",
+        "journal": "Aging Cell",
+        "pub_date": "2025-12-29",
+        "evidence_type": "review",
+        "evidence_strength": 2
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12928064",
+        "context": "Alzheimer's disease (AD) is a progressive, age\u2010related, neurodegenerative disorder marked by cognitive decline, memory loss, and accumulation of amyloid beta (A\u03b2) plaques and tau tangles.",
+        "journal": "Alzheimer's & Dementia",
+        "pub_date": "2026-02-22",
+        "evidence_type": "",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "alzheimer's disease",
+      "subject_labels": [
+        "Disease"
+      ],
+      "object": "cognitive decline",
+      "object_labels": [
+        "Symptom"
+      ],
+      "predicate_a": "PREVENTS",
+      "evidence_a": {
+        "source_id": "12748508",
+        "context": "The symposium underscored that preventing AD will require intervening during the preclinical asymptomatic phase.",
+        "journal": "Aging Cell",
+        "pub_date": "2025-12-29",
+        "evidence_type": "review",
+        "evidence_strength": 2
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12923517",
+        "context": "Alzheimer's disease is a progressive neurodegenerative disorder characterized by memory loss and cognitive decline",
+        "journal": "Scientific Reports",
+        "pub_date": "2026-02-05",
+        "evidence_type": "",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "alzheimer's disease",
+      "subject_labels": [
+        "Disease"
+      ],
+      "object": "cognitive decline",
+      "object_labels": [
+        "Symptom"
+      ],
+      "predicate_a": "PREVENTS",
+      "evidence_a": {
+        "source_id": "12748508",
+        "context": "The symposium underscored that preventing AD will require intervening during the preclinical asymptomatic phase.",
+        "journal": "Aging Cell",
+        "pub_date": "2025-12-29",
+        "evidence_type": "review",
+        "evidence_strength": 2
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12430141",
+        "context": "Alzheimer's Disease (AD), the most common form of dementia, is a progressive ND, characterized by the accumulation of amyloid \u03b2 and tau protein, entails cognitive decline, neuroinflammation, mitochondrial dysfunction, and blood\u2013brain barrier impairment, with oxidative stress playing a critical role in its pathogenesis.",
+        "journal": "Nutrients",
+        "pub_date": "2025-09-05",
+        "evidence_type": "",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "juvenile idiopathic arthritis",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "PMC12166184",
+        "context": "The aim was to elucidate potential therapeutic implications of vitamin D in the management of JIA.",
+        "journal": "Nutrition Reviews",
+        "pub_date": "2025-07-01",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "PMC12166184",
+        "context": "Among the environmental risk factors, vitamin D has been posited to have a component in disease progression, acting as an inflammatory mediator.",
+        "journal": "Nutrition Reviews",
+        "pub_date": "2025-07-01",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "PMC12694000",
+        "context": "The results showed that serum 25(OH)D concentrations were significantly increased by vitamin D-fortified (type not specified) yoghurt/yoghurt drinks...",
+        "journal": "Nutrients",
+        "pub_date": "2025-11-29",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12694141",
+        "context": "Vitamin D in its active form, 1,25-dihydroxyvitamin D3 [1,25(OH)2D3], plays a critical role in immune regulation, gut barrier function, and systemic inflammation. Its deficiency is frequent in Inflammatory Bowel Disease (IBD), but the clinical implications remain uncertain.",
+        "journal": "Nutrients",
+        "pub_date": "2025-11-25",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "PMC12694000",
+        "context": "The results showed that serum 25(OH)D concentrations were significantly increased by vitamin D-fortified (type not specified) yoghurt/yoghurt drinks...",
+        "journal": "Nutrients",
+        "pub_date": "2025-11-29",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12114258",
+        "context": "To characterize the clinical significance of vitamin D deficiency (VDD) detected in long COVID",
+        "journal": "Nutrients",
+        "pub_date": "2025-05-16",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "cancer",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "PMC12788083",
+        "context": "Low vitamin D3 levels are common in cancer patients, and these patients might benefit from vitamin D3 level normalization in parallel with the conventional oncology treatment.",
+        "journal": "Nutrients",
+        "pub_date": "2025-12-29",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "PMC6893762",
+        "context": "vitamin D deficiency is associated with a broad variety of independent diseases, including several types of cancer",
+        "journal": "Nutrients",
+        "pub_date": "2019-11-06",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "cancer",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "PMC12899719",
+        "context": "The study aimed to analyse vitamin D information exposure, attitudes, and practices, including the use of vitamin D and other supplements as well as serum 25-hydroxyvitamin D [(25(OH)D)] testing, among breast cancer and prostate cancer survivors.",
+        "journal": "Nutrients",
+        "pub_date": "2026-01-28",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "PMC6893762",
+        "context": "vitamin D deficiency is associated with a broad variety of independent diseases, including several types of cancer",
+        "journal": "Nutrients",
+        "pub_date": "2019-11-06",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "PMC6835528",
+        "context": "Serum concentration of vitamin D increased by 200% \u00b1 98% (p < 0.001) during the first month of treatment with vitamin D deficiency and insufficiency being successfully treated in 83% of the football players.",
+        "journal": "Nutrients",
+        "pub_date": "2019-10-08",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12694141",
+        "context": "Vitamin D in its active form, 1,25-dihydroxyvitamin D3 [1,25(OH)2D3], plays a critical role in immune regulation, gut barrier function, and systemic inflammation. Its deficiency is frequent in Inflammatory Bowel Disease (IBD), but the clinical implications remain uncertain.",
+        "journal": "Nutrients",
+        "pub_date": "2025-11-25",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "PMC6835528",
+        "context": "Serum concentration of vitamin D increased by 200% \u00b1 98% (p < 0.001) during the first month of treatment with vitamin D deficiency and insufficiency being successfully treated in 83% of the football players.",
+        "journal": "Nutrients",
+        "pub_date": "2019-10-08",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12114258",
+        "context": "To characterize the clinical significance of vitamin D deficiency (VDD) detected in long COVID",
+        "journal": "Nutrients",
+        "pub_date": "2025-05-16",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "PMC8620024",
+        "context": "Public health messaging for this group should focus on year-round vitamin D supplementation and increasing intakes of culturally appropriate vitamin D-rich foods.",
+        "journal": "Nutrients",
+        "pub_date": "2021-11-16",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12694141",
+        "context": "Vitamin D in its active form, 1,25-dihydroxyvitamin D3 [1,25(OH)2D3], plays a critical role in immune regulation, gut barrier function, and systemic inflammation. Its deficiency is frequent in Inflammatory Bowel Disease (IBD), but the clinical implications remain uncertain.",
+        "journal": "Nutrients",
+        "pub_date": "2025-11-25",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "PMC8620024",
+        "context": "Public health messaging for this group should focus on year-round vitamin D supplementation and increasing intakes of culturally appropriate vitamin D-rich foods.",
+        "journal": "Nutrients",
+        "pub_date": "2021-11-16",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12114258",
+        "context": "To characterize the clinical significance of vitamin D deficiency (VDD) detected in long COVID",
+        "journal": "Nutrients",
+        "pub_date": "2025-05-16",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "PMC9268702",
+        "context": "Vitamin D deficiency and insufficiency were highly prevalent in this sample of care home residents in NI.",
+        "journal": "Nutrients",
+        "pub_date": "2022-06-28",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12694141",
+        "context": "Vitamin D in its active form, 1,25-dihydroxyvitamin D3 [1,25(OH)2D3], plays a critical role in immune regulation, gut barrier function, and systemic inflammation. Its deficiency is frequent in Inflammatory Bowel Disease (IBD), but the clinical implications remain uncertain.",
+        "journal": "Nutrients",
+        "pub_date": "2025-11-25",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "PMC9268702",
+        "context": "Vitamin D deficiency and insufficiency were highly prevalent in this sample of care home residents in NI.",
+        "journal": "Nutrients",
+        "pub_date": "2022-06-28",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12114258",
+        "context": "To characterize the clinical significance of vitamin D deficiency (VDD) detected in long COVID",
+        "journal": "Nutrients",
+        "pub_date": "2025-05-16",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "PMC10490553",
+        "context": "Treatment of vitamin D deficiency costs less than 0.01% of the cost of investigation of worsening comorbidities associated with hypovitaminosis D",
+        "journal": "Nutrients",
+        "pub_date": "2023-09-02",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12694141",
+        "context": "Vitamin D in its active form, 1,25-dihydroxyvitamin D3 [1,25(OH)2D3], plays a critical role in immune regulation, gut barrier function, and systemic inflammation. Its deficiency is frequent in Inflammatory Bowel Disease (IBD), but the clinical implications remain uncertain.",
+        "journal": "Nutrients",
+        "pub_date": "2025-11-25",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "PMC10490553",
+        "context": "Treatment of vitamin D deficiency costs less than 0.01% of the cost of investigation of worsening comorbidities associated with hypovitaminosis D",
+        "journal": "Nutrients",
+        "pub_date": "2023-09-02",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12114258",
+        "context": "To characterize the clinical significance of vitamin D deficiency (VDD) detected in long COVID",
+        "journal": "Nutrients",
+        "pub_date": "2025-05-16",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "resveratrol",
+      "subject_labels": [
+        "Food"
+      ],
+      "object": "anxiety",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "11396965",
+        "context": "The protective mechanisms of resveratrol, particularly in anxiety-related stress disorders, have been well documented.",
+        "journal": "Nutrients",
+        "pub_date": "2024-08-26",
+        "evidence_type": "review",
+        "evidence_strength": 2
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "11396965",
+        "context": "However, less attention has been given to the side effects of resveratrol. This review explores not only the mechanisms underlying the anxiolytic effects of resveratrol but also the mechanisms that may lead to increased anxiety following resveratrol treatment.",
+        "journal": "Nutrients",
+        "pub_date": "2024-08-26",
+        "evidence_type": "review",
+        "evidence_strength": 2
+      }
+    },
+    {
+      "subject": "pbx1",
+      "subject_labels": [
+        "Mechanism"
+      ],
+      "object": "alzheimer's disease",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "12741244",
+        "context": "PBX1a overexpression reversed the effects and reduced soluble A\u03b2<sub>1-40</sub> and A\u03b2<sub>1-42</sub> levels.",
+        "journal": "",
+        "pub_date": "2025-12-04",
+        "evidence_type": "in vitro, in vivo",
+        "evidence_strength": 1
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12741244",
+        "context": "PBX1 expression was significantly downregulated in postmortem hippocampal tissues from patients with AD and in the APP/PS1 mouse model.",
+        "journal": "",
+        "pub_date": "2025-12-04",
+        "evidence_type": "in vitro, in vivo",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "crtc2",
+      "subject_labels": [
+        "Mechanism"
+      ],
+      "object": "alzheimer's disease",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "12741244",
+        "context": "Restoration of the PBX1-CRTC2-CREB axis enhanced neuronal survival and synaptic integrity.",
+        "journal": "",
+        "pub_date": "2025-12-04",
+        "evidence_type": "in vitro, in vivo",
+        "evidence_strength": 1
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12741244",
+        "context": "CRTC2 knockdown blocked PBX1-mediated reductions in A\u03b2 deposition, apoptosis, and hyperphosphorylated Tau expression.",
+        "journal": "",
+        "pub_date": "2025-12-04",
+        "evidence_type": "in vitro, in vivo",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "PMC10780696",
+        "context": "Taken together, VD supplementation (10 \u00b5g/day) is effective in children with SMID in institutional care.",
+        "journal": "Nutrients",
+        "pub_date": "2023-12-29",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12694141",
+        "context": "Vitamin D in its active form, 1,25-dihydroxyvitamin D3 [1,25(OH)2D3], plays a critical role in immune regulation, gut barrier function, and systemic inflammation. Its deficiency is frequent in Inflammatory Bowel Disease (IBD), but the clinical implications remain uncertain.",
+        "journal": "Nutrients",
+        "pub_date": "2025-11-25",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d deficiency",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "TREATS",
+      "evidence_a": {
+        "source_id": "PMC10780696",
+        "context": "Taken together, VD supplementation (10 \u00b5g/day) is effective in children with SMID in institutional care.",
+        "journal": "Nutrients",
+        "pub_date": "2023-12-29",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "CAUSES",
+      "evidence_b": {
+        "source_id": "12114258",
+        "context": "To characterize the clinical significance of vitamin D deficiency (VDD) detected in long COVID",
+        "journal": "Nutrients",
+        "pub_date": "2025-05-16",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "folate",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "homocysteine",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "11990278",
+        "context": "Specifically, elevated levels of homocysteine, they can be reduced by increasing intake of vitamins, such as folic acid, a B-vitamin.",
+        "journal": "Nutrients",
+        "pub_date": "2025-04-07",
+        "evidence_type": "review",
+        "evidence_strength": 2
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11722758",
+        "context": "Hcy significantly mediated 14.51% of the relationship between folate and stroke in the fully adjusted model.",
+        "journal": "Nutrients",
+        "pub_date": "2024-12-31",
+        "evidence_type": "cohort",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "parathyroid hormone",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "10975656",
+        "context": "In these individuals, there was no treatment effect of vitamin D supplementation on various parameters of bone metabolism and cardiovascular risk except for a significant effect on parathyroid hormone (PTH) and expected changes in vitamin D metabolites.",
+        "journal": "Nutrients",
+        "pub_date": "2024-03-14",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11820415",
+        "context": "Lower 25(OH)D levels were associated with ... higher ... PTH (p < 0.001)",
+        "journal": "Nutrients",
+        "pub_date": "2025-01-28",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "25(oh)d3",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12251007",
+        "context": "Intracellular concentrations were quantified through HPLC at various time points.",
+        "journal": "Nutrients",
+        "pub_date": "2025-06-25",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11901569",
+        "context": "the HD patients had significantly lower 25(OH)D3 levels (15 ng/mL vs. 22 ng/mL) and higher deficiency rates (69% vs. 39%) compared to the controls.",
+        "journal": "Nutrients",
+        "pub_date": "2025-02-22",
+        "evidence_type": "",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "parathyroid hormone",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "10975656",
+        "context": "In these individuals, there was no treatment effect of vitamin D supplementation on various parameters of bone metabolism and cardiovascular risk except for a significant effect on parathyroid hormone (PTH) and expected changes in vitamin D metabolites.",
+        "journal": "Nutrients",
+        "pub_date": "2024-03-14",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "12264547",
+        "context": "the inverse relationship between 25(OH)D and iPTH was optimized with an inflection point at 25 nmol/L [<25 nmol/L: \u22120.16 pmol/L per 1 nmol/L increase in 25(OH)D; 95% confidence interval (CI): \u22120.22, \u22120.10; P < 0.001), above which the slope attenuated (\u226525 nmol/L: \u20130.02 pmol/L; 95% CI: \u22120.04, \u22120.003; P = 0.019].",
+        "journal": "The Journal of Nutrition",
+        "pub_date": "2025-06-01",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "igg",
+      "subject_labels": [
+        "Biomarker"
+      ],
+      "object": "igg",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12532705",
+        "context": "After culture-confirmed S. pyogenes events, the highest IgG increases occurred in children younger than 2 years of age after both pharyngeal and skin disease and asymptomatic carriage at both sites.",
+        "journal": "Nature Medicine",
+        "pub_date": "2025-08-08",
+        "evidence_type": "",
+        "evidence_strength": 1
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "12532705",
+        "context": "As placentally transferred IgG waned after birth, serological evidence of new exposure was seen in 23% of infants during the first year of life.",
+        "journal": "Nature Medicine",
+        "pub_date": "2025-08-08",
+        "evidence_type": "",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "amyloid beta",
+      "subject_labels": [
+        "Biomarker"
+      ],
+      "object": "step symmetry",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12738619",
+        "context": "During DT walking, higher A\u03b2 in the cerebellar was associated with reduced stride regularity (\u03b2=-1.38, p = 0.034), while higher cerebellar and pericalcarine A\u03b2 was linked to lower step symmetry performance (\u03b2=-1.1, p < 0.001).",
+        "journal": "Scientific Reports",
+        "pub_date": "2025-12-24",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "12738619",
+        "context": "In contrast, elevated A\u03b2 in the cingulate (\u03b2 = 0.75, p < 0.001) and cuneus (\u03b2 = 0.49, p = 0.024) was positively associated with step symmetry.",
+        "journal": "Scientific Reports",
+        "pub_date": "2025-12-24",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "omega-6 polyunsaturated fatty acids",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "type 2 diabetes",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12796107",
+        "context": "In the same biospecimens, higher levels of specific n\u22126 PUFAs [\u03b3\u221220:3: SRR 1.07 (95% CI: 1.03, 1.11), \u03b3\u221218:3: 2.23 (1.42, 3.50), and 20:4: 1.02 (1.01, 1.04)] were associated with higher risk of T2D.",
+        "journal": "Advances in Nutrition",
+        "pub_date": "2026-01-01",
+        "evidence_type": "meta_analysis",
+        "evidence_strength": 4
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "12796107",
+        "context": "Analyses of plasma phospholipids (PPL) and red blood cells (RBC) provided inverse associations between higher concentrations of specific n\u22126 PUFA [18:2: SRR 0.93 (95% CI: 0.91, 0.95)] and risk of T2D, with moderate CoE.",
+        "journal": "Advances in Nutrition",
+        "pub_date": "2026-01-01",
+        "evidence_type": "meta_analysis",
+        "evidence_strength": 4
+      }
+    },
+    {
+      "subject": "p-tau217",
+      "subject_labels": [
+        "Biomarker"
+      ],
+      "object": "hippocampal volume",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12824393",
+        "context": "In CN, these biomarkers were positively associated with left hippocampal volume (\u03b2 \u2248 0.19; FDR p = 0.04)",
+        "journal": "Scientific Reports",
+        "pub_date": "2025-12-18",
+        "evidence_type": "",
+        "evidence_strength": 1
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "12824393",
+        "context": "Higher plasma p-tau217 and p-tau217/A\u03b21\u201342 were associated with reduced bilateral hippocampal and CA1 volumes in MCI",
+        "journal": "Scientific Reports",
+        "pub_date": "2025-12-18",
+        "evidence_type": "",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "anandamide (aea)",
+      "subject_labels": [
+        "Biomarker"
+      ],
+      "object": "elderly adults",
+      "object_labels": [
+        "AgeRelatedChange"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12848003",
+        "context": "For AEA and DEA, increases were larger in older adults (Time\u00d7Age).",
+        "journal": "Scientific Reports",
+        "pub_date": "2026-01-24",
+        "evidence_type": "",
+        "evidence_strength": 1
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "12848003",
+        "context": "At baseline, older adults exhibited lower AEA and DEA than younger adults, and lower LEA than midlife adults.",
+        "journal": "Scientific Reports",
+        "pub_date": "2026-01-24",
+        "evidence_type": "",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "dihomo-\u03b3-linolenoylethanolamide (dea)",
+      "subject_labels": [
+        "Biomarker"
+      ],
+      "object": "elderly adults",
+      "object_labels": [
+        "AgeRelatedChange"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12848003",
+        "context": "For AEA and DEA, increases were larger in older adults (Time\u00d7Age).",
+        "journal": "Scientific Reports",
+        "pub_date": "2026-01-24",
+        "evidence_type": "",
+        "evidence_strength": 1
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "12848003",
+        "context": "At baseline, older adults exhibited lower AEA and DEA than younger adults, and lower LEA than midlife adults.",
+        "journal": "Scientific Reports",
+        "pub_date": "2026-01-24",
+        "evidence_type": "",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "parathyroid hormone",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "10975656",
+        "context": "In these individuals, there was no treatment effect of vitamin D supplementation on various parameters of bone metabolism and cardiovascular risk except for a significant effect on parathyroid hormone (PTH) and expected changes in vitamin D metabolites.",
+        "journal": "Nutrients",
+        "pub_date": "2024-03-14",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "7284832",
+        "context": "Compared to the placebo, vitamin D3 treatment significantly reduced PTH levels (0.3 vs. \u22120.7 pmol/L, respectively, p < 0.00001)",
+        "journal": "Nutrients",
+        "pub_date": "2020-05-04",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "PMC9965411",
+        "context": "25(OH)D serum levels relate to clinical characteristics, symptoms, or habits in women after their BS",
+        "journal": "Nutrients",
+        "pub_date": "2023-02-04",
+        "evidence_type": "cohort",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "7589195",
+        "context": "Low circulating 25(OH)D levels are associated with a high body mass index (BMI), increased weight and the increased development of adipose tissue.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2020-10-19",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "9696842",
+        "context": "The increase was particularly dramatic in elderly females (28.8 \u00b1 12.3 ng/mL to 37.7 \u00b1 18.6 ng/mL, p = 0.008).",
+        "journal": "Nutrients",
+        "pub_date": "2022-11-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "7589195",
+        "context": "Low circulating 25(OH)D levels are associated with a high body mass index (BMI), increased weight and the increased development of adipose tissue.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2020-10-19",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "7513910",
+        "context": "Calcitriol levels, in fact, directly related with the levels of vitamin D (r = 0.175, p = 0.035), whereas an inverse linear relationship was observed with major inflammatory and metabolic markers of cardiovascular risk (C-reactive protein: r = \u22120.14, p = 0.076; uric acid: r = \u22120.18, p = 0.014; homocysteine: r = \u22120.19, p = 0.007; fibrinogen: r = \u22120.138, p = 0.05) and Lp-PLA2 (r = \u22120.167, p = 0.037), but not for leukocytes.",
+        "journal": "Nutrition, Metabolism, and Cardiovascular Diseases",
+        "pub_date": "2021-01-04",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "7589195",
+        "context": "Low circulating 25(OH)D levels are associated with a high body mass index (BMI), increased weight and the increased development of adipose tissue.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2020-10-19",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "7284832",
+        "context": "Compared to the placebo, vitamin D3 treatment significantly increased the levels of 25(OH)D (\u22125 vs. 59 nmol/L, respectively, p < 0.00001)",
+        "journal": "Nutrients",
+        "pub_date": "2020-05-04",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "7589195",
+        "context": "Low circulating 25(OH)D levels are associated with a high body mass index (BMI), increased weight and the increased development of adipose tissue.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2020-10-19",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "10819183",
+        "context": "The meta-analysis showed a significant increase in 25(OH)D blood levels after treatment in 10 studies, with an average standardized mean difference of 2.60 ng/mL (95% CI: 2.07 to 3.13).",
+        "journal": "Nutrients",
+        "pub_date": "2024-01-14",
+        "evidence_type": "meta_analysis",
+        "evidence_strength": 4
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "7589195",
+        "context": "Low circulating 25(OH)D levels are associated with a high body mass index (BMI), increased weight and the increased development of adipose tissue.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2020-10-19",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "PMC12158240",
+        "context": "Vitamin D3 supplementation at 800 IU/day significantly improved vitamin D status...",
+        "journal": "Nutrients",
+        "pub_date": "2025-05-30",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "7589195",
+        "context": "Low circulating 25(OH)D levels are associated with a high body mass index (BMI), increased weight and the increased development of adipose tissue.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2020-10-19",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12348430",
+        "context": "The 25(OH)D concentration increased in both groups (\u03c93VDCa group: 19.4 ng/mL vs. 44.0 ng/mL, p < 0.0001; VDCa group: 15.3 ng/mL vs. 42.8 ng/mL, p = 0.018) and remained significantly higher at 12 weeks.",
+        "journal": "Nutrients",
+        "pub_date": "2025-07-31",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "7589195",
+        "context": "Low circulating 25(OH)D levels are associated with a high body mass index (BMI), increased weight and the increased development of adipose tissue.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2020-10-19",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12430293",
+        "context": "After only 3 months of supplementation, the increase in 25(OH)D concentrations was significantly associated with a remission status",
+        "journal": "Nutrients",
+        "pub_date": "2025-08-31",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "7589195",
+        "context": "Low circulating 25(OH)D levels are associated with a high body mass index (BMI), increased weight and the increased development of adipose tissue.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2020-10-19",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12608287",
+        "context": "Following supplementation, serum 25(OH)D increased from 15.77 \u00b1 5.21 to 31.24 \u00b1 7.87 ng/mL (p = 0.031) in Orthodox nuns.",
+        "journal": "Nutrients",
+        "pub_date": "2025-10-28",
+        "evidence_type": "",
+        "evidence_strength": 1
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "7589195",
+        "context": "Low circulating 25(OH)D levels are associated with a high body mass index (BMI), increased weight and the increased development of adipose tissue.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2020-10-19",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12899947",
+        "context": "Baseline vitamin D concentrations of 22.6 ng/mL (controls) did not change significantly (2 months: 22.2; 1 year: 21.7; 2 years: 22.0; 3 years: 23.8; 4 years: 21.8; and 5 years: 22.1 ng/mL), while concentrations of 21.9 ng/mL (intervention group) reached and remained 40 ng/mL (2 months: 41.0; 1 year: 39.4; 2 years: 39.0; 3 years: 39.3; 4 years: 40.4; and 5 years: 39.4 ng/mL).",
+        "journal": "Nutrients",
+        "pub_date": "2026-02-01",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "7589195",
+        "context": "Low circulating 25(OH)D levels are associated with a high body mass index (BMI), increased weight and the increased development of adipose tissue.",
+        "journal": "International Journal of Environmental Research and Public Health",
+        "pub_date": "2020-10-19",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "PMC9965411",
+        "context": "25(OH)D serum levels relate to clinical characteristics, symptoms, or habits in women after their BS",
+        "journal": "Nutrients",
+        "pub_date": "2023-02-04",
+        "evidence_type": "cohort",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8308738",
+        "context": "Although mean 25(OH)D levels constantly remained in recommended ranges (\u226550 nmol/L) during AN treatment, levels decreased from (in)patient admission to 1 year follow up.",
+        "journal": "Nutrients",
+        "pub_date": "2021-07-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "9696842",
+        "context": "The increase was particularly dramatic in elderly females (28.8 \u00b1 12.3 ng/mL to 37.7 \u00b1 18.6 ng/mL, p = 0.008).",
+        "journal": "Nutrients",
+        "pub_date": "2022-11-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8308738",
+        "context": "Although mean 25(OH)D levels constantly remained in recommended ranges (\u226550 nmol/L) during AN treatment, levels decreased from (in)patient admission to 1 year follow up.",
+        "journal": "Nutrients",
+        "pub_date": "2021-07-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "7513910",
+        "context": "Calcitriol levels, in fact, directly related with the levels of vitamin D (r = 0.175, p = 0.035), whereas an inverse linear relationship was observed with major inflammatory and metabolic markers of cardiovascular risk (C-reactive protein: r = \u22120.14, p = 0.076; uric acid: r = \u22120.18, p = 0.014; homocysteine: r = \u22120.19, p = 0.007; fibrinogen: r = \u22120.138, p = 0.05) and Lp-PLA2 (r = \u22120.167, p = 0.037), but not for leukocytes.",
+        "journal": "Nutrition, Metabolism, and Cardiovascular Diseases",
+        "pub_date": "2021-01-04",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8308738",
+        "context": "Although mean 25(OH)D levels constantly remained in recommended ranges (\u226550 nmol/L) during AN treatment, levels decreased from (in)patient admission to 1 year follow up.",
+        "journal": "Nutrients",
+        "pub_date": "2021-07-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "7284832",
+        "context": "Compared to the placebo, vitamin D3 treatment significantly increased the levels of 25(OH)D (\u22125 vs. 59 nmol/L, respectively, p < 0.00001)",
+        "journal": "Nutrients",
+        "pub_date": "2020-05-04",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8308738",
+        "context": "Although mean 25(OH)D levels constantly remained in recommended ranges (\u226550 nmol/L) during AN treatment, levels decreased from (in)patient admission to 1 year follow up.",
+        "journal": "Nutrients",
+        "pub_date": "2021-07-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "10819183",
+        "context": "The meta-analysis showed a significant increase in 25(OH)D blood levels after treatment in 10 studies, with an average standardized mean difference of 2.60 ng/mL (95% CI: 2.07 to 3.13).",
+        "journal": "Nutrients",
+        "pub_date": "2024-01-14",
+        "evidence_type": "meta_analysis",
+        "evidence_strength": 4
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8308738",
+        "context": "Although mean 25(OH)D levels constantly remained in recommended ranges (\u226550 nmol/L) during AN treatment, levels decreased from (in)patient admission to 1 year follow up.",
+        "journal": "Nutrients",
+        "pub_date": "2021-07-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "PMC12158240",
+        "context": "Vitamin D3 supplementation at 800 IU/day significantly improved vitamin D status...",
+        "journal": "Nutrients",
+        "pub_date": "2025-05-30",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8308738",
+        "context": "Although mean 25(OH)D levels constantly remained in recommended ranges (\u226550 nmol/L) during AN treatment, levels decreased from (in)patient admission to 1 year follow up.",
+        "journal": "Nutrients",
+        "pub_date": "2021-07-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12348430",
+        "context": "The 25(OH)D concentration increased in both groups (\u03c93VDCa group: 19.4 ng/mL vs. 44.0 ng/mL, p < 0.0001; VDCa group: 15.3 ng/mL vs. 42.8 ng/mL, p = 0.018) and remained significantly higher at 12 weeks.",
+        "journal": "Nutrients",
+        "pub_date": "2025-07-31",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8308738",
+        "context": "Although mean 25(OH)D levels constantly remained in recommended ranges (\u226550 nmol/L) during AN treatment, levels decreased from (in)patient admission to 1 year follow up.",
+        "journal": "Nutrients",
+        "pub_date": "2021-07-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12430293",
+        "context": "After only 3 months of supplementation, the increase in 25(OH)D concentrations was significantly associated with a remission status",
+        "journal": "Nutrients",
+        "pub_date": "2025-08-31",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8308738",
+        "context": "Although mean 25(OH)D levels constantly remained in recommended ranges (\u226550 nmol/L) during AN treatment, levels decreased from (in)patient admission to 1 year follow up.",
+        "journal": "Nutrients",
+        "pub_date": "2021-07-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12608287",
+        "context": "Following supplementation, serum 25(OH)D increased from 15.77 \u00b1 5.21 to 31.24 \u00b1 7.87 ng/mL (p = 0.031) in Orthodox nuns.",
+        "journal": "Nutrients",
+        "pub_date": "2025-10-28",
+        "evidence_type": "",
+        "evidence_strength": 1
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8308738",
+        "context": "Although mean 25(OH)D levels constantly remained in recommended ranges (\u226550 nmol/L) during AN treatment, levels decreased from (in)patient admission to 1 year follow up.",
+        "journal": "Nutrients",
+        "pub_date": "2021-07-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12899947",
+        "context": "Baseline vitamin D concentrations of 22.6 ng/mL (controls) did not change significantly (2 months: 22.2; 1 year: 21.7; 2 years: 22.0; 3 years: 23.8; 4 years: 21.8; and 5 years: 22.1 ng/mL), while concentrations of 21.9 ng/mL (intervention group) reached and remained 40 ng/mL (2 months: 41.0; 1 year: 39.4; 2 years: 39.0; 3 years: 39.3; 4 years: 40.4; and 5 years: 39.4 ng/mL).",
+        "journal": "Nutrients",
+        "pub_date": "2026-02-01",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8308738",
+        "context": "Although mean 25(OH)D levels constantly remained in recommended ranges (\u226550 nmol/L) during AN treatment, levels decreased from (in)patient admission to 1 year follow up.",
+        "journal": "Nutrients",
+        "pub_date": "2021-07-09",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "PMC9965411",
+        "context": "25(OH)D serum levels relate to clinical characteristics, symptoms, or habits in women after their BS",
+        "journal": "Nutrients",
+        "pub_date": "2023-02-04",
+        "evidence_type": "cohort",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8470504",
+        "context": "the MetS+ RA patients exhibited significantly lower serum 25-hydroxyvitamin D [25(OH)D] concentrations",
+        "journal": "Nutrients",
+        "pub_date": "2021-09-11",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "9696842",
+        "context": "The increase was particularly dramatic in elderly females (28.8 \u00b1 12.3 ng/mL to 37.7 \u00b1 18.6 ng/mL, p = 0.008).",
+        "journal": "Nutrients",
+        "pub_date": "2022-11-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8470504",
+        "context": "the MetS+ RA patients exhibited significantly lower serum 25-hydroxyvitamin D [25(OH)D] concentrations",
+        "journal": "Nutrients",
+        "pub_date": "2021-09-11",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "7513910",
+        "context": "Calcitriol levels, in fact, directly related with the levels of vitamin D (r = 0.175, p = 0.035), whereas an inverse linear relationship was observed with major inflammatory and metabolic markers of cardiovascular risk (C-reactive protein: r = \u22120.14, p = 0.076; uric acid: r = \u22120.18, p = 0.014; homocysteine: r = \u22120.19, p = 0.007; fibrinogen: r = \u22120.138, p = 0.05) and Lp-PLA2 (r = \u22120.167, p = 0.037), but not for leukocytes.",
+        "journal": "Nutrition, Metabolism, and Cardiovascular Diseases",
+        "pub_date": "2021-01-04",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8470504",
+        "context": "the MetS+ RA patients exhibited significantly lower serum 25-hydroxyvitamin D [25(OH)D] concentrations",
+        "journal": "Nutrients",
+        "pub_date": "2021-09-11",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "7284832",
+        "context": "Compared to the placebo, vitamin D3 treatment significantly increased the levels of 25(OH)D (\u22125 vs. 59 nmol/L, respectively, p < 0.00001)",
+        "journal": "Nutrients",
+        "pub_date": "2020-05-04",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8470504",
+        "context": "the MetS+ RA patients exhibited significantly lower serum 25-hydroxyvitamin D [25(OH)D] concentrations",
+        "journal": "Nutrients",
+        "pub_date": "2021-09-11",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "10819183",
+        "context": "The meta-analysis showed a significant increase in 25(OH)D blood levels after treatment in 10 studies, with an average standardized mean difference of 2.60 ng/mL (95% CI: 2.07 to 3.13).",
+        "journal": "Nutrients",
+        "pub_date": "2024-01-14",
+        "evidence_type": "meta_analysis",
+        "evidence_strength": 4
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8470504",
+        "context": "the MetS+ RA patients exhibited significantly lower serum 25-hydroxyvitamin D [25(OH)D] concentrations",
+        "journal": "Nutrients",
+        "pub_date": "2021-09-11",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "PMC12158240",
+        "context": "Vitamin D3 supplementation at 800 IU/day significantly improved vitamin D status...",
+        "journal": "Nutrients",
+        "pub_date": "2025-05-30",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8470504",
+        "context": "the MetS+ RA patients exhibited significantly lower serum 25-hydroxyvitamin D [25(OH)D] concentrations",
+        "journal": "Nutrients",
+        "pub_date": "2021-09-11",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12348430",
+        "context": "The 25(OH)D concentration increased in both groups (\u03c93VDCa group: 19.4 ng/mL vs. 44.0 ng/mL, p < 0.0001; VDCa group: 15.3 ng/mL vs. 42.8 ng/mL, p = 0.018) and remained significantly higher at 12 weeks.",
+        "journal": "Nutrients",
+        "pub_date": "2025-07-31",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8470504",
+        "context": "the MetS+ RA patients exhibited significantly lower serum 25-hydroxyvitamin D [25(OH)D] concentrations",
+        "journal": "Nutrients",
+        "pub_date": "2021-09-11",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12430293",
+        "context": "After only 3 months of supplementation, the increase in 25(OH)D concentrations was significantly associated with a remission status",
+        "journal": "Nutrients",
+        "pub_date": "2025-08-31",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8470504",
+        "context": "the MetS+ RA patients exhibited significantly lower serum 25-hydroxyvitamin D [25(OH)D] concentrations",
+        "journal": "Nutrients",
+        "pub_date": "2021-09-11",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12608287",
+        "context": "Following supplementation, serum 25(OH)D increased from 15.77 \u00b1 5.21 to 31.24 \u00b1 7.87 ng/mL (p = 0.031) in Orthodox nuns.",
+        "journal": "Nutrients",
+        "pub_date": "2025-10-28",
+        "evidence_type": "",
+        "evidence_strength": 1
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8470504",
+        "context": "the MetS+ RA patients exhibited significantly lower serum 25-hydroxyvitamin D [25(OH)D] concentrations",
+        "journal": "Nutrients",
+        "pub_date": "2021-09-11",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12899947",
+        "context": "Baseline vitamin D concentrations of 22.6 ng/mL (controls) did not change significantly (2 months: 22.2; 1 year: 21.7; 2 years: 22.0; 3 years: 23.8; 4 years: 21.8; and 5 years: 22.1 ng/mL), while concentrations of 21.9 ng/mL (intervention group) reached and remained 40 ng/mL (2 months: 41.0; 1 year: 39.4; 2 years: 39.0; 3 years: 39.3; 4 years: 40.4; and 5 years: 39.4 ng/mL).",
+        "journal": "Nutrients",
+        "pub_date": "2026-02-01",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "8470504",
+        "context": "the MetS+ RA patients exhibited significantly lower serum 25-hydroxyvitamin D [25(OH)D] concentrations",
+        "journal": "Nutrients",
+        "pub_date": "2021-09-11",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "total cholesterol",
+      "subject_labels": [
+        "Biomarker"
+      ],
+      "object": "pancreatic cancer",
+      "object_labels": [
+        "Disease"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "9696583",
+        "context": "Compared with those with total cholesterol levels consistently below 240 mg/dL over the entire period, the OR of pancreatic cancer was 1.89 (0.95\u20133.75) for recent-resolved hypercholesterolemia.",
+        "journal": "Nutrients",
+        "pub_date": "2022-11-21",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "9696583",
+        "context": "Compared with those with total cholesterol levels consistently below 240 mg/dL over the entire period, the OR of pancreatic cancer was 0.45 (0.20\u20131.03) for participants with recent-onset hypercholesterolemia.",
+        "journal": "Nutrients",
+        "pub_date": "2022-11-21",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "PMC9965411",
+        "context": "25(OH)D serum levels relate to clinical characteristics, symptoms, or habits in women after their BS",
+        "journal": "Nutrients",
+        "pub_date": "2023-02-04",
+        "evidence_type": "cohort",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "FDA_ANDA206094",
+        "context": "In a one-year clinical trial, 25-hydroxyvitamin D (normal range 10 to 55 ng/mL) fell from 39 \u00b1 22 ng/mL to 34 \u00b1 22 ng/mL (p<0.01) with sevelamer hydrochloride treatment.",
+        "journal": "FDA Drug Label",
+        "pub_date": "2025-04-01",
+        "evidence_type": "clinical_trial",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "9696842",
+        "context": "The increase was particularly dramatic in elderly females (28.8 \u00b1 12.3 ng/mL to 37.7 \u00b1 18.6 ng/mL, p = 0.008).",
+        "journal": "Nutrients",
+        "pub_date": "2022-11-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "FDA_ANDA206094",
+        "context": "In a one-year clinical trial, 25-hydroxyvitamin D (normal range 10 to 55 ng/mL) fell from 39 \u00b1 22 ng/mL to 34 \u00b1 22 ng/mL (p<0.01) with sevelamer hydrochloride treatment.",
+        "journal": "FDA Drug Label",
+        "pub_date": "2025-04-01",
+        "evidence_type": "clinical_trial",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "7513910",
+        "context": "Calcitriol levels, in fact, directly related with the levels of vitamin D (r = 0.175, p = 0.035), whereas an inverse linear relationship was observed with major inflammatory and metabolic markers of cardiovascular risk (C-reactive protein: r = \u22120.14, p = 0.076; uric acid: r = \u22120.18, p = 0.014; homocysteine: r = \u22120.19, p = 0.007; fibrinogen: r = \u22120.138, p = 0.05) and Lp-PLA2 (r = \u22120.167, p = 0.037), but not for leukocytes.",
+        "journal": "Nutrition, Metabolism, and Cardiovascular Diseases",
+        "pub_date": "2021-01-04",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "FDA_ANDA206094",
+        "context": "In a one-year clinical trial, 25-hydroxyvitamin D (normal range 10 to 55 ng/mL) fell from 39 \u00b1 22 ng/mL to 34 \u00b1 22 ng/mL (p<0.01) with sevelamer hydrochloride treatment.",
+        "journal": "FDA Drug Label",
+        "pub_date": "2025-04-01",
+        "evidence_type": "clinical_trial",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "7284832",
+        "context": "Compared to the placebo, vitamin D3 treatment significantly increased the levels of 25(OH)D (\u22125 vs. 59 nmol/L, respectively, p < 0.00001)",
+        "journal": "Nutrients",
+        "pub_date": "2020-05-04",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "FDA_ANDA206094",
+        "context": "In a one-year clinical trial, 25-hydroxyvitamin D (normal range 10 to 55 ng/mL) fell from 39 \u00b1 22 ng/mL to 34 \u00b1 22 ng/mL (p<0.01) with sevelamer hydrochloride treatment.",
+        "journal": "FDA Drug Label",
+        "pub_date": "2025-04-01",
+        "evidence_type": "clinical_trial",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "10819183",
+        "context": "The meta-analysis showed a significant increase in 25(OH)D blood levels after treatment in 10 studies, with an average standardized mean difference of 2.60 ng/mL (95% CI: 2.07 to 3.13).",
+        "journal": "Nutrients",
+        "pub_date": "2024-01-14",
+        "evidence_type": "meta_analysis",
+        "evidence_strength": 4
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "FDA_ANDA206094",
+        "context": "In a one-year clinical trial, 25-hydroxyvitamin D (normal range 10 to 55 ng/mL) fell from 39 \u00b1 22 ng/mL to 34 \u00b1 22 ng/mL (p<0.01) with sevelamer hydrochloride treatment.",
+        "journal": "FDA Drug Label",
+        "pub_date": "2025-04-01",
+        "evidence_type": "clinical_trial",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "PMC12158240",
+        "context": "Vitamin D3 supplementation at 800 IU/day significantly improved vitamin D status...",
+        "journal": "Nutrients",
+        "pub_date": "2025-05-30",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "FDA_ANDA206094",
+        "context": "In a one-year clinical trial, 25-hydroxyvitamin D (normal range 10 to 55 ng/mL) fell from 39 \u00b1 22 ng/mL to 34 \u00b1 22 ng/mL (p<0.01) with sevelamer hydrochloride treatment.",
+        "journal": "FDA Drug Label",
+        "pub_date": "2025-04-01",
+        "evidence_type": "clinical_trial",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12348430",
+        "context": "The 25(OH)D concentration increased in both groups (\u03c93VDCa group: 19.4 ng/mL vs. 44.0 ng/mL, p < 0.0001; VDCa group: 15.3 ng/mL vs. 42.8 ng/mL, p = 0.018) and remained significantly higher at 12 weeks.",
+        "journal": "Nutrients",
+        "pub_date": "2025-07-31",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "FDA_ANDA206094",
+        "context": "In a one-year clinical trial, 25-hydroxyvitamin D (normal range 10 to 55 ng/mL) fell from 39 \u00b1 22 ng/mL to 34 \u00b1 22 ng/mL (p<0.01) with sevelamer hydrochloride treatment.",
+        "journal": "FDA Drug Label",
+        "pub_date": "2025-04-01",
+        "evidence_type": "clinical_trial",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12430293",
+        "context": "After only 3 months of supplementation, the increase in 25(OH)D concentrations was significantly associated with a remission status",
+        "journal": "Nutrients",
+        "pub_date": "2025-08-31",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "FDA_ANDA206094",
+        "context": "In a one-year clinical trial, 25-hydroxyvitamin D (normal range 10 to 55 ng/mL) fell from 39 \u00b1 22 ng/mL to 34 \u00b1 22 ng/mL (p<0.01) with sevelamer hydrochloride treatment.",
+        "journal": "FDA Drug Label",
+        "pub_date": "2025-04-01",
+        "evidence_type": "clinical_trial",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12608287",
+        "context": "Following supplementation, serum 25(OH)D increased from 15.77 \u00b1 5.21 to 31.24 \u00b1 7.87 ng/mL (p = 0.031) in Orthodox nuns.",
+        "journal": "Nutrients",
+        "pub_date": "2025-10-28",
+        "evidence_type": "",
+        "evidence_strength": 1
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "FDA_ANDA206094",
+        "context": "In a one-year clinical trial, 25-hydroxyvitamin D (normal range 10 to 55 ng/mL) fell from 39 \u00b1 22 ng/mL to 34 \u00b1 22 ng/mL (p<0.01) with sevelamer hydrochloride treatment.",
+        "journal": "FDA Drug Label",
+        "pub_date": "2025-04-01",
+        "evidence_type": "clinical_trial",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12899947",
+        "context": "Baseline vitamin D concentrations of 22.6 ng/mL (controls) did not change significantly (2 months: 22.2; 1 year: 21.7; 2 years: 22.0; 3 years: 23.8; 4 years: 21.8; and 5 years: 22.1 ng/mL), while concentrations of 21.9 ng/mL (intervention group) reached and remained 40 ng/mL (2 months: 41.0; 1 year: 39.4; 2 years: 39.0; 3 years: 39.3; 4 years: 40.4; and 5 years: 39.4 ng/mL).",
+        "journal": "Nutrients",
+        "pub_date": "2026-02-01",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "FDA_ANDA206094",
+        "context": "In a one-year clinical trial, 25-hydroxyvitamin D (normal range 10 to 55 ng/mL) fell from 39 \u00b1 22 ng/mL to 34 \u00b1 22 ng/mL (p<0.01) with sevelamer hydrochloride treatment.",
+        "journal": "FDA Drug Label",
+        "pub_date": "2025-04-01",
+        "evidence_type": "clinical_trial",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "hiv protease inhibitors",
+      "subject_labels": [
+        "Drug"
+      ],
+      "object": "estrogen and/or progestin",
+      "object_labels": [
+        "Nutrient"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "FDA_ANDA206850",
+        "context": "In contrast, significant increases in systemic exposure of the estrogen and/or progestin have been noted when COCs are co-administered with certain other HIV protease inhibitors (e.g. indinavir and atazanavir/ritonavir)",
+        "journal": "FDA Drug Label",
+        "pub_date": "2024-07-02",
+        "evidence_type": "",
+        "evidence_strength": 1
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "FDA_ANDA206850",
+        "context": "Significant decreases in systemic exposure of the estrogen and/or progestin have been noted when COCs are co-administered with some HIV protease inhibitors (e.g., nelfinavir, ritonavir, darunavir/ritonavir, (fos)amprenavir/ritonavir, lopinavir/ritonavir, and tipranavir/ritonavir]",
+        "journal": "FDA Drug Label",
+        "pub_date": "2024-07-02",
+        "evidence_type": "",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "non-nucleoside reverse transcriptase inhibitors",
+      "subject_labels": [
+        "Drug"
+      ],
+      "object": "estrogen and/or progestin",
+      "object_labels": [
+        "Nutrient"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "FDA_ANDA206850",
+        "context": "In contrast, significant increases in systemic exposure of the estrogen and/or progestin have been noted when COCs are co-administered with certain other non-nucleoside reverse transcriptase inhibitors (e.g. etravirine).",
+        "journal": "FDA Drug Label",
+        "pub_date": "2024-07-02",
+        "evidence_type": "",
+        "evidence_strength": 1
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "FDA_ANDA206850",
+        "context": "Significant decreases in systemic exposure of the estrogen and/or progestin have been noted when COCs are co-administered with some non-nucleosidase reverse transcriptase inhibitors (e.g. nevirapine)",
+        "journal": "FDA Drug Label",
+        "pub_date": "2024-07-02",
+        "evidence_type": "",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "PMC9965411",
+        "context": "25(OH)D serum levels relate to clinical characteristics, symptoms, or habits in women after their BS",
+        "journal": "Nutrients",
+        "pub_date": "2023-02-04",
+        "evidence_type": "cohort",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11356988",
+        "context": "Inverse correlations were found between the vitamin D level (measured by circulating 25(OH)D) and mortality for all five types of cancer.",
+        "journal": "Nutrients",
+        "pub_date": "2024-08-15",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "9696842",
+        "context": "The increase was particularly dramatic in elderly females (28.8 \u00b1 12.3 ng/mL to 37.7 \u00b1 18.6 ng/mL, p = 0.008).",
+        "journal": "Nutrients",
+        "pub_date": "2022-11-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11356988",
+        "context": "Inverse correlations were found between the vitamin D level (measured by circulating 25(OH)D) and mortality for all five types of cancer.",
+        "journal": "Nutrients",
+        "pub_date": "2024-08-15",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "7513910",
+        "context": "Calcitriol levels, in fact, directly related with the levels of vitamin D (r = 0.175, p = 0.035), whereas an inverse linear relationship was observed with major inflammatory and metabolic markers of cardiovascular risk (C-reactive protein: r = \u22120.14, p = 0.076; uric acid: r = \u22120.18, p = 0.014; homocysteine: r = \u22120.19, p = 0.007; fibrinogen: r = \u22120.138, p = 0.05) and Lp-PLA2 (r = \u22120.167, p = 0.037), but not for leukocytes.",
+        "journal": "Nutrition, Metabolism, and Cardiovascular Diseases",
+        "pub_date": "2021-01-04",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11356988",
+        "context": "Inverse correlations were found between the vitamin D level (measured by circulating 25(OH)D) and mortality for all five types of cancer.",
+        "journal": "Nutrients",
+        "pub_date": "2024-08-15",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "7284832",
+        "context": "Compared to the placebo, vitamin D3 treatment significantly increased the levels of 25(OH)D (\u22125 vs. 59 nmol/L, respectively, p < 0.00001)",
+        "journal": "Nutrients",
+        "pub_date": "2020-05-04",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11356988",
+        "context": "Inverse correlations were found between the vitamin D level (measured by circulating 25(OH)D) and mortality for all five types of cancer.",
+        "journal": "Nutrients",
+        "pub_date": "2024-08-15",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "10819183",
+        "context": "The meta-analysis showed a significant increase in 25(OH)D blood levels after treatment in 10 studies, with an average standardized mean difference of 2.60 ng/mL (95% CI: 2.07 to 3.13).",
+        "journal": "Nutrients",
+        "pub_date": "2024-01-14",
+        "evidence_type": "meta_analysis",
+        "evidence_strength": 4
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11356988",
+        "context": "Inverse correlations were found between the vitamin D level (measured by circulating 25(OH)D) and mortality for all five types of cancer.",
+        "journal": "Nutrients",
+        "pub_date": "2024-08-15",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "PMC12158240",
+        "context": "Vitamin D3 supplementation at 800 IU/day significantly improved vitamin D status...",
+        "journal": "Nutrients",
+        "pub_date": "2025-05-30",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11356988",
+        "context": "Inverse correlations were found between the vitamin D level (measured by circulating 25(OH)D) and mortality for all five types of cancer.",
+        "journal": "Nutrients",
+        "pub_date": "2024-08-15",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12348430",
+        "context": "The 25(OH)D concentration increased in both groups (\u03c93VDCa group: 19.4 ng/mL vs. 44.0 ng/mL, p < 0.0001; VDCa group: 15.3 ng/mL vs. 42.8 ng/mL, p = 0.018) and remained significantly higher at 12 weeks.",
+        "journal": "Nutrients",
+        "pub_date": "2025-07-31",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11356988",
+        "context": "Inverse correlations were found between the vitamin D level (measured by circulating 25(OH)D) and mortality for all five types of cancer.",
+        "journal": "Nutrients",
+        "pub_date": "2024-08-15",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12430293",
+        "context": "After only 3 months of supplementation, the increase in 25(OH)D concentrations was significantly associated with a remission status",
+        "journal": "Nutrients",
+        "pub_date": "2025-08-31",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11356988",
+        "context": "Inverse correlations were found between the vitamin D level (measured by circulating 25(OH)D) and mortality for all five types of cancer.",
+        "journal": "Nutrients",
+        "pub_date": "2024-08-15",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12608287",
+        "context": "Following supplementation, serum 25(OH)D increased from 15.77 \u00b1 5.21 to 31.24 \u00b1 7.87 ng/mL (p = 0.031) in Orthodox nuns.",
+        "journal": "Nutrients",
+        "pub_date": "2025-10-28",
+        "evidence_type": "",
+        "evidence_strength": 1
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11356988",
+        "context": "Inverse correlations were found between the vitamin D level (measured by circulating 25(OH)D) and mortality for all five types of cancer.",
+        "journal": "Nutrients",
+        "pub_date": "2024-08-15",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12899947",
+        "context": "Baseline vitamin D concentrations of 22.6 ng/mL (controls) did not change significantly (2 months: 22.2; 1 year: 21.7; 2 years: 22.0; 3 years: 23.8; 4 years: 21.8; and 5 years: 22.1 ng/mL), while concentrations of 21.9 ng/mL (intervention group) reached and remained 40 ng/mL (2 months: 41.0; 1 year: 39.4; 2 years: 39.0; 3 years: 39.3; 4 years: 40.4; and 5 years: 39.4 ng/mL).",
+        "journal": "Nutrients",
+        "pub_date": "2026-02-01",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11356988",
+        "context": "Inverse correlations were found between the vitamin D level (measured by circulating 25(OH)D) and mortality for all five types of cancer.",
+        "journal": "Nutrients",
+        "pub_date": "2024-08-15",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "25(oh)d3",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12251007",
+        "context": "Intracellular concentrations were quantified through HPLC at various time points.",
+        "journal": "Nutrients",
+        "pub_date": "2025-06-25",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11085312",
+        "context": "At baseline, in months 3, 6, and 12, biochemical parameters including 25(OH)D3, total cholesterol, LDL cholesterol, HDL cholesterol, triglycerides, and homeostatic model assessment (HOMA index), the insulin resistance indicator were measured.",
+        "journal": "Nutrients",
+        "pub_date": "2024-04-25",
+        "evidence_type": "",
+        "evidence_strength": 1
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "PMC9965411",
+        "context": "25(OH)D serum levels relate to clinical characteristics, symptoms, or habits in women after their BS",
+        "journal": "Nutrients",
+        "pub_date": "2023-02-04",
+        "evidence_type": "cohort",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11396950",
+        "context": "Vitamin D deficiency (i.e., serum 25-hydroxyvitamin D (25(OH)D) \u2264 20 ng/mL)",
+        "journal": "Nutrients",
+        "pub_date": "2024-09-08",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "9696842",
+        "context": "The increase was particularly dramatic in elderly females (28.8 \u00b1 12.3 ng/mL to 37.7 \u00b1 18.6 ng/mL, p = 0.008).",
+        "journal": "Nutrients",
+        "pub_date": "2022-11-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11396950",
+        "context": "Vitamin D deficiency (i.e., serum 25-hydroxyvitamin D (25(OH)D) \u2264 20 ng/mL)",
+        "journal": "Nutrients",
+        "pub_date": "2024-09-08",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "7513910",
+        "context": "Calcitriol levels, in fact, directly related with the levels of vitamin D (r = 0.175, p = 0.035), whereas an inverse linear relationship was observed with major inflammatory and metabolic markers of cardiovascular risk (C-reactive protein: r = \u22120.14, p = 0.076; uric acid: r = \u22120.18, p = 0.014; homocysteine: r = \u22120.19, p = 0.007; fibrinogen: r = \u22120.138, p = 0.05) and Lp-PLA2 (r = \u22120.167, p = 0.037), but not for leukocytes.",
+        "journal": "Nutrition, Metabolism, and Cardiovascular Diseases",
+        "pub_date": "2021-01-04",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11396950",
+        "context": "Vitamin D deficiency (i.e., serum 25-hydroxyvitamin D (25(OH)D) \u2264 20 ng/mL)",
+        "journal": "Nutrients",
+        "pub_date": "2024-09-08",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "7284832",
+        "context": "Compared to the placebo, vitamin D3 treatment significantly increased the levels of 25(OH)D (\u22125 vs. 59 nmol/L, respectively, p < 0.00001)",
+        "journal": "Nutrients",
+        "pub_date": "2020-05-04",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11396950",
+        "context": "Vitamin D deficiency (i.e., serum 25-hydroxyvitamin D (25(OH)D) \u2264 20 ng/mL)",
+        "journal": "Nutrients",
+        "pub_date": "2024-09-08",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "10819183",
+        "context": "The meta-analysis showed a significant increase in 25(OH)D blood levels after treatment in 10 studies, with an average standardized mean difference of 2.60 ng/mL (95% CI: 2.07 to 3.13).",
+        "journal": "Nutrients",
+        "pub_date": "2024-01-14",
+        "evidence_type": "meta_analysis",
+        "evidence_strength": 4
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11396950",
+        "context": "Vitamin D deficiency (i.e., serum 25-hydroxyvitamin D (25(OH)D) \u2264 20 ng/mL)",
+        "journal": "Nutrients",
+        "pub_date": "2024-09-08",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "PMC12158240",
+        "context": "Vitamin D3 supplementation at 800 IU/day significantly improved vitamin D status...",
+        "journal": "Nutrients",
+        "pub_date": "2025-05-30",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11396950",
+        "context": "Vitamin D deficiency (i.e., serum 25-hydroxyvitamin D (25(OH)D) \u2264 20 ng/mL)",
+        "journal": "Nutrients",
+        "pub_date": "2024-09-08",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12348430",
+        "context": "The 25(OH)D concentration increased in both groups (\u03c93VDCa group: 19.4 ng/mL vs. 44.0 ng/mL, p < 0.0001; VDCa group: 15.3 ng/mL vs. 42.8 ng/mL, p = 0.018) and remained significantly higher at 12 weeks.",
+        "journal": "Nutrients",
+        "pub_date": "2025-07-31",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11396950",
+        "context": "Vitamin D deficiency (i.e., serum 25-hydroxyvitamin D (25(OH)D) \u2264 20 ng/mL)",
+        "journal": "Nutrients",
+        "pub_date": "2024-09-08",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12430293",
+        "context": "After only 3 months of supplementation, the increase in 25(OH)D concentrations was significantly associated with a remission status",
+        "journal": "Nutrients",
+        "pub_date": "2025-08-31",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11396950",
+        "context": "Vitamin D deficiency (i.e., serum 25-hydroxyvitamin D (25(OH)D) \u2264 20 ng/mL)",
+        "journal": "Nutrients",
+        "pub_date": "2024-09-08",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12608287",
+        "context": "Following supplementation, serum 25(OH)D increased from 15.77 \u00b1 5.21 to 31.24 \u00b1 7.87 ng/mL (p = 0.031) in Orthodox nuns.",
+        "journal": "Nutrients",
+        "pub_date": "2025-10-28",
+        "evidence_type": "",
+        "evidence_strength": 1
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11396950",
+        "context": "Vitamin D deficiency (i.e., serum 25-hydroxyvitamin D (25(OH)D) \u2264 20 ng/mL)",
+        "journal": "Nutrients",
+        "pub_date": "2024-09-08",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12899947",
+        "context": "Baseline vitamin D concentrations of 22.6 ng/mL (controls) did not change significantly (2 months: 22.2; 1 year: 21.7; 2 years: 22.0; 3 years: 23.8; 4 years: 21.8; and 5 years: 22.1 ng/mL), while concentrations of 21.9 ng/mL (intervention group) reached and remained 40 ng/mL (2 months: 41.0; 1 year: 39.4; 2 years: 39.0; 3 years: 39.3; 4 years: 40.4; and 5 years: 39.4 ng/mL).",
+        "journal": "Nutrients",
+        "pub_date": "2026-02-01",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "11396950",
+        "context": "Vitamin D deficiency (i.e., serum 25-hydroxyvitamin D (25(OH)D) \u2264 20 ng/mL)",
+        "journal": "Nutrients",
+        "pub_date": "2024-09-08",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "PMC9965411",
+        "context": "25(OH)D serum levels relate to clinical characteristics, symptoms, or habits in women after their BS",
+        "journal": "Nutrients",
+        "pub_date": "2023-02-04",
+        "evidence_type": "cohort",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "10223421",
+        "context": "COVID-19-pandemic-related home confinement aids in limiting the spread of the virus but restricts exposure to sunlight, thereby possibly affecting 25(OH)D concentrations.",
+        "journal": "Nutrients",
+        "pub_date": "2023-05-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "9696842",
+        "context": "The increase was particularly dramatic in elderly females (28.8 \u00b1 12.3 ng/mL to 37.7 \u00b1 18.6 ng/mL, p = 0.008).",
+        "journal": "Nutrients",
+        "pub_date": "2022-11-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "10223421",
+        "context": "COVID-19-pandemic-related home confinement aids in limiting the spread of the virus but restricts exposure to sunlight, thereby possibly affecting 25(OH)D concentrations.",
+        "journal": "Nutrients",
+        "pub_date": "2023-05-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "7513910",
+        "context": "Calcitriol levels, in fact, directly related with the levels of vitamin D (r = 0.175, p = 0.035), whereas an inverse linear relationship was observed with major inflammatory and metabolic markers of cardiovascular risk (C-reactive protein: r = \u22120.14, p = 0.076; uric acid: r = \u22120.18, p = 0.014; homocysteine: r = \u22120.19, p = 0.007; fibrinogen: r = \u22120.138, p = 0.05) and Lp-PLA2 (r = \u22120.167, p = 0.037), but not for leukocytes.",
+        "journal": "Nutrition, Metabolism, and Cardiovascular Diseases",
+        "pub_date": "2021-01-04",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "10223421",
+        "context": "COVID-19-pandemic-related home confinement aids in limiting the spread of the virus but restricts exposure to sunlight, thereby possibly affecting 25(OH)D concentrations.",
+        "journal": "Nutrients",
+        "pub_date": "2023-05-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "7284832",
+        "context": "Compared to the placebo, vitamin D3 treatment significantly increased the levels of 25(OH)D (\u22125 vs. 59 nmol/L, respectively, p < 0.00001)",
+        "journal": "Nutrients",
+        "pub_date": "2020-05-04",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "10223421",
+        "context": "COVID-19-pandemic-related home confinement aids in limiting the spread of the virus but restricts exposure to sunlight, thereby possibly affecting 25(OH)D concentrations.",
+        "journal": "Nutrients",
+        "pub_date": "2023-05-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "10819183",
+        "context": "The meta-analysis showed a significant increase in 25(OH)D blood levels after treatment in 10 studies, with an average standardized mean difference of 2.60 ng/mL (95% CI: 2.07 to 3.13).",
+        "journal": "Nutrients",
+        "pub_date": "2024-01-14",
+        "evidence_type": "meta_analysis",
+        "evidence_strength": 4
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "10223421",
+        "context": "COVID-19-pandemic-related home confinement aids in limiting the spread of the virus but restricts exposure to sunlight, thereby possibly affecting 25(OH)D concentrations.",
+        "journal": "Nutrients",
+        "pub_date": "2023-05-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "PMC12158240",
+        "context": "Vitamin D3 supplementation at 800 IU/day significantly improved vitamin D status...",
+        "journal": "Nutrients",
+        "pub_date": "2025-05-30",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "10223421",
+        "context": "COVID-19-pandemic-related home confinement aids in limiting the spread of the virus but restricts exposure to sunlight, thereby possibly affecting 25(OH)D concentrations.",
+        "journal": "Nutrients",
+        "pub_date": "2023-05-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12348430",
+        "context": "The 25(OH)D concentration increased in both groups (\u03c93VDCa group: 19.4 ng/mL vs. 44.0 ng/mL, p < 0.0001; VDCa group: 15.3 ng/mL vs. 42.8 ng/mL, p = 0.018) and remained significantly higher at 12 weeks.",
+        "journal": "Nutrients",
+        "pub_date": "2025-07-31",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "10223421",
+        "context": "COVID-19-pandemic-related home confinement aids in limiting the spread of the virus but restricts exposure to sunlight, thereby possibly affecting 25(OH)D concentrations.",
+        "journal": "Nutrients",
+        "pub_date": "2023-05-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12430293",
+        "context": "After only 3 months of supplementation, the increase in 25(OH)D concentrations was significantly associated with a remission status",
+        "journal": "Nutrients",
+        "pub_date": "2025-08-31",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "10223421",
+        "context": "COVID-19-pandemic-related home confinement aids in limiting the spread of the virus but restricts exposure to sunlight, thereby possibly affecting 25(OH)D concentrations.",
+        "journal": "Nutrients",
+        "pub_date": "2023-05-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12608287",
+        "context": "Following supplementation, serum 25(OH)D increased from 15.77 \u00b1 5.21 to 31.24 \u00b1 7.87 ng/mL (p = 0.031) in Orthodox nuns.",
+        "journal": "Nutrients",
+        "pub_date": "2025-10-28",
+        "evidence_type": "",
+        "evidence_strength": 1
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "10223421",
+        "context": "COVID-19-pandemic-related home confinement aids in limiting the spread of the virus but restricts exposure to sunlight, thereby possibly affecting 25(OH)D concentrations.",
+        "journal": "Nutrients",
+        "pub_date": "2023-05-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    },
+    {
+      "subject": "vitamin d",
+      "subject_labels": [
+        "Nutrient"
+      ],
+      "object": "vitamin d level",
+      "object_labels": [
+        "Biomarker"
+      ],
+      "predicate_a": "INCREASES_BIOMARKER",
+      "evidence_a": {
+        "source_id": "12899947",
+        "context": "Baseline vitamin D concentrations of 22.6 ng/mL (controls) did not change significantly (2 months: 22.2; 1 year: 21.7; 2 years: 22.0; 3 years: 23.8; 4 years: 21.8; and 5 years: 22.1 ng/mL), while concentrations of 21.9 ng/mL (intervention group) reached and remained 40 ng/mL (2 months: 41.0; 1 year: 39.4; 2 years: 39.0; 3 years: 39.3; 4 years: 40.4; and 5 years: 39.4 ng/mL).",
+        "journal": "Nutrients",
+        "pub_date": "2026-02-01",
+        "evidence_type": "RCT",
+        "evidence_strength": 5
+      },
+      "predicate_b": "DECREASES_BIOMARKER",
+      "evidence_b": {
+        "source_id": "10223421",
+        "context": "COVID-19-pandemic-related home confinement aids in limiting the spread of the virus but restricts exposure to sunlight, thereby possibly affecting 25(OH)D concentrations.",
+        "journal": "Nutrients",
+        "pub_date": "2023-05-17",
+        "evidence_type": "observational",
+        "evidence_strength": 3
+      }
+    }
+  ],
+  "summary_by_pair": {
+    "REDUCES_RISK_OF vs INCREASES_RISK_OF": 47,
+    "ALLEVIATES vs AGGRAVATES": 5,
+    "PREVENTS vs CAUSES": 3,
+    "TREATS vs CAUSES": 18,
+    "TREATS vs AGGRAVATES": 0,
+    "INCREASES_BIOMARKER vs DECREASES_BIOMARKER": 85
+  },
+  "total_contradictions": 158
+}

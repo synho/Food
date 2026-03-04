@@ -27,7 +27,11 @@ fetch:
                    "telomere", "epigenetic aging", "biological age",
                    "mitochondrial dysfunction", "cellular senescence",
                    "inflammaging", "autophagy", "mTOR", "NAD+",
-                   "caloric restriction", "intermittent fasting"]
+                   "caloric restriction", "intermittent fasting",
+                   "gut microbiome aging", "microbiota longevity",
+                   "centenarian microbiome", "gut dysbiosis aging",
+                   "intestinal permeability aging", "gut barrier aging",
+                   "postbiotic aging", "butyrate aging", "urolithin longevity"]
 
   # Drug-nutrient and food-drug interaction keywords (targets CONTRAINDICATED_WITH, COMPLEMENTS_DRUG gaps)
   drug_interaction_keywords:
@@ -142,6 +146,8 @@ fetch:
     - "Free Radic Biol Med"            # Free Radical Biology and Medicine — oxidative stress
     # Microbiome expansion
     - "Gut Microbes"                   # Gut Microbes — microbiome-diet interactions
+    - "Metabolomics"                   # Springer metabolomics — dietary metabolomics
+    - "mSystems"                       # ASM systems microbiology — microbiome-health
     # Oncology / Cancer
     - "J Clin Oncol"                   # Journal of Clinical Oncology — top cancer journal
     - "CA Cancer J Clin"               # CA: Cancer Journal for Clinicians — highest impact
@@ -203,14 +209,14 @@ smart_fetch:
     - "Nutr Metab Cardiovasc Dis"
     - "Nutr Cancer"
     - "J Acad Nutr Diet"
-  gap_threshold: 5             # entities with < N relationships = underrepresented
-  max_per_cluster: 25          # papers per topic cluster per run
+  gap_threshold: 8             # entities with < N relationships = underrepresented (raised from 5 — wider net)
+  max_per_cluster: 50          # papers per topic cluster per run (raised from 25 — double throughput)
   days_back: 2555              # 7-year window for maximum coverage
   use_mesh: true
 
   # Phase 1: KG-targeted gap query settings
-  max_gap_queries: 30          # total entity-targeted queries per smart-fetch
-  max_gap_queries_per_type: 8  # max queries per gap type
+  max_gap_queries: 50          # total entity-targeted queries per smart-fetch (raised from 30)
+  max_gap_queries_per_type: 12  # max queries per gap type (raised from 8)
 
   # Specialty journals — broad disease + nutrition coverage
   specialty_journals:

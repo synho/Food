@@ -11,6 +11,9 @@ from ontology import (
     ALL_PREDICATES,
     ENTITY_TYPES,
     CANONICAL_ENTITY_NAMES,
+    REJECT_ENTITY_TYPES,
+    WEAK_PREDICATES,
+    _PREDICATE_ALIASES,
 )
 
 
@@ -202,3 +205,203 @@ class TestCanonicalNames:
     def test_all_values_are_nonempty_strings(self):
         for k, v in CANONICAL_ENTITY_NAMES.items():
             assert isinstance(v, str) and v, f"Value for '{k}' is empty or not a string"
+
+
+# ── Non-standard type aliases (Phase 1B) ────────────────────────────────────
+
+class TestNonStandardTypeAliases:
+    """Verify the 22 non-standard types found in audit map correctly."""
+
+    def test_cell_to_bodysystem(self):
+        assert normalize_entity_type("Cell") == "BodySystem"
+        assert normalize_entity_type("CellType") == "BodySystem"
+        assert normalize_entity_type("CellPopulation") == "BodySystem"
+
+    def test_intervention_to_drug(self):
+        assert normalize_entity_type("Intervention") == "Drug"
+
+    def test_cognitive_function_to_symptom(self):
+        assert normalize_entity_type("Cognitive_Function") == "Symptom"
+        assert normalize_entity_type("cognitive function") == "Symptom"
+
+    def test_device_dosage_procedure_to_drug(self):
+        assert normalize_entity_type("Device") == "Drug"
+        assert normalize_entity_type("Dosage") == "Drug"
+        assert normalize_entity_type("Procedure") == "Drug"
+
+    def test_chemical_to_nutrient(self):
+        assert normalize_entity_type("Chemical") == "Nutrient"
+
+    def test_nutrient_deficiency_to_disease(self):
+        assert normalize_entity_type("Nutrient_Deficiency") == "Disease"
+        assert normalize_entity_type("nutrient deficiency") == "Disease"
+
+    def test_variant_to_biomarker(self):
+        assert normalize_entity_type("Variant") == "Biomarker"
+
+    def test_adverse_event_to_symptom(self):
+        assert normalize_entity_type("Adverse_Event") == "Symptom"
+        assert normalize_entity_type("adverse event") == "Symptom"
+
+    def test_lifestage_related_change(self):
+        assert normalize_entity_type("LifestageRelatedChange") == "AgeRelatedChange"
+
+    def test_property_to_biomarker(self):
+        assert normalize_entity_type("Property") == "Biomarker"
+
+
+# ── Reject entity types ─────────────────────────────────────────────────────
+
+class TestRejectEntityTypes:
+    """Types that should be rejected outright (returns None)."""
+
+    def test_task_rejected(self):
+        assert normalize_entity_type("Task") is None
+
+    def test_technology_rejected(self):
+        assert normalize_entity_type("Technology") is None
+
+    def test_organism_rejected(self):
+        assert normalize_entity_type("Organism") is None
+
+    def test_algorithm_rejected(self):
+        assert normalize_entity_type("Algorithm") is None
+
+    def test_material_rejected(self):
+        assert normalize_entity_type("Material") is None
+
+    def test_pathogen_rejected(self):
+        assert normalize_entity_type("Pathogen") is None
+
+    def test_healthcare_facility_rejected(self):
+        assert normalize_entity_type("HealthcareFacility") is None
+        assert normalize_entity_type("healthcare facility") is None
+
+
+# ── Predicate aliases (Phase 2B) ────────────────────────────────────────────
+
+class TestPredicateAliases:
+    """Verify LLM near-miss predicates are mapped to canonical predicates."""
+
+    def test_worsens_to_aggravates(self):
+        assert normalize_predicate("WORSENS") == "AGGRAVATES"
+
+    def test_improves_to_alleviates(self):
+        assert normalize_predicate("IMPROVES") == "ALLEVIATES"
+
+    def test_inhibits_to_targets_mechanism(self):
+        assert normalize_predicate("INHIBITS") == "TARGETS_MECHANISM"
+
+    def test_activates_to_targets_mechanism(self):
+        assert normalize_predicate("ACTIVATES") == "TARGETS_MECHANISM"
+
+    def test_modulates_to_targets_mechanism(self):
+        assert normalize_predicate("MODULATES") == "TARGETS_MECHANISM"
+
+    def test_promotes_to_increases_risk(self):
+        assert normalize_predicate("PROMOTES") == "INCREASES_RISK_OF"
+
+    def test_suppresses_to_reduces_risk(self):
+        assert normalize_predicate("SUPPRESSES") == "REDUCES_RISK_OF"
+
+    def test_mitigates_to_alleviates(self):
+        assert normalize_predicate("MITIGATES") == "ALLEVIATES"
+
+    def test_exacerbates_to_aggravates(self):
+        assert normalize_predicate("EXACERBATES") == "AGGRAVATES"
+
+    def test_protects_against_to_prevents(self):
+        assert normalize_predicate("PROTECTS_AGAINST") == "PREVENTS"
+
+    def test_is_component_of_to_contains(self):
+        assert normalize_predicate("IS_COMPONENT_OF") == "CONTAINS"
+
+    def test_marker_for_to_biomarker_for(self):
+        assert normalize_predicate("MARKER_FOR") == "BIOMARKER_FOR"
+
+    def test_indicates_to_biomarker_for(self):
+        assert normalize_predicate("INDICATES") == "BIOMARKER_FOR"
+
+    def test_lowercase_alias(self):
+        assert normalize_predicate("worsens") == "AGGRAVATES"
+        assert normalize_predicate("improves") == "ALLEVIATES"
+
+    def test_all_alias_targets_are_valid_predicates(self):
+        """Every alias target must be in ALL_PREDICATES."""
+        all_set = set(ALL_PREDICATES)
+        for alias, target in _PREDICATE_ALIASES.items():
+            assert target in all_set, f"Alias '{alias}' → '{target}' is not in ALL_PREDICATES"
+
+
+# ── Microbiome/Metabolite layer ──────────────────────────────────────────────
+
+class TestMicrobiomeMetaboliteLayer:
+    def test_microbiome_entity_type_direct(self):
+        assert normalize_entity_type("Microbiome") == "Microbiome"
+
+    def test_microbiome_entity_type_alias(self):
+        assert normalize_entity_type("microbiome") == "Microbiome"
+        assert normalize_entity_type("gut bacteria") == "Microbiome"
+        assert normalize_entity_type("microbial species") == "Microbiome"
+
+    def test_metabolite_entity_type_direct(self):
+        assert normalize_entity_type("Metabolite") == "Metabolite"
+
+    def test_metabolite_entity_type_alias(self):
+        assert normalize_entity_type("metabolite") == "Metabolite"
+        assert normalize_entity_type("microbial metabolite") == "Metabolite"
+        assert normalize_entity_type("scfa") == "Metabolite"
+        assert normalize_entity_type("postbiotic") == "Metabolite"
+
+    def test_produces_in_all_predicates(self):
+        assert "PRODUCES" in ALL_PREDICATES
+
+    def test_produces_normalize(self):
+        assert normalize_predicate("PRODUCES") == "PRODUCES"
+        assert normalize_predicate("GENERATES") == "PRODUCES"
+        assert normalize_predicate("FERMENTS_TO") == "PRODUCES"
+
+    def test_modulates_microbiome_in_all_predicates(self):
+        assert "MODULATES_MICROBIOME" in ALL_PREDICATES
+
+    def test_modulates_microbiome_normalize(self):
+        assert normalize_predicate("MODULATES_MICROBIOME") == "MODULATES_MICROBIOME"
+        assert normalize_predicate("ENRICHES") == "MODULATES_MICROBIOME"
+        assert normalize_predicate("DEPLETES") == "MODULATES_MICROBIOME"
+
+    def test_microbiome_canonical_akkermansia(self):
+        assert normalize_entity_name("akkermansia") == "Akkermansia muciniphila"
+        assert normalize_entity_name("akkermansia muciniphila") == "Akkermansia muciniphila"
+
+    def test_metabolite_canonical_butyrate(self):
+        assert normalize_entity_name("butyrate") == "Butyrate"
+        assert normalize_entity_name("butyric acid") == "Butyrate"
+
+    def test_metabolite_canonical_scfa(self):
+        assert normalize_entity_name("scfa") == "Short-chain fatty acids"
+        assert normalize_entity_name("short chain fatty acids") == "Short-chain fatty acids"
+
+    def test_metabolite_canonical_tmao(self):
+        assert normalize_entity_name("tmao") == "TMAO"
+        assert normalize_entity_name("trimethylamine n-oxide") == "TMAO"
+
+    def test_metabolite_canonical_urolithin(self):
+        assert normalize_entity_name("urolithin") == "Urolithin A"
+        assert normalize_entity_name("urolithin a") == "Urolithin A"
+
+
+# ── Weak predicates ─────────────────────────────────────────────────────────
+
+class TestWeakPredicates:
+    def test_ambiguous_predicates_fall_through_to_relates_to(self):
+        # These should normalize to RELATES_TO (not in ALL_PREDICATES, not in aliases)
+        assert normalize_predicate("ASSOCIATED_WITH") == "RELATES_TO"
+        assert normalize_predicate("LINKED_TO") == "RELATES_TO"
+        assert normalize_predicate("CORRELATED_WITH") == "RELATES_TO"
+
+    def test_weak_predicates_set_contents(self):
+        assert "RELATES_TO" in WEAK_PREDICATES
+        assert "AFFECTS" in WEAK_PREDICATES
+        assert "ASSOCIATED_WITH" in WEAK_PREDICATES
+        assert "LINKED_TO" in WEAK_PREDICATES
+        assert "CORRELATED_WITH" in WEAK_PREDICATES

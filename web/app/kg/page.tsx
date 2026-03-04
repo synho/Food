@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import { fetchKgStats, type KgStats } from "@/lib/api";
+import { fetchKgStats, fetchKgLive, type KgStats, type KgLive } from "@/lib/api";
 import {
   DonutChart,
   RingScore,
@@ -13,15 +13,20 @@ import {
 import { TrendChart } from "@/components/kg/TrendChart";
 import { PipelinePanel } from "@/components/kg/PipelinePanel";
 
-const AUTO_REFRESH_MS = 60_000;
+const FAST_REFRESH_MS = 15_000;
+const SLOW_REFRESH_MS = 60_000;
 
 export default function KgDashboardPage() {
   const [stats, setStats] = useState<KgStats | null>(null);
+  const [prevStats, setPrevStats] = useState<KgStats | null>(null);
+  const [live, setLive] = useState<KgLive | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [at, setAt] = useState<Date | null>(null);
   const [autoRefreshing, setAutoRefreshing] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const isActive = live?.active ?? false;
 
   const load = useCallback(async (isAuto = false) => {
     if (isAuto) {
@@ -31,8 +36,15 @@ export default function KgDashboardPage() {
     }
     setError(null);
     try {
-      const data = await fetchKgStats();
-      setStats(data);
+      const [data, liveData] = await Promise.all([
+        fetchKgStats(),
+        fetchKgLive().catch(() => null),
+      ]);
+      setStats((prev) => {
+        if (prev) setPrevStats(prev);
+        return data;
+      });
+      if (liveData) setLive(liveData);
       setAt(new Date());
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load KG stats");
@@ -42,11 +54,17 @@ export default function KgDashboardPage() {
     }
   }, []);
 
+  // Adaptive refresh: 15s when expansion active, 60s when idle
   useEffect(() => {
     load();
-    timerRef.current = setInterval(() => load(true), AUTO_REFRESH_MS);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [load]);
+
+  useEffect(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    const interval = isActive ? FAST_REFRESH_MS : SLOW_REFRESH_MS;
+    timerRef.current = setInterval(() => load(true), interval);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [load, isActive]);
 
   if (loading && !stats) {
     return (
@@ -72,6 +90,18 @@ export default function KgDashboardPage() {
   const labelEntries = Object.entries(byLabel).sort((a, b) => b[1] - a[1]) as [string, number][];
   const totalNodes = labelEntries.reduce((s, [, v]) => s + v, 0);
 
+  // Delta tracking
+  const prevNeo = prevStats?.neo4j;
+  const nodeDelta = (neo?.nodes != null && prevNeo?.nodes != null && !neoError)
+    ? neo.nodes - prevNeo.nodes : null;
+  const relDelta = (neo?.relationships != null && prevNeo?.relationships != null && !neoError)
+    ? neo.relationships - prevNeo.relationships : null;
+
+  const fmtDelta = (d: number | null) => {
+    if (d == null || d === 0) return null;
+    return d > 0 ? `+${d.toLocaleString()}` : d.toLocaleString();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-gray-950 dark:to-gray-900">
       {/* Header */}
@@ -86,6 +116,12 @@ export default function KgDashboardPage() {
             <span className="text-slate-300 dark:text-gray-600">|</span>
             <Link href="/kg/explore" className="rounded-lg bg-teal-600 px-3 py-1 text-sm font-medium text-white hover:bg-teal-700">Graph Explorer →</Link>
             <h1 className="text-xl font-semibold text-slate-800 dark:text-gray-100">Knowledge Graph — Status</h1>
+            {isActive && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                Expansion Active
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-3">
             {at && (
@@ -163,12 +199,14 @@ export default function KgDashboardPage() {
                   value={neo?.nodes != null ? neo.nodes.toLocaleString() : "—"}
                   sub={`across ${Object.keys(byLabel).length} entity types`}
                   accent="blue"
+                  delta={fmtDelta(nodeDelta)}
                 />
                 <StatCard
                   title="Total relationships"
                   value={neo?.relationships != null ? neo.relationships.toLocaleString() : "—"}
                   sub={`across ${Object.keys(byRelType).length} predicate types`}
                   accent="emerald"
+                  delta={fmtDelta(relDelta)}
                 />
                 {pipeline && (
                   <>
@@ -206,9 +244,16 @@ export default function KgDashboardPage() {
           <section className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
             <PipelinePanel />
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-              <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-gray-400">
-                KG Growth Trend
-              </h3>
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-gray-400">
+                  KG Growth Trend
+                </h3>
+                {isActive && (
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                    Updating every 5m
+                  </span>
+                )}
+              </div>
               <p className="mb-3 text-xs text-slate-400 dark:text-gray-500">Node and relationship counts over time</p>
               {trend && trend.length >= 2 ? (
                 <>
@@ -287,7 +332,8 @@ export default function KgDashboardPage() {
 
         {/* Auto-refresh indicator */}
         <p className="text-center text-xs text-slate-400 mb-4 dark:text-gray-500">
-          Auto-refresh every 60s
+          Auto-refresh every {isActive ? "15s" : "60s"}
+          {isActive && " (expansion active)"}
         </p>
       </main>
     </div>

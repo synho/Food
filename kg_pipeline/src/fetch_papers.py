@@ -34,13 +34,18 @@ def build_search_query(journals, days_back=30, topic_keywords=None, humans_only=
             base = f"({base}) AND ({terms})"
     return base
 
+
+# Max journals per PMC query batch — keeps URI under ~4000 chars to avoid 414 errors
+_MAX_JOURNALS_PER_BATCH = 30
+
+
 def search_pmc(query, max_results=100):
     """
     Searches PubMed Central and returns a list of PMCID.
     Uses NCBI_API_KEY env var if available (10 req/s vs 3 req/s).
     Retries with exponential backoff on 429.
     """
-    print(f"Searching PMC with query: {query}")
+    print(f"Searching PMC with query: {query[:200]}{'...' if len(query) > 200 else ''}")
     api_key = os.getenv("NCBI_API_KEY", "").strip()
     params = {
         "db": "pmc", "term": query, "retmode": "json",
@@ -65,6 +70,35 @@ def search_pmc(query, max_results=100):
         print(f"Found {len(id_list)} articles.")
         return id_list
     return []
+
+
+def search_pmc_batched(journals, days_back, max_results, topic_keywords=None, humans_only=True):
+    """
+    Split journals into batches of _MAX_JOURNALS_PER_BATCH and merge results.
+    Avoids 414 URI Too Long errors when the journal list is large.
+    """
+    if len(journals) <= _MAX_JOURNALS_PER_BATCH:
+        query = build_search_query(journals, days_back=days_back,
+                                   topic_keywords=topic_keywords, humans_only=humans_only)
+        return search_pmc(query, max_results=max_results)
+
+    all_ids: list[str] = []
+    seen: set[str] = set()
+    for i in range(0, len(journals), _MAX_JOURNALS_PER_BATCH):
+        batch = journals[i:i + _MAX_JOURNALS_PER_BATCH]
+        batch_num = i // _MAX_JOURNALS_PER_BATCH + 1
+        total_batches = (len(journals) + _MAX_JOURNALS_PER_BATCH - 1) // _MAX_JOURNALS_PER_BATCH
+        print(f"Journal batch {batch_num}/{total_batches} ({len(batch)} journals)...")
+        query = build_search_query(batch, days_back=days_back,
+                                   topic_keywords=topic_keywords, humans_only=humans_only)
+        ids = search_pmc(query, max_results=max_results)
+        for pid in ids:
+            if pid not in seen:
+                seen.add(pid)
+                all_ids.append(pid)
+        time.sleep(0.5)  # brief pause between batches
+    print(f"Batched search total: {len(all_ids)} unique articles from {len(journals)} journals.")
+    return all_ids
 
 def fetch_article_data(pmcid):
     """
@@ -138,8 +172,8 @@ def main():
     delay_sec = cfg.get("request_delay_sec", 1)
     raw_dir = paths["raw_papers"]
 
-    query = build_search_query(journals, days_back=days_back, topic_keywords=topic_keywords, humans_only=humans_only)
-    pmcids = search_pmc(query, max_results=max_results)
+    pmcids = search_pmc_batched(journals, days_back=days_back, max_results=max_results,
+                                topic_keywords=topic_keywords, humans_only=humans_only)
 
     # Track which source query discovered each PMCID (for manifest provenance)
     pmcid_sources: dict[str, list[str]] = {}  # pmcid → [source_labels]
@@ -150,8 +184,8 @@ def main():
 
     def _merge_query_results(label: str, keywords: list[str]) -> None:
         """Run a secondary PubMed query, merge+dedupe PMCIDs, track provenance."""
-        q = build_search_query(journals, days_back=days_back, topic_keywords=keywords, humans_only=humans_only)
-        results = search_pmc(q, max_results=max_results)
+        results = search_pmc_batched(journals, days_back=days_back, max_results=max_results,
+                                     topic_keywords=keywords, humans_only=humans_only)
         new_count = 0
         pmcids_by_source[label] = []
         for pid in results:

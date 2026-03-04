@@ -23,10 +23,20 @@ ENTITY_TYPES = [
     "Mechanism",
     "BiochemicalPathway",
     "PopulationGroup",
+    # Microbiome/Metabolite layer
+    "Microbiome",   # gut bacteria species, microbiota diversity, dysbiosis states
+    "Metabolite",   # gut-derived compounds: butyrate, urolithin A, TMAO, equol, SCFAs
 ]
 
 # Fast lookup set for normalize_entity_type (avoids .capitalize() destroying PascalCase)
 _ENTITY_TYPES_SET = set(ENTITY_TYPES)
+
+# Entity types that should be rejected outright (extraction noise, not health-relevant)
+REJECT_ENTITY_TYPES = {
+    "task", "technology", "organism", "algorithm", "material",
+    "pathogen", "healthcarefacility", "healthcare_facility", "healthcare facility",
+    "thing",  # catch-all for unclassified extraction noise
+}
 
 # Human-readable names that map to entity types (for extraction prompt and normalization)
 ENTITY_TYPE_ALIASES = {
@@ -139,6 +149,54 @@ ENTITY_TYPE_ALIASES = {
     "organ": "BodySystem",
     "organ system": "BodySystem",
     "organ_system": "BodySystem",
+    # ── Non-standard types found in KG audit → remapped ─────────────────────
+    "cell": "BodySystem",
+    "celltype": "BodySystem",
+    "cell_type": "BodySystem",
+    "cell type": "BodySystem",
+    "cellpopulation": "BodySystem",
+    "cell_population": "BodySystem",
+    "cell population": "BodySystem",
+    "intervention": "Drug",
+    "cognitive_function": "Symptom",
+    "cognitive function": "Symptom",
+    "cognitivefunction": "Symptom",
+    "device": "Drug",
+    "dosage": "Drug",
+    "chemical": "Nutrient",
+    "nutrient_deficiency": "Disease",
+    "nutrient deficiency": "Disease",
+    "nutrientdeficiency": "Disease",
+    "variant": "Biomarker",
+    "procedure": "Drug",
+    "adverse_event": "Symptom",
+    "adverse event": "Symptom",
+    "adverseevent": "Symptom",
+    "lifestagerelatedchange": "AgeRelatedChange",
+    "lifestage_related_change": "AgeRelatedChange",
+    "property": "Biomarker",
+    # Microbiome/Metabolite aliases
+    "microorganism": "Microbiome",
+    "gut bacteria": "Microbiome",
+    "gut_bacteria": "Microbiome",
+    "bacteria": "Microbiome",
+    "probiotic species": "Microbiome",
+    "probiotic_species": "Microbiome",
+    "microbial species": "Microbiome",
+    "microbial_species": "Microbiome",
+    "gut microbe": "Microbiome",
+    "gut_microbe": "Microbiome",
+    "metabolite": "Metabolite",
+    "microbial metabolite": "Metabolite",
+    "microbial_metabolite": "Metabolite",
+    "gut metabolite": "Metabolite",
+    "gut_metabolite": "Metabolite",
+    "short-chain fatty acid": "Metabolite",
+    "short_chain_fatty_acid": "Metabolite",
+    "scfa": "Metabolite",
+    "postbiotic": "Metabolite",
+    "dietary metabolite": "Metabolite",
+    "dietary_metabolite": "Metabolite",
 }
 
 # Allowed relationship types (predicates) for core + drug substitution
@@ -175,7 +233,40 @@ PREDICATES_MEDICAL = [
     "STUDIED_IN",              # ClinicalTrial → PopulationGroup
 ]
 
-ALL_PREDICATES = PREDICATES + PREDICATES_AGING + PREDICATES_MEDICAL
+# Microbiome/Metabolite layer predicates
+PREDICATES_MICROBIOME = [
+    "PRODUCES",              # Food|Microbiome → Metabolite
+    "MODULATES_MICROBIOME",  # Food|Nutrient → Microbiome
+]
+
+ALL_PREDICATES = PREDICATES + PREDICATES_AGING + PREDICATES_MEDICAL + PREDICATES_MICROBIOME
+
+# Predicate aliases — normalize common LLM near-misses before RELATES_TO fallback
+_PREDICATE_ALIASES = {
+    "WORSENS": "AGGRAVATES",
+    "IMPROVES": "ALLEVIATES",
+    "INHIBITS": "TARGETS_MECHANISM",
+    "ACTIVATES": "TARGETS_MECHANISM",
+    "MODULATES": "TARGETS_MECHANISM",
+    "REGULATES": "TARGETS_MECHANISM",
+    "PROMOTES": "INCREASES_RISK_OF",
+    "SUPPRESSES": "REDUCES_RISK_OF",
+    "MITIGATES": "ALLEVIATES",
+    "EXACERBATES": "AGGRAVATES",
+    "PROTECTS_AGAINST": "PREVENTS",
+    "IS_COMPONENT_OF": "CONTAINS",
+    "MARKER_FOR": "BIOMARKER_FOR",
+    "INDICATES": "BIOMARKER_FOR",
+    "ENRICHES": "MODULATES_MICROBIOME",
+    "DEPLETES": "MODULATES_MICROBIOME",
+    "GENERATES": "PRODUCES",
+    "FERMENTS_TO": "PRODUCES",
+    "INCREASES_ABUNDANCE": "MODULATES_MICROBIOME",
+    "DECREASES_ABUNDANCE": "MODULATES_MICROBIOME",
+}
+
+# Ambiguous predicates that should be rejected (no clear directionality)
+WEAK_PREDICATES = {"ASSOCIATED_WITH", "LINKED_TO", "CORRELATED_WITH", "RELATES_TO", "AFFECTS"}
 
 # Canonical entity names for normalization (variant -> canonical).
 # SYNC: keep in sync with server/canonical.py CANONICAL_ENTITY_NAMES.
@@ -651,6 +742,56 @@ CANONICAL_ENTITY_NAMES = {
     "haematologic system": "Blood",
     "adrenal glands": "Adrenal glands",
     "adrenal": "Adrenal glands",
+    # ── Microbiome entities ──────────────────────────────────────────────
+    "gut microbiota": "Gut microbiota",
+    "intestinal microbiota": "Gut microbiota",
+    "gut flora": "Gut microbiota",
+    "intestinal flora": "Gut microbiota",
+    "gut microbiota diversity": "Gut microbiota diversity",
+    "microbiota diversity": "Gut microbiota diversity",
+    "gut dysbiosis": "Gut dysbiosis",
+    "intestinal dysbiosis": "Gut dysbiosis",
+    "akkermansia muciniphila": "Akkermansia muciniphila",
+    "akkermansia": "Akkermansia muciniphila",
+    "lactobacillus rhamnosus": "Lactobacillus rhamnosus",
+    "lactobacillus acidophilus": "Lactobacillus acidophilus",
+    "lactobacillus plantarum": "Lactobacillus plantarum",
+    "lactobacillus": "Lactobacillus",
+    "bifidobacterium longum": "Bifidobacterium longum",
+    "bifidobacterium adolescentis": "Bifidobacterium adolescentis",
+    "bifidobacterium": "Bifidobacterium",
+    "faecalibacterium prausnitzii": "Faecalibacterium prausnitzii",
+    "faecalibacterium": "Faecalibacterium prausnitzii",
+    "roseburia intestinalis": "Roseburia intestinalis",
+    "firmicutes-to-bacteroidetes ratio": "Firmicutes-to-Bacteroidetes ratio",
+    "firmicutes/bacteroidetes ratio": "Firmicutes-to-Bacteroidetes ratio",
+    # ── Metabolite entities ──────────────────────────────────────────────
+    "butyrate": "Butyrate",
+    "butyric acid": "Butyrate",
+    "propionate": "Propionate",
+    "propionic acid": "Propionate",
+    "acetate": "Acetate",
+    "short-chain fatty acids": "Short-chain fatty acids",
+    "short chain fatty acids": "Short-chain fatty acids",
+    "scfa": "Short-chain fatty acids",
+    "scfas": "Short-chain fatty acids",
+    "urolithin a": "Urolithin A",
+    "urolithin": "Urolithin A",
+    "equol": "Equol",
+    "s-equol": "Equol",
+    "trimethylamine n-oxide": "TMAO",
+    "trimethylamine-n-oxide": "TMAO",
+    "tmao": "TMAO",
+    "indole-3-propionic acid": "Indole-3-propionic acid",
+    "secondary bile acids": "Secondary bile acids",
+    "deoxycholic acid": "Deoxycholic acid",
+    "lithocholic acid": "Lithocholic acid",
+    "ellagic acid": "Ellagic acid",
+    "postbiotic": "Postbiotic",
+    "postbiotics": "Postbiotic",
+    "indole": "Indole",
+    "phenylacetylglutamine": "Phenylacetylglutamine",
+    "hippuric acid": "Hippuric acid",
 }
 
 
@@ -670,7 +811,8 @@ def normalize_entity_name_for_merge(name: str) -> str:
 
 
 def normalize_entity_type(raw: str) -> str:
-    """Map extraction output to canonical entity label (Neo4j node label)."""
+    """Map extraction output to canonical entity label (Neo4j node label).
+    Returns None for types in REJECT_ENTITY_TYPES (extraction noise)."""
     if not raw or not isinstance(raw, str):
         return "Thing"
     trimmed = raw.strip()
@@ -678,6 +820,9 @@ def normalize_entity_type(raw: str) -> str:
     if trimmed in _ENTITY_TYPES_SET:
         return trimmed
     key = trimmed.replace(" ", "_").replace("-", "_").lower()
+    # Check reject list before aliases
+    if key in REJECT_ENTITY_TYPES:
+        return None
     if key in ENTITY_TYPE_ALIASES:
         return ENTITY_TYPE_ALIASES[key]
     # Fallback: capitalize first letter (preserves PascalCase unlike .capitalize())
@@ -686,11 +831,18 @@ def normalize_entity_type(raw: str) -> str:
 
 
 def normalize_predicate(raw: str) -> str:
-    """Map extraction output to canonical predicate (Neo4j relationship type)."""
+    """Map extraction output to canonical predicate (Neo4j relationship type).
+    Checks _PREDICATE_ALIASES before falling back to RELATES_TO."""
     if not raw or not isinstance(raw, str):
         return "RELATES_TO"
     p = raw.strip().upper().replace(" ", "_").replace("-", "_")
-    return p if p in ALL_PREDICATES else "RELATES_TO"  # Fix: was returning p in both branches (no-op)
+    if p in ALL_PREDICATES:
+        return p
+    # Check aliases before fallback
+    alias = _PREDICATE_ALIASES.get(p)
+    if alias:
+        return alias
+    return "RELATES_TO"
 
 
 def get_ontology_prompt_section(include_aging: bool = True) -> str:
@@ -725,4 +877,17 @@ Medical KG extraction rules:
   Extract: ClinicalTrial -STUDIED_IN-> PopulationGroup
 - When the text discusses biochemical pathways (glucose metabolism, lipid metabolism):
   Extract: Food/Nutrient -TARGETS_MECHANISM-> BiochemicalPathway
+
+Microbiome/Metabolite layer extraction rules:
+- Specific gut bacteria, microbiota species, or microbiome states → Microbiome type
+  Examples: "Akkermansia muciniphila", "Lactobacillus", "Gut microbiota", "Gut dysbiosis"
+  Extract: Food|Nutrient -MODULATES_MICROBIOME-> Microbiome
+  Extract: Microbiome -PRODUCES-> Metabolite
+- Gut-derived compounds (SCFAs, urolithins, secondary bile acids, postbiotics) → Metabolite type
+  Examples: "Butyrate", "Short-chain fatty acids", "Urolithin A", "TMAO", "Equol"
+  Extract: Food|Nutrient|Microbiome -PRODUCES-> Metabolite
+  Extract: Metabolite -REDUCES_RISK_OF|PREVENTS|CAUSES|INCREASES_RISK_OF-> Disease
+  Extract: Metabolite -TARGETS_MECHANISM-> Mechanism
+- Do NOT use Microbiome for the general concept "microbiome" as a process; that stays Mechanism.
+  Use Microbiome only for specific organisms or named community states (e.g. "Gut dysbiosis").
 """

@@ -34,7 +34,7 @@ class TestMedicalEntityTypes:
         assert "PopulationGroup" in ENTITY_TYPES
 
     def test_entity_type_count(self):
-        assert len(ENTITY_TYPES) == 15
+        assert len(ENTITY_TYPES) == 17  # +2 Microbiome, Metabolite
 
 
 class TestMedicalEntityTypeNormalization:
@@ -96,7 +96,7 @@ class TestMedicalPredicates:
             assert normalize_predicate(p) == p, f"Roundtrip failed for '{p}'"
 
     def test_predicate_count(self):
-        assert len(ALL_PREDICATES) == 22
+        assert len(ALL_PREDICATES) == 24  # +2 PRODUCES, MODULATES_MICROBIOME
 
 
 # ── Medical canonical names — Biomarkers ─────────────────────────────────────

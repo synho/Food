@@ -191,6 +191,39 @@ export async function fetchPipelineHistory(limit: number = 5): Promise<PipelineR
   return Array.isArray(data) ? data : data.runs ?? [];
 }
 
+/** Live expansion status for real-time dashboard. */
+export interface KgLive {
+  active: boolean;
+  started_at?: string;
+  corpus: {
+    raw_papers: number;
+    extracted: number;
+    backlog: number;
+  };
+  cycles: Array<{
+    cycle: number;
+    papers: number;
+    nodes_delta: number;
+    rels_delta: number;
+    total_nodes: number;
+    total_rels: number;
+    time: string;
+  }>;
+  processes: Array<{
+    pid: number;
+    cpu: string;
+    mem: string;
+    elapsed: string;
+    name: string;
+  }>;
+}
+
+export async function fetchKgLive(): Promise<KgLive> {
+  const res = await fetch(`${API}/api/kg/live`);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
 /** Food-chain multi-hop result: Food → Nutrient → Disease/Symptom */
 export interface FoodChainLink {
   nutrient: string;

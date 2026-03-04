@@ -19,10 +19,19 @@ Usage:
 """
 from __future__ import annotations
 
-from ontology import ENTITY_TYPES
+from ontology import ENTITY_TYPES, REJECT_ENTITY_TYPES, WEAK_PREDICATES
 
 # Set of valid entity types for fast lookup
 _VALID_ENTITY_TYPES = set(ENTITY_TYPES)
+
+# ── Known medical abbreviations that have canonical name mappings ─────────────
+# These pass the vague/length check even though they're short
+_ABBREVIATION_WHITELIST = {
+    "ra", "ms", "uc", "oa", "mi", "uv", "sle", "t1d", "gad",
+    "hba1c", "crp", "ldl", "hdl", "bmi", "tg", "crc", "amd",
+    "copd", "ptsd", "ckd", "mdd", "ibs", "cvd", "egfr",
+    "nafld", "gerd", "nsclc", "fbg", "sbp", "dbp", "a1c",
+}
 
 # ── Vague entity names to reject ─────────────────────────────────────────────
 _VAGUE = {
@@ -59,8 +68,8 @@ _EVIDENCE_STRENGTH: dict[str, int] = {
     "": 1,
 }
 
-# ── Low-value predicates (no specific relationship information) ───────────────
-_WEAK_PREDICATES = {"RELATES_TO", "AFFECTS"}
+# ── Low-value predicates — imported from ontology.WEAK_PREDICATES ─────────────
+_WEAK_PREDICATES = WEAK_PREDICATES
 
 
 def _evidence_strength(evidence_type: str) -> int:
@@ -70,9 +79,15 @@ def _evidence_strength(evidence_type: str) -> int:
 
 
 def _is_vague(name: str) -> bool:
-    if not name or len(name.strip()) < 3:
+    if not name or not name.strip():
         return True
-    return name.strip().lower() in _VAGUE
+    cleaned = name.strip().lower()
+    # Allow known medical abbreviations even if short
+    if cleaned in _ABBREVIATION_WHITELIST:
+        return False
+    if len(cleaned) < 3:
+        return True
+    return cleaned in _VAGUE
 
 
 def validate_and_score(
@@ -132,15 +147,25 @@ def validate_and_score(
             _reject(t, f"low-value predicate: {predicate}")
             continue
 
-        # 6. Entity type validation — reject types not in ontology
+        # 6. Entity type validation — reject types not in ontology or in reject list
         subject_type = (t.get("subject_type") or "").strip()
         object_type = (t.get("object_type") or "").strip()
-        if subject_type and subject_type not in _VALID_ENTITY_TYPES:
-            _reject(t, f"unknown subject_type: {subject_type}")
-            continue
-        if object_type and object_type not in _VALID_ENTITY_TYPES:
-            _reject(t, f"unknown object_type: {object_type}")
-            continue
+        if subject_type:
+            st_key = subject_type.replace(" ", "_").replace("-", "_").lower()
+            if st_key in REJECT_ENTITY_TYPES:
+                _reject(t, f"rejected subject_type: {subject_type}")
+                continue
+            if subject_type not in _VALID_ENTITY_TYPES:
+                _reject(t, f"unknown subject_type: {subject_type}")
+                continue
+        if object_type:
+            ot_key = object_type.replace(" ", "_").replace("-", "_").lower()
+            if ot_key in REJECT_ENTITY_TYPES:
+                _reject(t, f"rejected object_type: {object_type}")
+                continue
+            if object_type not in _VALID_ENTITY_TYPES:
+                _reject(t, f"unknown object_type: {object_type}")
+                continue
 
         # 7. Assign evidence strength
         t["evidence_strength"] = _evidence_strength(t.get("evidence_type", ""))

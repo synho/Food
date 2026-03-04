@@ -60,6 +60,10 @@ _FOOD_CHEM_JOURNALS = [
     "Food Chem", "J Food Compos Anal", "LWT", "Food Res Int",
     "Nutrients", "Br J Nutr", "J Nutr",
 ]
+_MICROBIOME_JOURNALS = [
+    "Microbiome", "Cell Host Microbe", "Gut Microbes",
+    "NPJ Biofilm Microbiomes", "Gut", "mSystems",
+] + _NUTRITION_JOURNALS
 
 
 @dataclass
@@ -82,6 +86,9 @@ class GapReport:
     biomarkers_no_food_link: list[str] = field(default_factory=list)
     diseases_no_biomarker: list[str] = field(default_factory=list)
     mechanisms_no_food: list[str] = field(default_factory=list)
+    # Microbiome/Metabolite layer gaps
+    microbiome_no_food_link: list[str] = field(default_factory=list)
+    metabolites_no_producer: list[str] = field(default_factory=list)
     generated_queries: list[GapQuery] = field(default_factory=list)
     as_of: str = ""
 
@@ -96,6 +103,8 @@ class GapReport:
             f"  Biomarkers w/o food link:       {len(self.biomarkers_no_food_link)}",
             f"  Diseases w/o biomarker:         {len(self.diseases_no_biomarker)}",
             f"  Mechanisms w/o food link:        {len(self.mechanisms_no_food)}",
+            f"  Microbiome w/o food link:       {len(self.microbiome_no_food_link)}",
+            f"  Metabolites w/o producer:       {len(self.metabolites_no_producer)}",
             f"  Generated targeted queries:     {len(self.generated_queries)}",
         ]
         return "\n".join(lines)
@@ -195,6 +204,22 @@ def _run_gap_queries(uri: str, user: str, pw: str, min_food_recs: int = 3) -> Op
             """)
             report.mechanisms_no_food = [r["name"] for r in rows if r["name"]]
 
+            # 9. Microbiome nodes with no MODULATES_MICROBIOME from Food/Nutrient
+            rows = s.run("""
+                MATCH (m:Microbiome)
+                WHERE NOT (:Food|Nutrient)-[:MODULATES_MICROBIOME]->(m)
+                RETURN m.name AS name ORDER BY name
+            """)
+            report.microbiome_no_food_link = [r["name"] for r in rows if r["name"]]
+
+            # 10. Metabolite nodes with no PRODUCES link from Food/Nutrient/Microbiome
+            rows = s.run("""
+                MATCH (m:Metabolite)
+                WHERE NOT (:Food|Nutrient|Microbiome)-[:PRODUCES]->(m)
+                RETURN m.name AS name ORDER BY name
+            """)
+            report.metabolites_no_producer = [r["name"] for r in rows if r["name"]]
+
     except Exception as e:
         print(f"Warning: gap query failed: {e}")
     finally:
@@ -232,6 +257,7 @@ def _build_queries(
     nutr_j = _journal_clause(_NUTRITION_JOURNALS)
     med_j = _journal_clause(_MEDICAL_JOURNALS)
     food_j = _journal_clause(_FOOD_CHEM_JOURNALS)
+    microbiome_j = _journal_clause(_MICROBIOME_JOURNALS)
 
     # Priority 1 (0 if demand-boosted) — Conditions with no food recommendations (most impactful)
     for name, count in report.conditions_no_food_recs[:max_per_type]:
@@ -357,6 +383,30 @@ def _build_queries(
         queries.append(GapQuery(
             entity=name, gap_type="mechanism_no_food", query=q, priority=2,
             hint=f"Mechanism {name} has no food targeting — find dietary modulators",
+        ))
+
+    # Priority 2 — Microbiome nodes with no food modulation link
+    for name in report.microbiome_no_food_link[:max_per_type]:
+        q = (
+            f'("{name}"[Title/Abstract] OR "{name}"[MeSH Terms]) '
+            f'AND (diet OR food OR nutrition OR "fermented food" OR prebiotic OR probiotic) '
+            f'AND {microbiome_j} AND {base_filters}'
+        )
+        queries.append(GapQuery(
+            entity=name, gap_type="microbiome_no_food", query=q, priority=2,
+            hint=f"Microbiome {name} has no food link — find dietary modulators",
+        ))
+
+    # Priority 2 — Metabolites with no producer link
+    for name in report.metabolites_no_producer[:max_per_type]:
+        q = (
+            f'("{name}"[Title/Abstract] OR "{name}"[MeSH Terms]) '
+            f'AND (produced OR fermented OR "food source" OR dietary OR "gut bacteria") '
+            f'AND {microbiome_j} AND {base_filters}'
+        )
+        queries.append(GapQuery(
+            entity=name, gap_type="metabolite_no_producer", query=q, priority=2,
+            hint=f"Metabolite {name} has no producer — find foods or bacteria that produce it",
         ))
 
     # Sort: priority ascending, then by entity name

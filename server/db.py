@@ -11,7 +11,7 @@ import json
 import os
 import sqlite3
 import threading
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from pathlib import Path
 
 _DB_PATH = Path(os.getenv(
@@ -164,14 +164,19 @@ def save_kg_snapshot(
     by_label: dict | None = None,
     by_relationship_type: dict | None = None,
 ) -> None:
-    """Save a KG stats snapshot (call once per stats request, at most daily)."""
+    """Save a KG stats snapshot.
+
+    Rate-limited to one snapshot per 5 minutes so the trend chart captures
+    intra-day growth during expansion cycles without flooding the table.
+    """
     c = _conn()
-    today = date.today().isoformat()
-    existing = c.execute(
-        "SELECT id FROM kg_stats WHERE recorded_at LIKE ?", (f"{today}%",)
+    # Skip if we already have a snapshot within the last 5 minutes
+    cutoff = (datetime.now() - timedelta(minutes=5)).isoformat()
+    recent = c.execute(
+        "SELECT id FROM kg_stats WHERE recorded_at > ?", (cutoff,)
     ).fetchone()
-    if existing:
-        return  # one snapshot per day
+    if recent:
+        return
     c.execute(
         """INSERT INTO kg_stats (recorded_at, total_nodes, total_relationships,
                                   by_label, by_relationship_type)

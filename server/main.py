@@ -150,7 +150,16 @@ def kg_stats():
             )
         except Exception:
             pass
-    out["trend"] = get_kg_trend(30)
+    # Map DB field names to frontend-expected names; reverse to chronological
+    trend_raw = get_kg_trend(90)
+    out["trend"] = [
+        {
+            "date": t["recorded_at"],
+            "nodes": t["total_nodes"],
+            "relationships": t["total_relationships"],
+        }
+        for t in reversed(trend_raw)
+    ]
     master_path = os.getenv("MASTER_GRAPH_PATH")
     if master_path and os.path.isfile(master_path):
         try:
@@ -167,6 +176,94 @@ def kg_stats():
         except Exception:
             pass
     return out
+
+
+@app.get("/api/kg/live")
+def kg_live():
+    """Live expansion metrics: process status, corpus counts, cycle history.
+
+    Reads from the filesystem (PID files, paper directories, expansion logs)
+    so the dashboard can show real-time progress during overnight runs.
+    """
+    import glob
+    import re
+    import subprocess
+    from pathlib import Path
+
+    kg_root = Path(__file__).resolve().parent.parent / "kg_pipeline"
+    data_root = kg_root / "data"
+    logs_dir = kg_root / "logs"
+    run_dir = kg_root / ".run"
+
+    result: dict = {"active": False, "corpus": {}, "cycles": [], "processes": []}
+
+    # ── Corpus counts ─────────────────────────────────────────────────────
+    raw_dir = data_root / "raw_papers"
+    ext_dir = data_root / "extracted_triples"
+    raw_count = len(list(raw_dir.glob("*.json"))) if raw_dir.is_dir() else 0
+    ext_count = len([f for f in ext_dir.glob("*_triples.json")]) if ext_dir.is_dir() else 0
+    result["corpus"] = {
+        "raw_papers": raw_count,
+        "extracted": ext_count,
+        "backlog": max(0, raw_count - ext_count),
+    }
+
+    # ── Process detection ─────────────────────────────────────────────────
+    try:
+        ps = subprocess.run(
+            ["ps", "aux"], capture_output=True, text=True, timeout=5,
+        )
+        procs = []
+        for line in ps.stdout.splitlines():
+            for name in ("watch_kg", "run_expansion", "run_overnight",
+                         "fetch_papers", "extract_triples", "smart_fetch",
+                         "ingest_to_neo4j", "run_pipeline"):
+                if name in line and "grep" not in line:
+                    parts = line.split()
+                    procs.append({
+                        "pid": int(parts[1]),
+                        "cpu": parts[2],
+                        "mem": parts[3],
+                        "elapsed": parts[9] if len(parts) > 9 else "",
+                        "name": name,
+                    })
+                    break
+        result["processes"] = procs
+        result["active"] = any(p["name"] in ("watch_kg", "run_expansion", "run_overnight") for p in procs)
+    except Exception:
+        pass
+
+    # ── Latest expansion cycle log ────────────────────────────────────────
+    cycle_logs = sorted(logs_dir.glob("expansion_cycles_*.log"), reverse=True)
+    if cycle_logs:
+        try:
+            text = cycle_logs[0].read_text()
+            cycles = []
+            for line in text.splitlines():
+                m = re.search(
+                    r"\[CYCLE\s+(\d+)\]\s+papers \+(\d+)\s+nodes \+(\d+)\s+rels \+(\d+)\s+total=(\d+) nodes / (\d+) rels",
+                    line,
+                )
+                if m:
+                    ts_match = re.match(r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})", line)
+                    cycles.append({
+                        "cycle": int(m.group(1)),
+                        "papers": int(m.group(2)),
+                        "nodes_delta": int(m.group(3)),
+                        "rels_delta": int(m.group(4)),
+                        "total_nodes": int(m.group(5)),
+                        "total_rels": int(m.group(6)),
+                        "time": ts_match.group(1) if ts_match else "",
+                    })
+            result["cycles"] = cycles[-20:]  # last 20 cycles
+            # Extract start time
+            start_match = re.search(r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*\[START\]", text)
+            if start_match:
+                result["started_at"] = start_match.group(1)
+        except Exception:
+            pass
+
+    return result
 
 
 @app.get("/api/kg/demand")

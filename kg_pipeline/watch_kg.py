@@ -52,15 +52,30 @@ def _handle_signal(sig, frame):
 # ── Subprocess helper ─────────────────────────────────────────────────────────
 
 def _run(cmd: list[str], timeout: int = 900) -> tuple[int, str]:
-    """Run a subprocess in kg_pipeline/, return (returncode, combined_output)."""
+    """Run a subprocess in kg_pipeline/, return (returncode, combined_output).
+
+    Uses a process group so timeout kills the entire tree (not just the
+    direct child), preventing orphaned grandchild processes.
+    """
     try:
-        r = subprocess.run(
+        proc = subprocess.Popen(
             cmd, cwd=str(ROOT),
-            capture_output=True, text=True, timeout=timeout,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            text=True, start_new_session=True,
         )
-        return r.returncode, (r.stdout + r.stderr).strip()
-    except subprocess.TimeoutExpired:
-        return -1, "timeout"
+        try:
+            stdout, stderr = proc.communicate(timeout=timeout)
+            return proc.returncode, (stdout + stderr).strip()
+        except subprocess.TimeoutExpired:
+            # Kill the entire process group
+            import os as _os
+            try:
+                _os.killpg(proc.pid, signal.SIGTERM)
+            except OSError:
+                pass
+            proc.kill()
+            proc.wait()
+            return -1, "timeout"
     except Exception as e:
         return -1, str(e)
 
@@ -240,10 +255,10 @@ def run_cycle(
 
     # ── Phase 1: Broad journal sweep ──────────────────────────────────────────
     if not gap_only:
-        print(f"\n  [1/2] Broad sweep  (26 journals × 2 yr window)…")
+        print(f"\n  [1/2] Broad sweep  (88 journals, batched)…")
         code, out = _run(
             [str(VENV_PYTHON), "run_pipeline.py"],
-            timeout=900,
+            timeout=3600,
         )
         broad_new = _parse_new_papers_fetch(out)
         triples    = _parse_valid_triples(out)
@@ -261,7 +276,7 @@ def run_cycle(
     print(f"\n  [2/2] Smart gap fetch  (entity-targeted PMC queries)…")
     code, out = _run(
         [str(VENV_PYTHON), "src/smart_fetch.py", "--gap-only"],
-        timeout=300,
+        timeout=600,
     )
     smart_new = _parse_new_papers_smart(out)
 
