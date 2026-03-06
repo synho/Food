@@ -1,0 +1,448 @@
+[
+  {
+    "timestamp": "2026-03-04T03:36:43.905516+00:00",
+    "total_nodes": 21430,
+    "total_relationships": 27163,
+    "unique_sources": 4929,
+    "node_counts_by_label": {
+      "Disease": 4570,
+      "Biomarker": 2932,
+      "LifestyleFactor": 2440,
+      "Mechanism": 2041,
+      "Drug": 2031,
+      "Symptom": 1482,
+      "Nutrient": 1058,
+      "Food": 933,
+      "AgeRelatedChange": 921,
+      "BodySystem": 873,
+      "PopulationGroup": 754,
+      "BiochemicalPathway": 523,
+      "Study": 393,
+      "ClinicalTrial": 241,
+      "LifeStage": 238
+    },
+    "nonstandard_labels": {},
+    "nonstandard_node_count": 0,
+    "duplicate_groups": 1239,
+    "duplicate_excess_nodes": 1587,
+    "weak_predicate_count": 0,
+    "weak_predicate_pct": 0.0,
+    "empty_journal_count": 4173,
+    "empty_journal_pct": 15.4,
+    "empty_evidence_type_count": 9254,
+    "empty_evidence_type_pct": 34.1,
+    "evidence_strength_distribution": {
+      "1": 12181,
+      "2": 2778,
+      "3": 9857,
+      "4": 434,
+      "5": 1913
+    },
+    "contradiction_count": 183,
+    "contradictions": [
+      {
+        "subject": "vitamin d",
+        "object": "hypovitaminosis d",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC11643912",
+        "source_b": "PMC9919642"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "hypovitaminosis d",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC11643912",
+        "source_b": "PMC12158240"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC11676626",
+        "source_b": "PMC9963378"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC11676626",
+        "source_b": "PMC12694000"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC11676626",
+        "source_b": "PMC12389060"
+      },
+      {
+        "subject": "100% juice",
+        "object": "disease",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "11723140",
+        "source_b": "11723140"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12171927",
+        "source_b": "PMC9963378"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12171927",
+        "source_b": "PMC12694000"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12171927",
+        "source_b": "PMC12389060"
+      },
+      {
+        "subject": "breakfast variety",
+        "object": "unhealthy dietary and lifestyle patterns",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12348111",
+        "source_b": "PMC12348111"
+      },
+      {
+        "subject": "tea",
+        "object": "liver cancer",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12389169",
+        "source_b": "PMC12389169"
+      },
+      {
+        "subject": "physical activity",
+        "object": "fried foods",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12566812",
+        "source_b": "PMC12566812"
+      },
+      {
+        "subject": "physical activity",
+        "object": "salty snacks",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12566812",
+        "source_b": "PMC12566812"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12567200",
+        "source_b": "PMC9963378"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12567200",
+        "source_b": "PMC12694000"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12567200",
+        "source_b": "PMC12389060"
+      },
+      {
+        "subject": "fruit and vegetable (fv) intake",
+        "object": "frailty",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12735815",
+        "source_b": "PMC12735815"
+      },
+      {
+        "subject": "calcium",
+        "object": "osteoporosis",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12788094",
+        "source_b": "PMC12844650"
+      },
+      {
+        "subject": "eaa density",
+        "object": "protein malnutrition",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12799415",
+        "source_b": "PMC12799415"
+      },
+      {
+        "subject": "therapeutic plasma exchange",
+        "object": "persistent asymptomatic hypocalcemia",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12819856",
+        "source_b": "PMC12819856"
+      },
+      {
+        "subject": "calcium",
+        "object": "osteoporosis",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12844650",
+        "source_b": "PMC12844650"
+      },
+      {
+        "subject": "treatment withdrawal and disease monitoring",
+        "object": "relapse",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12855600",
+        "source_b": "PMC12855600"
+      },
+      {
+        "subject": "educational attainment",
+        "object": "alzheimer's disease",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "12883339",
+        "source_b": "12883339"
+      },
+      {
+        "subject": "sensor-based devices",
+        "object": "burden on respondents and practitioners",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12887789",
+        "source_b": "PMC12887789"
+      },
+      {
+        "subject": "25-hydroxy-vitamin d",
+        "object": "covid-19",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC10097275",
+        "source_b": "PMC10097275"
+      },
+      {
+        "subject": "calcium",
+        "object": "osteoporosis",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12899934",
+        "source_b": "PMC12844650"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC7281985",
+        "source_b": "PMC9963378"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC7281985",
+        "source_b": "PMC12694000"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC7281985",
+        "source_b": "PMC12389060"
+      },
+      {
+        "subject": "coffee",
+        "object": "rheumatoid arthritis",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "9025922",
+        "source_b": "PMC11644016"
+      },
+      {
+        "subject": "physical activity",
+        "object": "non-communicable diseases",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "9367817",
+        "source_b": "PMC12472676"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "osteoporosis",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12910436",
+        "source_b": "PMC7196732"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "osteoporosis",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12910436",
+        "source_b": "PMC10574730"
+      },
+      {
+        "subject": "low gnri",
+        "object": "sarcopenia",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC8618310",
+        "source_b": "PMC8618310"
+      },
+      {
+        "subject": "serum 25(oh)d concentration",
+        "object": "major cardiovascular events",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "11547645",
+        "source_b": "11547645"
+      },
+      {
+        "subject": "fat intake",
+        "object": "obesity",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12859491",
+        "source_b": "PMC12859491"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC10948476",
+        "source_b": "PMC9963378"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC10948476",
+        "source_b": "PMC12694000"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC10948476",
+        "source_b": "PMC12389060"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12388922",
+        "source_b": "PMC9963378"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12388922",
+        "source_b": "PMC12694000"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12388922",
+        "source_b": "PMC12389060"
+      },
+      {
+        "subject": "solid tumors",
+        "object": "non-relapse mortality (nrm)",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12916414",
+        "source_b": "PMC12916414"
+      },
+      {
+        "subject": "ht use",
+        "object": "cataracts",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC7050793",
+        "source_b": "PMC7050793"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC11013822",
+        "source_b": "PMC9963378"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC11013822",
+        "source_b": "PMC12694000"
+      },
+      {
+        "subject": "vitamin d",
+        "object": "vitamin d deficiency",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC11013822",
+        "source_b": "PMC12389060"
+      },
+      {
+        "subject": "period circadian regulator 3 (per3)",
+        "object": "lung adenocarcinoma",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12644904",
+        "source_b": "PMC12644904"
+      },
+      {
+        "subject": "heparin locking frequency",
+        "object": "catheter dysfunction",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12918543",
+        "source_b": "PMC12918543"
+      },
+      {
+        "subject": "heparin locking frequency",
+        "object": "catheter-related bloodstream infections (crbsi)",
+        "predicate_a": "REDUCES_RISK_OF",
+        "predicate_b": "INCREASES_RISK_OF",
+        "source_a": "PMC12918543",
+        "source_b": "PMC12918543"
+      }
+    ],
+    "orphan_nodes": 0,
+    "missing_source_id_count": 0,
+    "source_id_coverage_pct": 100.0
+  }
+]
