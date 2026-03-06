@@ -43,6 +43,19 @@ _VAGUE = {
     "healthy individuals", "older adults", "young adults", "volunteers",
     "intervention group", "placebo group", "control", "intervention",
     "experimental group", "samples", "cases", "cohort", "body",
+    # Administrative/document artifacts (extraction noise)
+    "guidelines", "publications", "standards", "proof", "data",
+    "biological samples", "metabolite profiles",
+    # Overly generic biological groupings
+    "gram-negative bacteria", "gram-positive bacteria",
+    "bacteria", "microorganisms", "microbes", "organisms",
+    "lipids", "metabolites", "proteins", "compounds",
+    # Process/state descriptions (not entities)
+    "physiological states", "microbiome data",
+    "wide geographic distribution", "geographically distinct clades",
+    "microbial signals", "microbial signal-related genes",
+    "growth of beneficial taxa", "proliferation of beneficial bacteria",
+    "unique metabolomic effects", "downstream catabolites",
 }
 
 # ── Evidence type → strength score ───────────────────────────────────────────
